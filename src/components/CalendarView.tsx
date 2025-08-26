@@ -82,7 +82,12 @@ export default function CalendarView() {
           {incompleteTodos.length > 0 ? (
             <ul className="space-y-3">
               {incompleteTodos.map((todo) => (
-                <TodoItem key={todo.id} todo={todo} onUpdate={mutate} />
+                <TodoItem
+                  key={todo.id}
+                  todo={todo}
+                  todos={todos}
+                  mutate={mutate}
+                />
               ))}
             </ul>
           ) : (
@@ -98,7 +103,12 @@ export default function CalendarView() {
           {completedTodos.length > 0 ? (
             <ul className="space-y-3">
               {completedTodos.map((todo) => (
-                <TodoItem key={todo.id} todo={todo} onUpdate={mutate} />
+                <TodoItem
+                  key={todo.id}
+                  todo={todo}
+                  todos={todos}
+                  mutate={mutate}
+                />
               ))}
             </ul>
           ) : (

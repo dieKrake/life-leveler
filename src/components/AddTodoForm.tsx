@@ -1,12 +1,12 @@
-// src/components/AddTodoForm.tsx
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 import { format } from "date-fns";
+import { addHours } from "date-fns/addHours";
 import { CalendarIcon } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { Todo } from "@/types";
 
 import { Button } from "@/components/ui/button";
@@ -26,16 +26,23 @@ import {
 } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 
-// HIER IST DIE KORREKTUR: Keine Parameter für z.date und z.enum
-const formSchema = z.object({
-  title: z
-    .string()
-    .min(2, { message: "Der Titel muss mindestens 2 Zeichen lang sein." }),
-  dateTime: z.date(),
-  type: z.enum(["event", "task"]),
-});
+const formSchema = z
+  .object({
+    title: z
+      .string()
+      .min(2, { message: "Der Titel muss mindestens 2 Zeichen lang sein." }),
+    startDateTime: z.date(),
+    endDateTime: z.date(),
+    type: z.enum(["event", "task"]),
+  })
+  .refine((data) => data.endDateTime >= data.startDateTime, {
+    message: "Die Endzeit muss nach der Startzeit liegen.",
+    path: ["endDateTime"],
+  });
 
 type AddTodoFormProps = {
   onSuccess: (newTodo: Todo) => void;
@@ -43,6 +50,7 @@ type AddTodoFormProps = {
 
 export default function AddTodoForm({ onSuccess }: AddTodoFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const supabase = createClientComponentClient();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -51,6 +59,25 @@ export default function AddTodoForm({ onSuccess }: AddTodoFormProps) {
     },
   });
 
+  const taskType = useWatch({ control: form.control, name: "type" });
+  const startDateTimeValue = useWatch({
+    control: form.control,
+    name: "startDateTime",
+  });
+
+  useEffect(() => {
+    if (taskType === "task" && startDateTimeValue) {
+      if (
+        form.getValues("endDateTime")?.getTime() !==
+        startDateTimeValue.getTime()
+      ) {
+        form.setValue("endDateTime", startDateTimeValue, {
+          shouldValidate: true,
+        });
+      }
+    }
+  }, [taskType, startDateTimeValue, form]);
+
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsSubmitting(true);
     try {
@@ -58,12 +85,19 @@ export default function AddTodoForm({ onSuccess }: AddTodoFormProps) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          ...values,
-          dateTime: values.dateTime.toISOString(),
+          title: values.title,
+          startDateTime: values.startDateTime.toISOString(),
+          endDateTime: values.endDateTime.toISOString(),
+          type: values.type,
         }),
       });
 
       if (!response.ok) {
+        if (response.status === 401) {
+          await supabase.auth.signOut();
+          window.location.href = "/login";
+          return;
+        }
         throw new Error("Fehler beim Erstellen des Todos.");
       }
 
@@ -78,7 +112,7 @@ export default function AddTodoForm({ onSuccess }: AddTodoFormProps) {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         <FormField
           control={form.control}
           name="title"
@@ -95,13 +129,13 @@ export default function AddTodoForm({ onSuccess }: AddTodoFormProps) {
 
         <FormField
           control={form.control}
-          name="dateTime"
+          name="startDateTime"
           render={({ field }) => (
             <FormItem className="flex flex-col">
-              <FormLabel>Datum und Uhrzeit</FormLabel>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <FormControl>
+              <FormLabel>Start</FormLabel>
+              <FormControl>
+                <Popover>
+                  <PopoverTrigger asChild>
                     <Button
                       variant={"outline"}
                       className={cn(
@@ -116,35 +150,116 @@ export default function AddTodoForm({ onSuccess }: AddTodoFormProps) {
                       )}
                       <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                     </Button>
-                  </FormControl>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={field.value}
-                    onSelect={field.onChange}
-                    initialFocus
-                  />
-                  <div className="p-3 border-t border-border">
-                    <Input
-                      type="time"
-                      defaultValue={format(field.value || new Date(), "HH:mm")}
-                      onChange={(e) => {
-                        const [hours, minutes] = e.target.value
-                          .split(":")
-                          .map(Number);
-                        const newDate = new Date(field.value || new Date());
-                        newDate.setHours(hours, minutes);
-                        field.onChange(newDate);
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={field.value}
+                      onSelect={(date) => {
+                        field.onChange(date);
+                        if (date) {
+                          const currentType = form.getValues("type");
+                          if (currentType === "event") {
+                            form.setValue("endDateTime", addHours(date, 1));
+                          } else {
+                            form.setValue("endDateTime", date);
+                          }
+                        }
                       }}
+                      initialFocus
                     />
-                  </div>
-                </PopoverContent>
-              </Popover>
+                    <div className="p-3 border-t border-border">
+                      <Input
+                        type="time"
+                        defaultValue={format(
+                          field.value || new Date(),
+                          "HH:mm"
+                        )}
+                        onChange={(e) => {
+                          const [hours, minutes] = e.target.value
+                            .split(":")
+                            .map(Number);
+                          const newDate = new Date(field.value || new Date());
+                          newDate.setHours(hours, minutes);
+                          field.onChange(newDate);
+                        }}
+                      />
+                    </div>
+                  </PopoverContent>
+                </Popover>
+              </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
+
+        {taskType === "event" && (
+          <FormField
+            control={form.control}
+            name="endDateTime"
+            render={({ field }) => (
+              <FormItem className="flex flex-col">
+                <FormLabel>Ende</FormLabel>
+                <FormControl>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant={"outline"}
+                        className={cn(
+                          "pl-3 text-left font-normal",
+                          !field.value && "text-muted-foreground"
+                        )}
+                      >
+                        {field.value ? (
+                          format(field.value, "PPP HH:mm")
+                        ) : (
+                          <span>Wähle ein Datum</span>
+                        )}
+                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={field.value}
+                        onSelect={field.onChange}
+                        initialFocus
+                        disabled={(date) => {
+                          const startDate = form.getValues("startDateTime");
+                          return startDate
+                            ? date < new Date(startDate.toDateString())
+                            : false;
+                        }}
+                      />
+                      <div className="p-3 border-t border-border">
+                        <Input
+                          type="time"
+                          defaultValue={format(
+                            field.value ||
+                              addHours(
+                                form.getValues("startDateTime") || new Date(),
+                                1
+                              ),
+                            "HH:mm"
+                          )}
+                          onChange={(e) => {
+                            const [hours, minutes] = e.target.value
+                              .split(":")
+                              .map(Number);
+                            const newDate = new Date(field.value || new Date());
+                            newDate.setHours(hours, minutes);
+                            field.onChange(newDate);
+                          }}
+                        />
+                      </div>
+                    </PopoverContent>
+                  </Popover>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        )}
 
         <FormField
           control={form.control}
@@ -158,18 +273,18 @@ export default function AddTodoForm({ onSuccess }: AddTodoFormProps) {
                   defaultValue={field.value}
                   className="flex space-x-4"
                 >
-                  <FormItem className="flex items-center space-x-2">
-                    <FormControl>
-                      <RadioGroupItem value="event" />
-                    </FormControl>
-                    <FormLabel className="font-normal">Termin</FormLabel>
-                  </FormItem>
-                  <FormItem className="flex items-center space-x-2">
-                    <FormControl>
-                      <RadioGroupItem value="task" />
-                    </FormControl>
-                    <FormLabel className="font-normal">Aufgabe</FormLabel>
-                  </FormItem>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="event" id="type-event" />
+                    <Label htmlFor="type-event" className="font-normal">
+                      Termin
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="task" id="type-task" />
+                    <Label htmlFor="type-task" className="font-normal">
+                      Aufgabe
+                    </Label>
+                  </div>
                 </RadioGroup>
               </FormControl>
               <FormMessage />

@@ -1,19 +1,19 @@
-// app/api/create-todo/route.ts
 import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
-// Validierungsschema für die eingehenden Daten
 const createTodoSchema = z.object({
   title: z.string().min(1, "Titel ist erforderlich."),
-  dateTime: z.string().datetime(),
+  startDateTime: z.string().datetime(),
+  endDateTime: z.string().datetime(),
   type: z.enum(["event", "task"]),
 });
 
 export async function POST(request: Request) {
   const cookieStore = cookies();
   const supabase = createRouteHandlerClient({ cookies: () => cookieStore });
+
   const {
     data: { session },
   } = await supabase.auth.getSession();
@@ -24,27 +24,26 @@ export async function POST(request: Request) {
     );
   }
 
-  const body = await request.json();
-  const validation = createTodoSchema.safeParse(body);
-  if (!validation.success) {
-    return NextResponse.json(
-      { error: validation.error.format() },
-      { status: 400 }
-    );
-  }
-
-  const { title, dateTime, type } = validation.data;
-  let newTodoFromDb = null;
-
   try {
+    const body = await request.json();
+    const validation = createTodoSchema.safeParse(body);
+    if (!validation.success) {
+      return NextResponse.json(
+        { error: validation.error.format() },
+        { status: 400 }
+      );
+    }
+
+    const { title, startDateTime, endDateTime, type } = validation.data;
+    let newTodoFromDb = null;
+
     if (type === "event") {
-      // --- Google Calendar Event erstellen ---
       const calendarApiUrl =
         "https://www.googleapis.com/calendar/v3/calendars/primary/events";
       const eventBody = {
         summary: title,
-        start: { dateTime: dateTime },
-        end: { dateTime: dateTime }, // Für ein einfaches Todo setzen wir Start- und Endzeit gleich
+        start: { dateTime: startDateTime },
+        end: { dateTime: endDateTime },
       };
 
       const response = await fetch(calendarApiUrl, {
@@ -56,8 +55,10 @@ export async function POST(request: Request) {
         body: JSON.stringify(eventBody),
       });
 
-      if (!response.ok)
+      if (!response.ok) {
+        console.error("Google Calendar API Error:", await response.json());
         throw new Error("Fehler beim Erstellen des Google Calendar Events");
+      }
 
       const newGoogleEvent = await response.json();
       const { data, error } = await supabase
@@ -75,12 +76,11 @@ export async function POST(request: Request) {
       if (error) throw error;
       newTodoFromDb = data;
     } else if (type === "task") {
-      // --- Google Task erstellen ---
       const tasksApiUrl =
         "https://www.googleapis.com/tasks/v1/lists/@default/tasks";
       const taskBody = {
         title: title,
-        due: dateTime,
+        due: startDateTime,
       };
 
       const response = await fetch(tasksApiUrl, {
@@ -92,8 +92,10 @@ export async function POST(request: Request) {
         body: JSON.stringify(taskBody),
       });
 
-      if (!response.ok)
+      if (!response.ok) {
+        console.error("Google Tasks API Error:", await response.json());
         throw new Error("Fehler beim Erstellen des Google Tasks");
+      }
 
       const newGoogleTask = await response.json();
       const { data, error } = await supabase

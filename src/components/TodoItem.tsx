@@ -1,4 +1,3 @@
-// src/components/TodoItem.tsx
 "use client";
 
 import { useState, useEffect } from "react";
@@ -9,11 +8,11 @@ import { KeyedMutator } from "swr";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { formatTodoDate } from "@/lib/dateUtils";
-import DeleteTodoButton from "./DeleteTodoButton"; // Importieren
+import DeleteTodoButton from "./DeleteTodoButton";
 
 type TodoItemProps = {
   todo: Todo;
-  todos: Todo[] | undefined; // Hinzugefügt für optimistisches Update
+  todos: Todo[] | undefined;
   mutate: KeyedMutator<Todo[]>;
 };
 
@@ -27,15 +26,40 @@ export default function TodoItem({ todo, todos, mutate }: TodoItemProps) {
 
   const handleToggleComplete = async (checked: boolean) => {
     setIsChecked(checked);
-    const { error } = await supabase
-      .from("todos")
-      .update({ is_completed: checked })
-      .eq("id", todo.id);
-    if (error) {
-      console.error("Fehler beim Aktualisieren des Todos:", error);
-      setIsChecked(!checked);
+
+    // NEUE LOGIK: Wir unterscheiden zwischen "erledigen" und "rückgängig machen"
+    if (checked) {
+      // ---- FALL 1: Aufgabe wird als erledigt markiert ----
+
+      // Rufe die Datenbank-Funktion auf, die XP vergibt und das Todo aktualisiert
+      const { error } = await supabase.rpc("complete_todo", {
+        todo_id: todo.id,
+      });
+
+      if (error) {
+        console.error("Fehler beim Erledigen des Todos:", error);
+        setIsChecked(false); // Bei Fehler zurücksetzen
+      } else {
+        // Lade die gesamte Seite neu. Das aktualisiert die Todos-Liste
+        // UND die PlayerStatsBar mit den neuen XP.
+        window.location.reload();
+      }
     } else {
-      mutate();
+      // ---- FALL 2: Das Erledigen wird rückgängig gemacht ----
+      // Hier werden keine XP vergeben, wir machen nur ein einfaches Update.
+
+      const { error } = await supabase
+        .from("todos")
+        .update({ is_completed: false })
+        .eq("id", todo.id);
+
+      if (error) {
+        console.error("Fehler beim Rückgängigmachen des Todos:", error);
+        setIsChecked(true); // Bei Fehler zurücksetzen
+      } else {
+        // Hier reicht ein 'mutate', da sich die XP nicht ändern.
+        mutate();
+      }
     }
   };
 

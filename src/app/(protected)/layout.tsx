@@ -1,4 +1,6 @@
 // app/(protected)/layout.tsx
+import Navbar from "@/components/Navbar";
+import PlayerStatsBar from "@/components/PlayerStatsBar";
 import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
@@ -37,5 +39,10 @@ export default async function ProtectedLayout({
     redirect("/auth/logout");
   }
 
-  return <>{children}</>;
+  return (
+    <div className="flex flex-col min-h-screen">
+      <PlayerStatsBar /> {/* NEU: Hier wird die Leiste eingefügt */}
+      <main>{children}</main>
+    </div>
+  );
 }

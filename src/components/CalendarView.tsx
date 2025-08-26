@@ -10,10 +10,9 @@ import AddTodoSheet from "./AddTodoSheet";
 
 export default function CalendarView() {
   const [isSyncing, setIsSyncing] = useState(false);
-  const [isSheetOpen, setIsSheetOpen] = useState(false); // State für das Sheet
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
   const supabase = createClientComponentClient();
 
-  // Ruft die schnelle Lese-Route auf, um Daten aus der DB anzuzeigen
   const {
     data: todos,
     error,
@@ -21,7 +20,6 @@ export default function CalendarView() {
     mutate,
   } = useSWR<Todo[]>("/api/get-todos");
 
-  // Filtert die Todos in zwei separate Listen für die Anzeige
   const incompleteTodos = useMemo(
     () => todos?.filter((todo) => !todo.is_completed) || [],
     [todos]
@@ -31,13 +29,11 @@ export default function CalendarView() {
     [todos]
   );
 
-  // Löst die Synchronisierung mit Google aus
   const handleSync = async () => {
     setIsSyncing(true);
     try {
       const response = await fetch("/api/sync-events", { method: "POST" });
 
-      // Reagiert auf Fehler, insbesondere auf einen abgelaufenen Token (401)
       if (!response.ok) {
         if (response.status === 401) {
           await supabase.auth.signOut();
@@ -46,7 +42,6 @@ export default function CalendarView() {
         throw new Error("Synchronisierung fehlgeschlagen");
       }
 
-      // Bei Erfolg: Weist SWR an, die Daten neu zu laden, um die UI zu aktualisieren
       mutate();
     } catch (err) {
       console.error("Fehler bei der Synchronisierung:", err);
@@ -64,7 +59,7 @@ export default function CalendarView() {
 
   return (
     <div className="w-full space-y-8">
-      <div className="flex justify-end">
+      <div className="flex flex-col md:flex-row justify-end gap-2">
         <Button onClick={() => setIsSheetOpen(true)}>Todo hinzufügen</Button>
         <Button onClick={handleSync} disabled={isSyncing}>
           {isSyncing

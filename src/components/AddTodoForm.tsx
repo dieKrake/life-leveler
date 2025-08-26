@@ -115,6 +115,37 @@ export default function AddTodoForm({ onSuccess }: AddTodoFormProps) {
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         <FormField
           control={form.control}
+          name="type"
+          render={({ field }) => (
+            <FormItem className="space-y-3">
+              <FormLabel>Typ</FormLabel>
+              <FormControl>
+                <RadioGroup
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                  className="flex space-x-4"
+                >
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="event" id="type-event" />
+                    <Label htmlFor="type-event" className="font-normal">
+                      Termin
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="task" id="type-task" />
+                    <Label htmlFor="type-task" className="font-normal">
+                      Aufgabe
+                    </Label>
+                  </div>
+                </RadioGroup>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
           name="title"
           render={({ field }) => (
             <FormItem>
@@ -260,37 +291,6 @@ export default function AddTodoForm({ onSuccess }: AddTodoFormProps) {
             )}
           />
         )}
-
-        <FormField
-          control={form.control}
-          name="type"
-          render={({ field }) => (
-            <FormItem className="space-y-3">
-              <FormLabel>Typ</FormLabel>
-              <FormControl>
-                <RadioGroup
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                  className="flex space-x-4"
-                >
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="event" id="type-event" />
-                    <Label htmlFor="type-event" className="font-normal">
-                      Termin
-                    </Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="task" id="type-task" />
-                    <Label htmlFor="type-task" className="font-normal">
-                      Aufgabe
-                    </Label>
-                  </div>
-                </RadioGroup>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
 
         <Button type="submit" disabled={isSubmitting}>
           {isSubmitting ? "Speichere..." : "Todo erstellen"}

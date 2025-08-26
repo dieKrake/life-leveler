@@ -2,7 +2,6 @@
 "use client";
 
 import { SWRConfig } from "swr";
-import { useRouter } from "next/navigation";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 
 export default function SWRProvider({
@@ -10,7 +9,6 @@ export default function SWRProvider({
 }: {
   children: React.ReactNode;
 }) {
-  const router = useRouter();
   const supabase = createClientComponentClient();
 
   return (

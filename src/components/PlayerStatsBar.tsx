@@ -1,34 +1,49 @@
 // src/components/PlayerStatsBar.tsx
-import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
-import { cookies } from "next/headers";
+"use client";
 
-export default async function PlayerStatsBar() {
-  const cookieStore = cookies();
-  const supabase = createServerComponentClient({ cookies: () => cookieStore });
+import useSWR from "swr";
+import { getXpForNextLevel } from "@/lib/leveling";
+import { Progress } from "@/components/ui/progress";
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+// Typ-Definition für die Stats
+type PlayerStats = {
+  xp: number;
+  level: number;
+};
 
-  if (!user) {
-    return null;
+export default function PlayerStatsBar() {
+  // Rufe die neue API-Route mit SWR ab
+  const { data: stats, isLoading } = useSWR<PlayerStats>("/api/player-stats");
+
+  // Während die Daten laden oder falls sie nicht vorhanden sind, zeige einen Ladezustand an
+  if (isLoading || !stats) {
+    return (
+      <div className="w-full bg-muted border-b">
+        <div className="container flex items-center h-12 text-sm text-muted-foreground">
+          Lade Stats...
+        </div>
+      </div>
+    );
   }
 
-  const { data: stats } = await supabase
-    .from("player_stats")
-    .select("xp, level")
-    .single();
+  const { level, xp } = stats;
+  const xpForNextLevel = getXpForNextLevel(level);
+  const progressPercentage = (xp / xpForNextLevel) * 100;
 
   return (
-    <div className="w-full bg-muted">
-      <div className="container flex items-center h-10 text-sm">
-        <div className="flex gap-6">
-          <span>
-            <strong>Level:</strong> {stats?.level ?? 1}
-          </span>
-          <span>
-            <strong>XP:</strong> {stats?.xp ?? 0}
-          </span>
+    <div className="w-full bg-muted border-b">
+      <div className="container flex items-center h-12 text-sm text-muted-foreground">
+        <div className="flex items-center gap-6 w-full">
+          <span className="font-bold">Level {level}</span>
+          <div className="flex-1 max-w-xs">
+            <div className="flex justify-between text-xs mb-1">
+              <span>XP</span>
+              <span>
+                {xp} / {xpForNextLevel}
+              </span>
+            </div>
+            <Progress value={progressPercentage} className="h-2" />
+          </div>
         </div>
       </div>
     </div>

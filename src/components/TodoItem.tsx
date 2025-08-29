@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import type { Todo } from "@/types";
-import { KeyedMutator } from "swr";
+import { KeyedMutator, useSWRConfig } from "swr"; // useSWRConfig importieren
 
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
@@ -13,12 +13,15 @@ import DeleteTodoButton from "./DeleteTodoButton";
 type TodoItemProps = {
   todo: Todo;
   todos: Todo[] | undefined;
-  mutate: KeyedMutator<Todo[]>;
+  mutate: KeyedMutator<Todo[]>; // Dies ist die 'lokale' mutate für die Todo-Liste
 };
 
 export default function TodoItem({ todo, todos, mutate }: TodoItemProps) {
   const supabase = createClientComponentClient();
   const [isChecked, setIsChecked] = useState(todo.is_completed);
+
+  // NEU: Zugriff auf die globale SWR-Konfiguration und ihre mutate-Funktion
+  const { mutate: globalMutate } = useSWRConfig();
 
   useEffect(() => {
     setIsChecked(todo.is_completed);
@@ -27,27 +30,23 @@ export default function TodoItem({ todo, todos, mutate }: TodoItemProps) {
   const handleToggleComplete = async (checked: boolean) => {
     setIsChecked(checked);
 
-    // NEUE LOGIK: Wir unterscheiden zwischen "erledigen" und "rückgängig machen"
     if (checked) {
-      // ---- FALL 1: Aufgabe wird als erledigt markiert ----
-
-      // Rufe die Datenbank-Funktion auf, die XP vergibt und das Todo aktualisiert
       const { error } = await supabase.rpc("complete_todo", {
         todo_id: todo.id,
       });
 
       if (error) {
         console.error("Fehler beim Erledigen des Todos:", error);
-        setIsChecked(false); // Bei Fehler zurücksetzen
+        setIsChecked(false);
       } else {
-        // Lade die gesamte Seite neu. Das aktualisiert die Todos-Liste
-        // UND die PlayerStatsBar mit den neuen XP.
-        window.location.reload();
+        // NEU: Statt Reload jetzt gezielte Updates
+        // 1. Aktualisiere die Todo-Liste
+        mutate();
+        // 2. Aktualisiere die Player-Stats-Leiste über ihren API-Key
+        globalMutate("/api/player-stats");
       }
     } else {
-      // ---- FALL 2: Das Erledigen wird rückgängig gemacht ----
-      // Hier werden keine XP vergeben, wir machen nur ein einfaches Update.
-
+      // Das Rückgängigmachen bleibt wie gehabt
       const { error } = await supabase
         .from("todos")
         .update({ is_completed: false })
@@ -55,10 +54,11 @@ export default function TodoItem({ todo, todos, mutate }: TodoItemProps) {
 
       if (error) {
         console.error("Fehler beim Rückgängigmachen des Todos:", error);
-        setIsChecked(true); // Bei Fehler zurücksetzen
+        setIsChecked(true);
       } else {
-        // Hier reicht ein 'mutate', da sich die XP nicht ändern.
         mutate();
+        // Optional: Auch hier die Stats neu laden, falls du später XP abziehen möchtest
+        globalMutate("/api/player-stats");
       }
     }
   };
@@ -66,6 +66,7 @@ export default function TodoItem({ todo, todos, mutate }: TodoItemProps) {
   const todoId = `todo-${todo.id}`;
 
   return (
+    // ... Dein JSX bleibt hier komplett unverändert
     <li className="flex items-center space-x-3 p-3 border rounded-md bg-card">
       <Checkbox
         id={todoId}
@@ -86,8 +87,6 @@ export default function TodoItem({ todo, todos, mutate }: TodoItemProps) {
           {formatTodoDate(todo.start_time, todo.end_time)}
         </p>
       </div>
-
-      {/* Zeige den Löschen-Button nur bei erledigten Aufgaben */}
       {todo.is_completed && (
         <div className="ml-auto">
           <DeleteTodoButton todo={todo} todos={todos} mutate={mutate} />

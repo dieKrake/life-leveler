@@ -1,4 +1,3 @@
-// app/api/delete-todo/[id]/route.ts
 import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
@@ -22,7 +21,7 @@ export async function DELETE(
   }
 
   try {
-    // 1. Entscheiden, ob es ein Event oder Task ist, basierend auf dem Präfix
+    // --- LÖSCHEN BEI GOOGLE ---
     if (googleItemId.startsWith("evt-")) {
       const eventId = googleItemId.substring(4);
       const url = `https://www.googleapis.com/calendar/v3/calendars/primary/events/${eventId}`;
@@ -30,30 +29,36 @@ export async function DELETE(
         method: "DELETE",
         headers: { Authorization: `Bearer ${session.provider_token}` },
       });
-      // Wir loggen einen Fehler, aber fahren fort, um den Eintrag trotzdem aus unserer DB zu löschen
       if (!response.ok && response.status !== 404) {
-        // 404 (Not Found) ignorieren, falls es bei Google schon weg ist
         console.error(
           "Fehler beim Löschen des Google Calendar Events:",
-          response.statusText
+          response.status,
+          await response.text()
         );
       }
     } else if (googleItemId.startsWith("tsk-")) {
       const taskId = googleItemId.substring(4);
-      const url = `https://tasks.googleapis.com/v1/lists/@default/tasks/${taskId}`;
+      const url = `https://www.googleapis.com/tasks/v1/lists/@default/tasks/${taskId}`;
       const response = await fetch(url, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${session.provider_token}` },
       });
+
+      // NEU: Detailliertes Logging für Tasks
       if (!response.ok && response.status !== 404) {
-        console.error(
-          "Fehler beim Löschen des Google Tasks:",
-          response.statusText
-        );
+        // Wir loggen den Status und die komplette Antwort von Google
+        const errorBody = await response.text();
+        console.error(`Fehler beim Löschen des Google Tasks (ID: ${taskId}):`, {
+          status: response.status,
+          body: errorBody,
+        });
+        // Wir fahren trotzdem fort, um den Eintrag aus unserer DB zu löschen
+      } else {
+        console.log(`Google Task (ID: ${taskId}) erfolgreich gelöscht.`);
       }
     }
 
-    // 2. Eintrag aus der Supabase-Datenbank löschen
+    // --- LÖSCHEN AUS DER EIGENEN DATENBANK ---
     const { error: dbError } = await supabase
       .from("todos")
       .delete()

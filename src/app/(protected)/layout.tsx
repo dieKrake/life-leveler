@@ -1,4 +1,3 @@
-// app/(protected)/layout.tsx
 import Navbar from "@/components/Navbar";
 import PlayerStatsBar from "@/components/PlayerStatsBar";
 import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
@@ -18,7 +17,7 @@ export default async function ProtectedLayout({
     data: { session },
   } = await supabase.auth.getSession();
 
-  if (!session || !session.provider_token) {
+  if (!session || !session.access_token) {
     redirect("/login");
   }
 
@@ -28,8 +27,11 @@ export default async function ProtectedLayout({
       headers: {
         Authorization: `Bearer ${session.provider_token}`,
       },
+      cache: "no-store",
     }
   );
+
+  console.log("Google userinfo response status:", response.status);
 
   if (!response.ok) {
     console.log(
@@ -41,7 +43,7 @@ export default async function ProtectedLayout({
 
   return (
     <div className="flex flex-col min-h-screen">
-      <PlayerStatsBar /> {/* NEU: Hier wird die Leiste eingefügt */}
+      <PlayerStatsBar />
       <main>{children}</main>
     </div>
   );

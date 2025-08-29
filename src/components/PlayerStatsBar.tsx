@@ -12,10 +12,8 @@ type PlayerStats = {
 };
 
 export default function PlayerStatsBar() {
-  // Rufe die neue API-Route mit SWR ab
   const { data: stats, isLoading } = useSWR<PlayerStats>("/api/player-stats");
 
-  // Während die Daten laden oder falls sie nicht vorhanden sind, zeige einen Ladezustand an
   if (isLoading || !stats) {
     return (
       <div className="w-full bg-muted border-b">

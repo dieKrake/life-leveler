@@ -31,8 +31,6 @@ export default async function ProtectedLayout({
     }
   );
 
-  console.log("Google userinfo response status:", response.status);
-
   if (!response.ok) {
     console.log(
       "Proaktive Prüfung: Google Token ist abgelaufen. Leite Logout ein."
@@ -43,7 +41,6 @@ export default async function ProtectedLayout({
 
   return (
     <div className="flex flex-col min-h-screen">
-      <PlayerStatsBar />
       <main>{children}</main>
     </div>
   );

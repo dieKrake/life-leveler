@@ -7,4 +7,5 @@ export type Todo = {
   end_time: string;
   is_completed: boolean;
   created_at: string;
+  xp_value: number;
 };

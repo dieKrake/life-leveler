@@ -1,5 +1,3 @@
-// src/lib/dateUtils.ts
-
 export function formatTodoDate(
   startTimeStr: string,
   endTimeStr: string
@@ -57,4 +55,33 @@ export function formatTodoDate(
   const formattedStartDate = startDate.toLocaleString("de-DE", fullOptions);
   const formattedEndDate = endDate.toLocaleString("de-DE", fullOptions);
   return `${formattedStartDate} Uhr - ${formattedEndDate} Uhr`;
+}
+
+export function handleCalendarSelect(
+  selectedDate: Date | undefined,
+  currentDateTime: Date | undefined
+): Date | undefined {
+  if (!selectedDate) {
+    return undefined;
+  }
+
+  const timeSource = currentDateTime || new Date();
+  const hours = timeSource.getHours();
+  const minutes = timeSource.getMinutes();
+
+  const newDateTime = new Date(selectedDate);
+  newDateTime.setHours(hours, minutes, 0, 0);
+
+  return newDateTime;
+}
+
+export function handleTimeInputChange(
+  timeString: string,
+  currentDateTime: Date | undefined
+): Date {
+  const [hours, minutes] = timeString.split(":").map(Number);
+  const newDateTime = new Date(currentDateTime || new Date());
+  newDateTime.setHours(hours, minutes, 0, 0);
+
+  return newDateTime;
 }

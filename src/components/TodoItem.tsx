@@ -71,14 +71,17 @@ export default function TodoItem({ todo, todos, mutate }: TodoItemProps) {
         className="mt-1 self-start"
       />
       <div className="grid gap-1.5 leading-none flex-1">
-        <Label
-          htmlFor={todoId}
-          className={`text-sm font-medium ${
-            isChecked ? "line-through text-muted-foreground" : ""
-          }`}
-        >
-          {todo.title}
-        </Label>
+        <div className="flex justify-between items-center">
+          <Label
+            htmlFor={todoId}
+            className={`text-sm font-medium ${
+              isChecked ? "line-through text-muted-foreground" : ""
+            }`}
+          >
+            {todo.title}
+          </Label>
+          <p className="text-sm text-muted-foreground">{todo.xp_value} XP</p>
+        </div>
         <p className="text-sm text-muted-foreground">
           {formatTodoDate(todo.start_time, todo.end_time)}
         </p>

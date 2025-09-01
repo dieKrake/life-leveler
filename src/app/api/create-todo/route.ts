@@ -8,6 +8,7 @@ const createTodoSchema = z.object({
   startDateTime: z.string().datetime(),
   endDateTime: z.string().datetime(),
   type: z.enum(["event", "task"]),
+  xp_value: z.number().int().min(0).optional(),
 });
 
 export async function POST(request: Request) {
@@ -34,7 +35,8 @@ export async function POST(request: Request) {
       );
     }
 
-    const { title, startDateTime, endDateTime, type } = validation.data;
+    const { title, startDateTime, endDateTime, type, xp_value } =
+      validation.data;
     let newTodoFromDb = null;
 
     if (type === "event") {
@@ -69,6 +71,7 @@ export async function POST(request: Request) {
           title: newGoogleEvent.summary,
           start_time: newGoogleEvent.start.dateTime,
           end_time: newGoogleEvent.end.dateTime,
+          xp_value: xp_value,
         })
         .select()
         .single();
@@ -106,6 +109,7 @@ export async function POST(request: Request) {
           title: newGoogleTask.title,
           start_time: newGoogleTask.due,
           end_time: newGoogleTask.due,
+          xp_value: xp_value,
         })
         .select()
         .single();

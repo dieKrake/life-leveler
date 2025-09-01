@@ -8,7 +8,7 @@ import { addHours } from "date-fns/addHours";
 import { CalendarIcon } from "lucide-react";
 import { useState, useEffect } from "react";
 import type { Todo } from "@/types";
-
+import { handleCalendarSelect, handleTimeInputChange } from "@/lib/dateUtils";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -38,6 +38,11 @@ const formSchema = z
     startDateTime: z.date(),
     endDateTime: z.date(),
     type: z.enum(["event", "task"]),
+    xp_value: z
+      .number()
+      .int()
+      .min(0, "XP können nicht negativ sein.")
+      .optional(),
   })
   .refine((data) => data.endDateTime >= data.startDateTime, {
     message: "Die Endzeit muss nach der Startzeit liegen.",
@@ -56,6 +61,7 @@ export default function AddTodoForm({ onSuccess }: AddTodoFormProps) {
     defaultValues: {
       title: "",
       type: "event",
+      xp_value: undefined,
     },
   });
 
@@ -89,6 +95,7 @@ export default function AddTodoForm({ onSuccess }: AddTodoFormProps) {
           startDateTime: values.startDateTime.toISOString(),
           endDateTime: values.endDateTime.toISOString(),
           type: values.type,
+          xp_value: values.xp_value || 10,
         }),
       });
 
@@ -187,13 +194,21 @@ export default function AddTodoForm({ onSuccess }: AddTodoFormProps) {
                       mode="single"
                       selected={field.value}
                       onSelect={(date) => {
-                        field.onChange(date);
-                        if (date) {
+                        const newDateTime = handleCalendarSelect(
+                          date,
+                          field.value
+                        );
+                        field.onChange(newDateTime);
+
+                        if (newDateTime) {
                           const currentType = form.getValues("type");
                           if (currentType === "event") {
-                            form.setValue("endDateTime", addHours(date, 1));
+                            form.setValue(
+                              "endDateTime",
+                              addHours(newDateTime, 1)
+                            );
                           } else {
-                            form.setValue("endDateTime", date);
+                            form.setValue("endDateTime", newDateTime);
                           }
                         }
                       }}
@@ -207,12 +222,11 @@ export default function AddTodoForm({ onSuccess }: AddTodoFormProps) {
                           "HH:mm"
                         )}
                         onChange={(e) => {
-                          const [hours, minutes] = e.target.value
-                            .split(":")
-                            .map(Number);
-                          const newDate = new Date(field.value || new Date());
-                          newDate.setHours(hours, minutes);
-                          field.onChange(newDate);
+                          const newDateTime = handleTimeInputChange(
+                            e.target.value,
+                            field.value
+                          );
+                          field.onChange(newDateTime);
                         }}
                       />
                     </div>
@@ -291,6 +305,33 @@ export default function AddTodoForm({ onSuccess }: AddTodoFormProps) {
             )}
           />
         )}
+
+        <FormField
+          control={form.control}
+          name="xp_value"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>XP-Wert (optional)</FormLabel>
+              <FormControl>
+                <Input
+                  type="number"
+                  placeholder="10"
+                  onBlur={field.onBlur}
+                  name={field.name}
+                  ref={field.ref}
+                  value={field.value ?? ""}
+                  onChange={(event) => {
+                    const value = event.target.value;
+                    field.onChange(
+                      value === "" ? undefined : parseInt(value, 10)
+                    );
+                  }}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
         <Button type="submit" disabled={isSubmitting}>
           {isSubmitting ? "Speichere..." : "Todo erstellen"}

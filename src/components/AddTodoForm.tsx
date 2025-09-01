@@ -24,6 +24,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Calendar } from "@/components/ui/calendar";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
@@ -38,11 +39,7 @@ const formSchema = z
     startDateTime: z.date(),
     endDateTime: z.date(),
     type: z.enum(["event", "task"]),
-    xp_value: z
-      .number()
-      .int()
-      .min(0, "XP können nicht negativ sein.")
-      .optional(),
+    xp_value: z.transform(Number),
   })
   .refine((data) => data.endDateTime >= data.startDateTime, {
     message: "Die Endzeit muss nach der Startzeit liegen.",
@@ -61,7 +58,7 @@ export default function AddTodoForm({ onSuccess }: AddTodoFormProps) {
     defaultValues: {
       title: "",
       type: "event",
-      xp_value: undefined,
+      xp_value: 20,
     },
   });
 
@@ -311,22 +308,23 @@ export default function AddTodoForm({ onSuccess }: AddTodoFormProps) {
           name="xp_value"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>XP-Wert (optional)</FormLabel>
-              <FormControl>
-                <Input
-                  type="number"
-                  placeholder="10"
-                  onBlur={field.onBlur}
-                  name={field.name}
-                  ref={field.ref}
-                  value={field.value ?? ""}
-                  onChange={(event) => {
-                    const value = event.target.value;
-                    field.onChange(
-                      value === "" ? undefined : parseInt(value, 10)
-                    );
-                  }}
-                />
+              <FormLabel>Schwierigkeit</FormLabel>
+              <FormControl className="flex justify-start gap-2">
+                <ToggleGroup
+                  type="single"
+                  variant="outline"
+                  onValueChange={field.onChange}
+                >
+                  <ToggleGroupItem value="10" aria-label="Leicht">
+                    Easy
+                  </ToggleGroupItem>
+                  <ToggleGroupItem value="20" aria-label="Mittel">
+                    Medium
+                  </ToggleGroupItem>
+                  <ToggleGroupItem value="30" aria-label="Schwer">
+                    Hard
+                  </ToggleGroupItem>
+                </ToggleGroup>
               </FormControl>
               <FormMessage />
             </FormItem>

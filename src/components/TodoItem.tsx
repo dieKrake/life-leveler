@@ -22,6 +22,10 @@ export default function TodoItem({ todo, todos, mutate }: TodoItemProps) {
   const { mutate: globalMutate } = useSWRConfig();
   const { data: stats, isLoading } = useSWR<PlayerStats>("/api/player-stats");
 
+  useEffect(() => {
+    setIsChecked(todo.is_completed);
+  }, [todo.is_completed]);
+
   if (!stats) {
     return <div className="w-full bg-muted border-b">Lade Stats...</div>;
   }
@@ -34,10 +38,6 @@ export default function TodoItem({ todo, todos, mutate }: TodoItemProps) {
     current_streak,
     streak_multiplier,
   } = stats;
-
-  useEffect(() => {
-    setIsChecked(todo.is_completed);
-  }, [todo.is_completed]);
 
   const handleToggleComplete = async (checked: boolean) => {
     setIsChecked(checked);
@@ -89,14 +89,14 @@ export default function TodoItem({ todo, todos, mutate }: TodoItemProps) {
           >
             {todo.title}
           </Label>
-          <p className="flex items-center gap-2 text-sm text-muted-foreground">
+          <div className="flex font-bold items-center gap-2 text-sm text-muted-foreground">
             {todo.xp_value} XP
             {streak_multiplier > 1.0 && (
               <span className="text-xs font-semibold bg-amber-500 text-white px-1.5 py-0.5 rounded-full">
-                x{streak_multiplier.toFixed(1)} XP
+                x{streak_multiplier.toFixed(1)}
               </span>
             )}
-          </p>
+          </div>
         </div>
         <p className="text-sm text-muted-foreground">
           {formatTodoDate(todo.start_time, todo.end_time)}

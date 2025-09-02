@@ -2,8 +2,17 @@
 
 import useSWR from "swr";
 import { Progress } from "@/components/ui/progress";
-import { Flame } from "lucide-react";
-import { PlayerStats } from "@/types";
+import { Flame, Gem } from "lucide-react"; // Gem-Icon importieren
+
+type PlayerStats = {
+  xp: number;
+  level: number;
+  xp_for_current_level: number;
+  xp_for_next_level: number | null;
+  current_streak: number;
+  streak_multiplier: number;
+  gems: number; // NEUES FELD im Typ
+};
 
 export default function PlayerStatsBar() {
   const { data: stats, isLoading } = useSWR<PlayerStats>("/api/player-stats");
@@ -25,6 +34,7 @@ export default function PlayerStatsBar() {
     xp_for_next_level,
     current_streak,
     streak_multiplier,
+    gems,
   } = stats;
 
   const isMaxLevel = xp_for_next_level === null;
@@ -61,16 +71,22 @@ export default function PlayerStatsBar() {
           <span className="text-xs">(Gesamt-XP: {xp})</span>
         </div>
 
-        <div className="flex items-center gap-2 font-bold text-amber-500">
-          <div className="flex items-center gap-1">
-            <Flame className="h-4 w-4" />
-            <span>{current_streak}</span>
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-1 font-bold text-blue-500">
+            <Gem className="h-4 w-4" />
+            <span>{gems}</span>
           </div>
-          {streak_multiplier > 1.0 && (
-            <span className="text-xs font-semibold bg-amber-500 text-white px-1.5 py-0.5 rounded-full">
-              x{streak_multiplier.toFixed(1)} XP
-            </span>
-          )}
+          <div className="flex items-center gap-2 font-bold text-amber-500">
+            <div className="flex items-center gap-1">
+              <Flame className="h-4 w-4" />
+              <span>{current_streak}</span>
+            </div>
+            {streak_multiplier > 1.0 && (
+              <span className="text-xs font-semibold bg-amber-500 text-white px-1.5 py-0.5 rounded-full">
+                x{streak_multiplier.toFixed(1)} XP
+              </span>
+            )}
+          </div>
         </div>
       </div>
     </div>

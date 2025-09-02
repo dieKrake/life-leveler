@@ -21,13 +21,11 @@ export async function GET() {
 
   const { data: stats, error } = await supabase
     .rpc("get_player_stats_with_level_info")
-    .single(); // <--- DIESE ZEILE IST NEU UND WICHTIG
+    .single();
 
   if (error) {
     console.error("Fehler beim Laden der Player Stats:", error);
-    // Behandelt den Fall, dass für einen Nutzer noch keine Stats existieren
     if (error.code === "PGRST116") {
-      // Wir holen die Startwerte für Level 1 manuell aus der levels Tabelle
       const { data: level1Stats } = await supabase
         .from("levels")
         .select("xp_required")

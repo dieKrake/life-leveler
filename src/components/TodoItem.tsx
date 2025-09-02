@@ -3,8 +3,8 @@
 import { useState, useEffect } from "react";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import type { Todo } from "@/types";
-import { KeyedMutator, useSWRConfig } from "swr";
-
+import useSWR, { KeyedMutator, useSWRConfig } from "swr";
+import { PlayerStats } from "@/types";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { formatTodoDate } from "@/lib/dateUtils";
@@ -20,6 +20,20 @@ export default function TodoItem({ todo, todos, mutate }: TodoItemProps) {
   const supabase = createClientComponentClient();
   const [isChecked, setIsChecked] = useState(todo.is_completed);
   const { mutate: globalMutate } = useSWRConfig();
+  const { data: stats, isLoading } = useSWR<PlayerStats>("/api/player-stats");
+
+  if (!stats) {
+    return <div className="w-full bg-muted border-b">Lade Stats...</div>;
+  }
+
+  const {
+    level,
+    xp,
+    xp_for_current_level,
+    xp_for_next_level,
+    current_streak,
+    streak_multiplier,
+  } = stats;
 
   useEffect(() => {
     setIsChecked(todo.is_completed);
@@ -29,7 +43,6 @@ export default function TodoItem({ todo, todos, mutate }: TodoItemProps) {
     setIsChecked(checked);
 
     if (checked) {
-      // ---- FALL 1: Aufgabe wird als erledigt markiert (unverändert) ----
       const { error } = await supabase.rpc("complete_todo", {
         todo_id: todo.id,
       });
@@ -42,18 +55,14 @@ export default function TodoItem({ todo, todos, mutate }: TodoItemProps) {
         globalMutate("/api/player-stats");
       }
     } else {
-      // ---- FALL 2: Das Erledigen wird rückgängig gemacht (NEUE LOGIK) ----
-
-      // Rufe die neue Datenbank-Funktion zum XP-Abzug auf
       const { error } = await supabase.rpc("uncomplete_todo", {
         todo_id: todo.id,
       });
 
       if (error) {
         console.error("Fehler beim Rückgängigmachen des Todos:", error);
-        setIsChecked(true); // Bei Fehler zurücksetzen
+        setIsChecked(true);
       } else {
-        // Lade die Todos-Liste UND die Player-Stats-Leiste neu
         mutate();
         globalMutate("/api/player-stats");
       }
@@ -80,7 +89,14 @@ export default function TodoItem({ todo, todos, mutate }: TodoItemProps) {
           >
             {todo.title}
           </Label>
-          <p className="text-sm text-muted-foreground">{todo.xp_value} XP</p>
+          <p className="flex items-center gap-2 text-sm text-muted-foreground">
+            {todo.xp_value} XP
+            {streak_multiplier > 1.0 && (
+              <span className="text-xs font-semibold bg-amber-500 text-white px-1.5 py-0.5 rounded-full">
+                x{streak_multiplier.toFixed(1)} XP
+              </span>
+            )}
+          </p>
         </div>
         <p className="text-sm text-muted-foreground">
           {formatTodoDate(todo.start_time, todo.end_time)}

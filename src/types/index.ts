@@ -9,3 +9,12 @@ export type Todo = {
   created_at: string;
   xp_value: number;
 };
+
+export type PlayerStats = {
+  xp: number;
+  level: number;
+  xp_for_current_level: number;
+  xp_for_next_level: number | null;
+  current_streak: number;
+  streak_multiplier: number;
+};

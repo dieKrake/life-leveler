@@ -2,22 +2,13 @@
 
 import useSWR from "swr";
 import { Progress } from "@/components/ui/progress";
-
-type PlayerStats = {
-  xp: number;
-  level: number;
-  xp_for_current_level: number;
-  xp_for_next_level: number | null;
-};
+import { Flame } from "lucide-react";
+import { PlayerStats } from "@/types";
 
 export default function PlayerStatsBar() {
-  const {
-    data: stats,
-    isLoading,
-    error,
-  } = useSWR<PlayerStats>("/api/player-stats");
+  const { data: stats, isLoading } = useSWR<PlayerStats>("/api/player-stats");
 
-  if (isLoading) {
+  if (isLoading || !stats) {
     return (
       <div className="w-full bg-muted border-b">
         <div className="container flex items-center h-12 text-sm text-muted-foreground">
@@ -27,17 +18,14 @@ export default function PlayerStatsBar() {
     );
   }
 
-  if (error || !stats) {
-    return (
-      <div className="w-full bg-muted border-b">
-        <div className="container flex items-center h-12 text-sm text-destructive">
-          Fehler beim Laden der Stats.
-        </div>
-      </div>
-    );
-  }
-
-  const { level, xp, xp_for_current_level, xp_for_next_level } = stats;
+  const {
+    level,
+    xp,
+    xp_for_current_level,
+    xp_for_next_level,
+    current_streak,
+    streak_multiplier,
+  } = stats;
 
   const isMaxLevel = xp_for_next_level === null;
 
@@ -54,8 +42,8 @@ export default function PlayerStatsBar() {
 
   return (
     <div className="w-full bg-muted border-b">
-      <div className="container flex items-center h-12 text-sm text-muted-foreground">
-        <div className="flex items-center gap-6 w-full">
+      <div className="container flex items-center justify-between h-12 text-sm text-muted-foreground">
+        <div className="flex items-center gap-6">
           <span className="font-bold">Level {level}</span>
           <div className="flex-1 max-w-xs">
             <div className="flex justify-between text-xs mb-1">
@@ -71,6 +59,18 @@ export default function PlayerStatsBar() {
             <Progress value={progressPercentage} className="h-2" />
           </div>
           <span className="text-xs">(Gesamt-XP: {xp})</span>
+        </div>
+
+        <div className="flex items-center gap-2 font-bold text-amber-500">
+          <div className="flex items-center gap-1">
+            <Flame className="h-4 w-4" />
+            <span>{current_streak}</span>
+          </div>
+          {streak_multiplier > 1.0 && (
+            <span className="text-xs font-semibold bg-amber-500 text-white px-1.5 py-0.5 rounded-full">
+              x{streak_multiplier.toFixed(1)} XP
+            </span>
+          )}
         </div>
       </div>
     </div>

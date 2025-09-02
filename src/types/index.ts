@@ -17,4 +17,5 @@ export type PlayerStats = {
   xp_for_next_level: number | null;
   current_streak: number;
   streak_multiplier: number;
+  gems: number;
 };

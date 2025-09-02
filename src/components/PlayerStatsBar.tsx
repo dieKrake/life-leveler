@@ -3,16 +3,7 @@
 import useSWR from "swr";
 import { Progress } from "@/components/ui/progress";
 import { Flame, Gem } from "lucide-react"; // Gem-Icon importieren
-
-type PlayerStats = {
-  xp: number;
-  level: number;
-  xp_for_current_level: number;
-  xp_for_next_level: number | null;
-  current_streak: number;
-  streak_multiplier: number;
-  gems: number; // NEUES FELD im Typ
-};
+import { PlayerStats } from "@/types";
 
 export default function PlayerStatsBar() {
   const { data: stats, isLoading } = useSWR<PlayerStats>("/api/player-stats");

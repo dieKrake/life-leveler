@@ -9,6 +9,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { formatTodoDate } from "@/lib/dateUtils";
 import DeleteTodoButton from "./DeleteTodoButton";
+import { DifficultySelector } from "./DifficultySelector";
 
 type TodoItemProps = {
   todo: Todo;
@@ -69,6 +70,28 @@ export default function TodoItem({ todo, todos, mutate }: TodoItemProps) {
     }
   };
 
+  const handleDifficultyChange = async (todoId: number, newXpValue: number) => {
+    try {
+      const response = await fetch("/api/update-todo-difficulty", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ todoId, xpValue: newXpValue }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(
+          errorData.error || "Fehler beim Aktualisieren der Schwierigkeit"
+        );
+      }
+
+      mutate(); // Aktualisiere die Todo-Liste
+    } catch (error) {
+      console.error("Fehler beim Ändern der Schwierigkeit:", error);
+      throw error;
+    }
+  };
+
   const todoId = `todo-${todo.id}`;
 
   return (
@@ -89,13 +112,18 @@ export default function TodoItem({ todo, todos, mutate }: TodoItemProps) {
           >
             {todo.title}
           </Label>
-          <div className="flex font-bold items-center gap-2 text-sm text-muted-foreground">
-            {todo.xp_value} XP
-            {streak_multiplier > 1.0 && (
-              <span className="text-xs font-semibold bg-amber-500 text-white px-1.5 py-0.5 rounded-full">
-                x{streak_multiplier.toFixed(1)}
-              </span>
-            )}
+          <div className="flex items-center gap-3">
+            <DifficultySelector
+              todo={todo}
+              onDifficultyChange={handleDifficultyChange}
+            />
+            <div className="flex font-bold items-center gap-2 text-sm text-muted-foreground">
+              {streak_multiplier > 1.0 && (
+                <span className="text-xs font-semibold bg-amber-500 text-white px-1.5 py-0.5 rounded-full">
+                  x{streak_multiplier.toFixed(1)}
+                </span>
+              )}
+            </div>
           </div>
         </div>
         <p className="text-sm text-muted-foreground">
@@ -103,11 +131,9 @@ export default function TodoItem({ todo, todos, mutate }: TodoItemProps) {
         </p>
       </div>
 
-      {todo.is_completed && (
-        <div className="ml-auto">
-          <DeleteTodoButton todo={todo} todos={todos} mutate={mutate} />
-        </div>
-      )}
+      <div className="ml-auto">
+        <DeleteTodoButton todo={todo} todos={todos} mutate={mutate} />
+      </div>
     </li>
   );
 }

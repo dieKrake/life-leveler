@@ -19,3 +19,10 @@ export type PlayerStats = {
   streak_multiplier: number;
   gems: number;
 };
+
+export type StreakMultiplier = {
+  id: number;
+  min_streak_days: number;
+  multiplier: number;
+  created_at: string;
+};

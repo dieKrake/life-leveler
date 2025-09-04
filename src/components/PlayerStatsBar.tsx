@@ -57,7 +57,7 @@ export default function PlayerStatsBar() {
                 </span>
               )}
             </div>
-            <Progress value={progressPercentage} className="h-2" />
+            <Progress value={progressPercentage} className="h-2 w-32" />
           </div>
           <span className="text-xs">(Gesamt-XP: {xp})</span>
         </div>

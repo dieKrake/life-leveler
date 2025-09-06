@@ -26,3 +26,32 @@ export type StreakMultiplier = {
   multiplier: number;
   created_at: string;
 };
+
+export type Achievement = {
+  id: number;
+  name: string;
+  description: string;
+  icon: string;
+  category: "streak" | "xp" | "gems" | "level" | "tasks";
+  condition_type: "reach_value" | "complete_count" | "streak_days";
+  condition_value: number;
+  reward_gems: number;
+  sort_order: number;
+  is_active: boolean;
+  created_at: string;
+};
+
+export type UserAchievement = {
+  achievement_id: number;
+  name: string;
+  description: string;
+  icon: string;
+  category: "streak" | "xp" | "gems" | "level" | "tasks";
+  condition_value: number;
+  reward_gems: number;
+  sort_order: number;
+  is_unlocked: boolean;
+  current_progress: number;
+  progress_percentage: number;
+  unlocked_at: string | null;
+};

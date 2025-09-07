@@ -42,7 +42,7 @@ export default function PlayerStatsBar() {
   }
 
   return (
-    <div className="flex justify-center w-full bg-muted border-b px-4">
+    <div className="flex justify-center w-full bg-muted border-b px-4 sticky top-14 z-50">
       <div className="container flex items-center justify-between h-12 text-sm text-muted-foreground">
         <div className="flex items-center gap-6">
           <span className="font-bold">Level {level}</span>

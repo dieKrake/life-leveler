@@ -5,6 +5,8 @@ import { useState } from "react";
 import { KeyedMutator } from "swr";
 import { Archive } from "lucide-react";
 import type { Todo } from "@/types";
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { useRouter } from "next/navigation";
 
 import {
   AlertDialog,
@@ -31,6 +33,14 @@ export default function DeleteTodoButton({
   mutate,
 }: DeleteTodoButtonProps) {
   const [isArchiving, setIsArchiving] = useState(false);
+  const supabase = createClientComponentClient();
+  const router = useRouter();
+
+  const handleTokenExpiration = async () => {
+    console.log("Token expired, logging out user...");
+    await supabase.auth.signOut();
+    router.push("/auth");
+  };
 
   const handleArchive = async () => {
     if (!todos) return;
@@ -44,9 +54,20 @@ export default function DeleteTodoButton({
       const response = await fetch(`/api/delete-todo/${todo.google_event_id}`, {
         method: "DELETE",
       });
-      if (!response.ok) {
-        throw new Error("Fehler beim Archivieren des Todos.");
+
+      // Check for authentication errors (401 or 403)
+      if (response.status === 401 || response.status === 403) {
+        await handleTokenExpiration();
+        return;
       }
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(
+          errorData.error || "Fehler beim Archivieren des Todos."
+        );
+      }
+
       // Re-validiere die Daten nach erfolgreichem Archivieren
       mutate();
     } catch (error) {

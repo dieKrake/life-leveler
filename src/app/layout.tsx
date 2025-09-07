@@ -5,8 +5,6 @@ import SWRProvider from "@/components/SWRProvider";
 import Navbar from "@/components/Navbar";
 import { cookies } from "next/headers";
 import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
-import { useState } from "react";
-import { set } from "zod";
 import PlayerStatsBar from "@/components/PlayerStatsBar";
 
 const inter = Inter({ subsets: ["latin"] });

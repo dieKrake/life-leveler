@@ -54,6 +54,7 @@ export default function TodoItem({ todo, todos, mutate }: TodoItemProps) {
       } else {
         mutate();
         globalMutate("/api/player-stats");
+        globalMutate("/api/achievements"); // Refresh achievements progress
       }
     } else {
       const { error } = await supabase.rpc("uncomplete_todo", {
@@ -66,6 +67,7 @@ export default function TodoItem({ todo, todos, mutate }: TodoItemProps) {
       } else {
         mutate();
         globalMutate("/api/player-stats");
+        globalMutate("/api/achievements"); // Refresh achievements progress
       }
     }
   };

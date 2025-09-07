@@ -20,6 +20,7 @@ export async function GET() {
     .from("todos")
     .select("*")
     .eq("user_id", session.user.id)
+    .is("archived_at", null)
     .order("start_time", { ascending: true });
 
   if (error) {

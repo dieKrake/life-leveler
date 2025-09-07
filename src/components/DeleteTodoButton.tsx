@@ -3,7 +3,7 @@
 
 import { useState } from "react";
 import { KeyedMutator } from "swr";
-import { Trash2 } from "lucide-react";
+import { Archive } from "lucide-react";
 import type { Todo } from "@/types";
 
 import {
@@ -30,11 +30,11 @@ export default function DeleteTodoButton({
   todos,
   mutate,
 }: DeleteTodoButtonProps) {
-  const [isDeleting, setIsDeleting] = useState(false);
+  const [isArchiving, setIsArchiving] = useState(false);
 
-  const handleDelete = async () => {
+  const handleArchive = async () => {
     if (!todos) return;
-    setIsDeleting(true);
+    setIsArchiving(true);
 
     // Optimistisches Update: Entferne das Todo sofort aus der UI
     const optimisticData = todos.filter((t) => t.id !== todo.id);
@@ -45,16 +45,16 @@ export default function DeleteTodoButton({
         method: "DELETE",
       });
       if (!response.ok) {
-        throw new Error("Fehler beim Löschen des Todos.");
+        throw new Error("Fehler beim Archivieren des Todos.");
       }
-      // Re-validiere die Daten nach erfolgreichem Löschen (optional, aber gut für Konsistenz)
+      // Re-validiere die Daten nach erfolgreichem Archivieren
       mutate();
     } catch (error) {
       console.error(error);
       // Bei einem Fehler: Setze die UI auf den ursprünglichen Zustand zurück
       mutate(todos, false);
     } finally {
-      setIsDeleting(false);
+      setIsArchiving(false);
     }
   };
 
@@ -62,21 +62,23 @@ export default function DeleteTodoButton({
     <AlertDialog>
       <AlertDialogTrigger asChild>
         <Button variant="ghost" size="icon" className="h-8 w-8">
-          <Trash2 className="h-4 w-4 text-muted-foreground" />
+          <Archive className="h-4 w-4 text-muted-foreground" />
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Bist du dir absolut sicher?</AlertDialogTitle>
+          <AlertDialogTitle>Todo archivieren?</AlertDialogTitle>
           <AlertDialogDescription>
-            Diese Aktion kann nicht rückgängig gemacht werden. Dies löscht das
-            Todo dauerhaft aus deiner Liste und aus deinem Google Account.
+            Das Todo wird aus deiner aktiven Liste entfernt und archiviert. Es
+            bleibt für deine Statistiken und Achievements erhalten, wird aber
+            nicht mehr in der normalen Ansicht angezeigt. Das Todo wird auch aus
+            deinem Google Account gelöscht.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Abbrechen</AlertDialogCancel>
-          <AlertDialogAction onClick={handleDelete} disabled={isDeleting}>
-            {isDeleting ? "Lösche..." : "Löschen"}
+          <AlertDialogAction onClick={handleArchive} disabled={isArchiving}>
+            {isArchiving ? "Archiviere..." : "Archivieren"}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

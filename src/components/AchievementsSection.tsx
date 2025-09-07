@@ -1,9 +1,11 @@
-import useSWR from "swr";
+import useSWR, { mutate as globalMutate } from "swr";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Target, Trophy, Flame, Gem, TrendingUp } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Target, Trophy, Flame, Gem, TrendingUp, Unlock } from "lucide-react";
 import { UserAchievement } from "@/types";
+import { useState } from "react";
 
 const iconMap = {
   Trophy,
@@ -14,8 +16,44 @@ const iconMap = {
 };
 
 export default function AchievementsSection() {
-  const { data: achievements, isLoading } =
-    useSWR<UserAchievement[]>("/api/achievements");
+  const {
+    data: achievements,
+    isLoading,
+    mutate,
+  } = useSWR<UserAchievement[]>("/api/achievements");
+  const [unlockingIds, setUnlockingIds] = useState<Set<number>>(new Set());
+
+  const unlockAchievement = async (achievementId: number) => {
+    setUnlockingIds((prev) => new Set(prev).add(achievementId));
+
+    try {
+      const response = await fetch("/api/achievements/unlock", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ achievementId }),
+      });
+
+      if (response.ok) {
+        // Refresh achievements data
+        mutate();
+        // Also refresh player stats to update gems in UI
+        globalMutate("/api/player-stats");
+      } else {
+        const error = await response.json();
+        console.error("Fehler beim Freischalten:", error);
+      }
+    } catch (error) {
+      console.error("Fehler beim Freischalten:", error);
+    } finally {
+      setUnlockingIds((prev) => {
+        const newSet = new Set(prev);
+        newSet.delete(achievementId);
+        return newSet;
+      });
+    }
+  };
 
   if (isLoading) {
     return (
@@ -124,6 +162,26 @@ export default function AchievementsSection() {
                       <p className="text-xs text-muted-foreground">
                         {progressPercentage.toFixed(0)}% erreicht
                       </p>
+
+                      {/* Unlock button if achievement is completed but not unlocked */}
+                      {achievement.current_progress >=
+                        achievement.condition_value && (
+                        <Button
+                          size="sm"
+                          onClick={() =>
+                            unlockAchievement(achievement.achievement_id)
+                          }
+                          disabled={unlockingIds.has(
+                            achievement.achievement_id
+                          )}
+                          className="w-full mt-2"
+                        >
+                          <Unlock className="h-3 w-3 mr-1" />
+                          {unlockingIds.has(achievement.achievement_id)
+                            ? "Schalte frei..."
+                            : "Freischalten"}
+                        </Button>
+                      )}
                     </div>
                   )}
 

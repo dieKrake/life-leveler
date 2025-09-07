@@ -20,17 +20,6 @@ export async function GET() {
   }
 
   try {
-    const { error: updateError } = await supabase.rpc(
-      "check_and_update_achievements",
-      {
-        user_id_param: user.id,
-      }
-    );
-
-    if (updateError) {
-      console.error("Fehler beim Aktualisieren der Achievements:", updateError);
-    }
-
     const { data: achievements, error } = await supabase.rpc(
       "get_user_achievements_with_progress",
       { user_id_param: user.id }

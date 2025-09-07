@@ -6,6 +6,8 @@ export type Todo = {
   start_time: string;
   end_time: string;
   is_completed: boolean;
+  completed_at: string | null;
+  archived_at: string | null;
   created_at: string;
   xp_value: number;
 };

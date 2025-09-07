@@ -44,25 +44,26 @@ export async function DELETE(
         headers: { Authorization: `Bearer ${session.provider_token}` },
       });
 
-      // NEU: Detailliertes Logging für Tasks
       if (!response.ok && response.status !== 404) {
-        // Wir loggen den Status und die komplette Antwort von Google
         const errorBody = await response.text();
         console.error(`Fehler beim Löschen des Google Tasks (ID: ${taskId}):`, {
           status: response.status,
           body: errorBody,
         });
-        // Wir fahren trotzdem fort, um den Eintrag aus unserer DB zu löschen
       } else {
         console.log(`Google Task (ID: ${taskId}) erfolgreich gelöscht.`);
       }
     }
 
-    // --- LÖSCHEN AUS DER EIGENEN DATENBANK ---
+    // --- ARCHIVIEREN IN DER EIGENEN DATENBANK (statt löschen) ---
     const { error: dbError } = await supabase
       .from("todos")
-      .delete()
-      .match({ user_id: session.user.id, google_event_id: googleItemId });
+      .update({
+        archived_at: new Date().toISOString(),
+      })
+      .eq("user_id", session.user.id)
+      .eq("google_event_id", googleItemId)
+      .is("archived_at", null);
 
     if (dbError) {
       throw dbError;
@@ -70,7 +71,7 @@ export async function DELETE(
 
     return NextResponse.json({
       success: true,
-      message: "Todo erfolgreich gelöscht.",
+      message: "Todo erfolgreich archiviert.",
     });
   } catch (error) {
     console.error("Fehler in delete-todo Route:", error);

@@ -18,7 +18,6 @@ export default function StreakSection({ stats }: StreakSectionProps) {
 
   const { current_streak, streak_multiplier } = stats;
 
-  // Helper function to get streak tier info
   const getStreakTierInfo = (minDays: number, multiplier: number) => {
     const isActive = current_streak >= minDays;
     const isNext =

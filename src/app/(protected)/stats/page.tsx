@@ -21,63 +21,65 @@ import {
   CheckCircle2,
   XCircle,
 } from "lucide-react";
+import useSWR from "swr";
+import type { TodoStats } from "@/types";
+
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 export default function StatsPage() {
-  // Mock data - später durch echte API-Calls ersetzen
-  const mockStats = {
-    totalTodos: 156,
-    completedTodos: 134,
-    currentStreak: 7,
-    longestStreak: 12,
-    totalXP: 2840,
-    totalGems: 89,
-    averageCompletionTime: "2.3h",
-    productiveHour: "10:00",
-  };
+  const {
+    data: stats,
+    error,
+    isLoading,
+  } = useSWR<TodoStats>("/api/todo-stats", fetcher);
 
-  const dailyCompletions = [
-    { day: "Mo", completed: 8, target: 5 },
-    { day: "Di", completed: 6, target: 5 },
-    { day: "Mi", completed: 12, target: 5 },
-    { day: "Do", completed: 4, target: 5 },
-    { day: "Fr", completed: 9, target: 5 },
-    { day: "Sa", completed: 3, target: 5 },
-    { day: "So", completed: 7, target: 5 },
-  ];
+  if (isLoading) {
+    return (
+      <div className="container mx-auto p-6 space-y-8">
+        <div className="space-y-2">
+          <h1 className="text-3xl font-bold">Statistiken</h1>
+          <p className="text-muted-foreground">Lade Statistiken...</p>
+        </div>
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <Card key={i} className="animate-pulse">
+              <CardHeader className="space-y-2">
+                <div className="h-4 bg-muted rounded w-3/4" />
+              </CardHeader>
+              <CardContent>
+                <div className="h-8 bg-muted rounded w-1/2 mb-2" />
+                <div className="h-3 bg-muted rounded w-2/3" />
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+    );
+  }
 
-  const weeklyTrend = [
-    { week: "KW 32", todos: 28 },
-    { week: "KW 33", todos: 35 },
-    { week: "KW 34", todos: 42 },
-    { week: "KW 35", todos: 38 },
-    { week: "KW 36", todos: 49 },
-  ];
+  if (error) {
+    return (
+      <div className="container mx-auto p-6 space-y-8">
+        <div className="space-y-2">
+          <h1 className="text-3xl font-bold">Statistiken</h1>
+          <p className="text-red-500">
+            Fehler beim Laden der Statistiken: {error.message}
+          </p>
+        </div>
+      </div>
+    );
+  }
 
-  const difficultyDistribution = [
-    { difficulty: "Easy", count: 45, xp: 10, color: "bg-green-500" },
-    { difficulty: "Medium", count: 67, xp: 20, color: "bg-yellow-500" },
-    { difficulty: "Hard", count: 22, xp: 30, color: "bg-red-500" },
-  ];
-
-  const hourlyActivity = [
-    { hour: "6", count: 2 },
-    { hour: "7", count: 5 },
-    { hour: "8", count: 12 },
-    { hour: "9", count: 18 },
-    { hour: "10", count: 25 },
-    { hour: "11", count: 22 },
-    { hour: "12", count: 15 },
-    { hour: "13", count: 8 },
-    { hour: "14", count: 14 },
-    { hour: "15", count: 20 },
-    { hour: "16", count: 16 },
-    { hour: "17", count: 12 },
-    { hour: "18", count: 8 },
-    { hour: "19", count: 4 },
-    { hour: "20", count: 2 },
-  ];
-
-  const maxHourlyCount = Math.max(...hourlyActivity.map((h) => h.count));
+  if (!stats) {
+    return (
+      <div className="container mx-auto p-6 space-y-8">
+        <div className="space-y-2">
+          <h1 className="text-3xl font-bold">Statistiken</h1>
+          <p className="text-muted-foreground">Keine Daten verfügbar</p>
+        </div>
+      </div>
+    );
+  }
 
   const BarChart = ({
     data,
@@ -87,41 +89,143 @@ export default function StatsPage() {
     data: any[];
     title: string;
     color?: string;
-  }) => (
-    <div className="space-y-3">
-      <h4 className="font-medium text-sm">{title}</h4>
-      <div className="flex items-end justify-between h-32 gap-2">
-        {data.map((item, index) => (
-          <div key={index} className="flex flex-col items-center gap-1 flex-1">
+  }) => {
+    const maxValue = Math.max(
+      ...data.map((d) => d.completed || d.todos || d.count),
+      1 // Ensure maxValue is at least 1 to avoid division by zero
+    );
+
+    return (
+      <div className="space-y-3">
+        <h4 className="font-medium text-sm">{title}</h4>
+        <div className="flex items-end justify-between h-32 gap-2">
+          {data.map((item, index) => (
             <div
-              className="relative w-full bg-muted rounded-sm overflow-hidden"
-              style={{ height: "80px" }}
+              key={index}
+              className="flex flex-col items-center gap-1 flex-1"
             >
               <div
-                className={`${color} rounded-sm transition-all duration-500 ease-out`}
-                style={{
-                  height: `${
-                    ((item.completed || item.todos || item.count) /
-                      Math.max(
-                        ...data.map((d) => d.completed || d.todos || d.count)
-                      )) *
-                    100
-                  }%`,
-                  marginTop: "auto",
-                }}
-              />
+                className="relative w-full bg-muted rounded-sm overflow-hidden"
+                style={{ height: "80px" }}
+              >
+                <div
+                  className={`${color} rounded-sm transition-all duration-500 ease-out`}
+                  style={{
+                    height: `${
+                      ((item.completed || item.todos || item.count) /
+                        maxValue) *
+                      100
+                    }%`,
+                    marginTop: "auto",
+                  }}
+                />
+              </div>
+              <span className="text-xs text-muted-foreground">
+                {item.day || item.week || item.hour}
+              </span>
+              <span className="text-xs font-medium">
+                {item.completed || item.todos || item.count}
+              </span>
             </div>
-            <span className="text-xs text-muted-foreground">
-              {item.day || item.week || item.hour}
-            </span>
-            <span className="text-xs font-medium">
-              {item.completed || item.todos || item.count}
-            </span>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
-    </div>
-  );
+    );
+  };
+
+  const SimpleBarChart = ({
+    data,
+    title,
+    color = "bg-blue-500",
+  }: {
+    data: any[];
+    title: string;
+    color?: string;
+  }) => {
+    const values = data.map((d) => d.completed || d.todos || d.count || 0);
+    const maxValue = Math.max(...values, 1);
+
+    return (
+      <div className="space-y-4">
+        <h4 className="font-medium text-sm">{title}</h4>
+        <div className="grid grid-cols-7 gap-2 h-32">
+          {data.map((item, index) => {
+            const value = values[index];
+            const height =
+              maxValue > 0 ? Math.round((value / maxValue) * 100) : 0;
+
+            return (
+              <div
+                key={index}
+                className="flex flex-col items-center justify-end space-y-1"
+              >
+                <div className="w-full h-24 bg-gray-100 rounded flex items-end justify-center relative">
+                  <div
+                    className={`${color} w-full rounded transition-all duration-300`}
+                    style={{
+                      height: value > 0 ? `${Math.max(height, 8)}%` : "0%",
+                    }}
+                  />
+                </div>
+                <div className="text-xs text-center">
+                  <div className="text-muted-foreground">
+                    {item.day || item.week || item.hour}
+                  </div>
+                  <div className="font-medium">{value}</div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
+  };
+
+  const WeeklyBarChart = ({
+    data,
+    title,
+    color = "bg-green-500",
+  }: {
+    data: any[];
+    title: string;
+    color?: string;
+  }) => {
+    const values = data.map((d) => d.todos || d.completed || d.count || 0);
+    const maxValue = Math.max(...values, 1);
+
+    return (
+      <div className="space-y-4">
+        <h4 className="font-medium text-sm">{title}</h4>
+        <div className="grid grid-cols-5 gap-3 h-32">
+          {data.map((item, index) => {
+            const value = values[index];
+            const height =
+              maxValue > 0 ? Math.round((value / maxValue) * 100) : 0;
+
+            return (
+              <div
+                key={index}
+                className="flex flex-col items-center justify-end space-y-1"
+              >
+                <div className="w-full h-24 bg-gray-100 rounded flex items-end justify-center relative">
+                  <div
+                    className={`${color} w-full rounded transition-all duration-300`}
+                    style={{
+                      height: value > 0 ? `${Math.max(height, 8)}%` : "0%",
+                    }}
+                  />
+                </div>
+                <div className="text-xs text-center">
+                  <div className="text-muted-foreground">{item.week}</div>
+                  <div className="font-medium">{value}</div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
+  };
 
   const PieChart = ({ data, title }: { data: any[]; title: string }) => {
     const total = data.reduce((sum, item) => sum + item.count, 0);
@@ -170,9 +274,9 @@ export default function StatsPage() {
             <Target className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{mockStats.totalTodos}</div>
+            <div className="text-2xl font-bold">{stats.totalTodos}</div>
             <p className="text-xs text-muted-foreground">
-              {mockStats.completedTodos} abgeschlossen
+              {stats.completedTodos} abgeschlossen
             </p>
           </CardContent>
         </Card>
@@ -185,11 +289,9 @@ export default function StatsPage() {
             <Activity className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
-              {mockStats.currentStreak} Tage
-            </div>
+            <div className="text-2xl font-bold">{stats.currentStreak} Tage</div>
             <p className="text-xs text-muted-foreground">
-              Rekord: {mockStats.longestStreak} Tage
+              {stats.completedTodosWithTimestamps} mit Timestamps
             </p>
           </CardContent>
         </Card>
@@ -201,10 +303,10 @@ export default function StatsPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {mockStats.totalXP.toLocaleString()}
+              {stats.totalXP.toLocaleString()}
             </div>
             <p className="text-xs text-muted-foreground">
-              {mockStats.totalGems} Gems gesammelt
+              {stats.totalGems} Gems gesammelt
             </p>
           </CardContent>
         </Card>
@@ -218,14 +320,13 @@ export default function StatsPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {(
-                (mockStats.completedTodos / mockStats.totalTodos) *
-                100
-              ).toFixed(1)}
+              {stats.totalTodos > 0
+                ? ((stats.completedTodos / stats.totalTodos) * 100).toFixed(1)
+                : "0"}
               %
             </div>
             <p className="text-xs text-muted-foreground">
-              Ø {mockStats.averageCompletionTime} pro Todo
+              Produktivste Zeit: {stats.productiveHour}
             </p>
           </CardContent>
         </Card>
@@ -245,8 +346,8 @@ export default function StatsPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <BarChart
-              data={dailyCompletions}
+            <SimpleBarChart
+              data={stats.dailyCompletions}
               title="Todos pro Tag"
               color="bg-blue-500"
             />
@@ -265,8 +366,8 @@ export default function StatsPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <BarChart
-              data={weeklyTrend}
+            <WeeklyBarChart
+              data={stats.weeklyTrend}
               title="Todos pro Woche"
               color="bg-green-500"
             />
@@ -286,7 +387,7 @@ export default function StatsPage() {
           </CardHeader>
           <CardContent>
             <PieChart
-              data={difficultyDistribution}
+              data={stats.difficultyDistribution}
               title="Nach Schwierigkeit"
             />
           </CardContent>
@@ -303,7 +404,7 @@ export default function StatsPage() {
           </CardHeader>
           <CardContent>
             <BarChart
-              data={hourlyActivity}
+              data={stats.hourlyActivity}
               title="Todos pro Stunde"
               color="bg-purple-500"
             />
@@ -311,63 +412,13 @@ export default function StatsPage() {
               <div className="flex items-center gap-2">
                 <Trophy className="h-4 w-4 text-yellow-500" />
                 <span className="text-sm font-medium">
-                  Produktivste Zeit: {mockStats.productiveHour} Uhr
+                  Produktivste Zeit: {stats.productiveHour} Uhr
                 </span>
               </div>
             </div>
           </CardContent>
         </Card>
       </div>
-
-      {/* Recent Achievements */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Letzte Erfolge</CardTitle>
-          <CardDescription>
-            Deine neuesten Meilensteine und Errungenschaften
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            <div className="flex items-center gap-3 p-3 bg-green-50 rounded-lg border border-green-200">
-              <Trophy className="h-5 w-5 text-green-600" />
-              <div className="flex-1">
-                <p className="font-medium text-green-900">
-                  7-Tage Streak erreicht!
-                </p>
-                <p className="text-sm text-green-700">
-                  Du hast 7 Tage in Folge Todos erledigt
-                </p>
-              </div>
-              <Badge variant="secondary">+100 XP</Badge>
-            </div>
-
-            <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
-              <Zap className="h-5 w-5 text-blue-600" />
-              <div className="flex-1">
-                <p className="font-medium text-blue-900">Produktiver Tag</p>
-                <p className="text-sm text-blue-700">
-                  12 Todos an einem Tag erledigt
-                </p>
-              </div>
-              <Badge variant="secondary">+50 XP</Badge>
-            </div>
-
-            <div className="flex items-center gap-3 p-3 bg-purple-50 rounded-lg border border-purple-200">
-              <Target className="h-5 w-5 text-purple-600" />
-              <div className="flex-1">
-                <p className="font-medium text-purple-900">
-                  Schwere Aufgaben Meister
-                </p>
-                <p className="text-sm text-purple-700">
-                  10 Hard-Difficulty Todos abgeschlossen
-                </p>
-              </div>
-              <Badge variant="secondary">+200 XP</Badge>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 }

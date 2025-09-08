@@ -22,6 +22,35 @@ export type PlayerStats = {
   gems: number;
 };
 
+export type TodoStats = {
+  totalTodos: number;
+  completedTodos: number;
+  completedTodosWithTimestamps: number;
+  currentStreak: number;
+  totalXP: number;
+  totalGems: number;
+  productiveHour: string;
+  dailyCompletions: Array<{
+    day: string;
+    completed: number;
+    target: number;
+  }>;
+  weeklyTrend: Array<{
+    week: string;
+    todos: number;
+  }>;
+  difficultyDistribution: Array<{
+    difficulty: string;
+    count: number;
+    xp: number;
+    color: string;
+  }>;
+  hourlyActivity: Array<{
+    hour: string;
+    count: number;
+  }>;
+};
+
 export type StreakMultiplier = {
   id: number;
   min_streak_days: number;

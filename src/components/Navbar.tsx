@@ -27,7 +27,7 @@ export default function Navbar() {
                 asChild
                 className={navigationMenuTriggerStyle()}
               >
-                <Link href="/calendar">Kalender</Link>
+                <Link href="/todos">Todos</Link>
               </NavigationMenuLink>
             </NavigationMenuItem>
             <NavigationMenuItem>

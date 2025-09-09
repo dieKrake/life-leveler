@@ -152,6 +152,7 @@ export async function GET() {
       completedTodos: completedCount || 0,
       completedTodosWithTimestamps: completedTodosWithTimestamps?.length || 0,
       currentStreak: (playerStats as any)?.current_streak || 0,
+      highestStreak: (playerStats as any)?.highest_streak || 0,
       totalXP: (playerStats as any)?.xp || 0,
       totalGems: (playerStats as any)?.gems || 0,
       productiveHour: `${mostProductiveHour.hour}:00`,

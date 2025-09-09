@@ -27,6 +27,7 @@ export type TodoStats = {
   completedTodos: number;
   completedTodosWithTimestamps: number;
   currentStreak: number;
+  highestStreak: number;
   totalXP: number;
   totalGems: number;
   productiveHour: string;

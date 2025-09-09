@@ -59,8 +59,10 @@ export function StatsKeyMetrics({ stats }: StatsKeyMetricsProps) {
           <BarChart3 className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{stats.currentStreak}</div>
-          <p className="text-xs text-muted-foreground"></p>
+          <div className="text-2xl font-bold">{stats.highestStreak}</div>
+          <p className="text-xs text-muted-foreground">
+            Current streak: {stats.currentStreak}
+          </p>
         </CardContent>
       </Card>
     </section>

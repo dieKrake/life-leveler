@@ -61,13 +61,6 @@ export default function StatsPage() {
 
   return (
     <div className="container mx-auto p-6 space-y-8">
-      <div className="space-y-2">
-        <h1 className="text-3xl font-bold">Statistiken</h1>
-        <p className="text-muted-foreground">
-          Verfolge deinen Fortschritt und analysiere deine Produktivität
-        </p>
-      </div>
-
       {/* Key Metrics */}
       <StatsKeyMetrics stats={stats} />
 

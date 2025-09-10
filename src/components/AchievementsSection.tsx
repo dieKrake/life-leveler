@@ -57,17 +57,15 @@ export default function AchievementsSection() {
 
   if (isLoading) {
     return (
-      <Card>
+      <Card className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 border-slate-700/50 backdrop-blur-sm">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Target className="h-5 w-5" />
+          <CardTitle className="flex items-center gap-2 text-white">
+            <Target className="h-5 w-5 text-purple-400" />
             Erfolge
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-center text-muted-foreground">
-            Lade Erfolge...
-          </div>
+          <div className="text-center text-slate-400">Lade Erfolge...</div>
         </CardContent>
       </Card>
     );
@@ -75,15 +73,15 @@ export default function AchievementsSection() {
 
   if (!achievements || achievements.length === 0) {
     return (
-      <Card>
+      <Card className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 border-slate-700/50 backdrop-blur-sm">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Target className="h-5 w-5" />
+          <CardTitle className="flex items-center gap-2 text-white">
+            <Target className="h-5 w-5 text-purple-400" />
             Erfolge
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-center text-muted-foreground">
+          <div className="text-center text-slate-400">
             Keine Erfolge verfügbar
           </div>
         </CardContent>
@@ -92,10 +90,10 @@ export default function AchievementsSection() {
   }
 
   return (
-    <Card>
+    <Card className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 border-slate-700/50 backdrop-blur-sm">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Target className="h-5 w-5" />
+        <CardTitle className="flex items-center gap-2 text-white">
+          <Target className="h-5 w-5 text-purple-400" />
           Erfolge
         </CardTitle>
       </CardHeader>
@@ -115,15 +113,15 @@ export default function AchievementsSection() {
                 key={achievement.achievement_id}
                 className={`relative p-4 border rounded-lg transition-all ${
                   isUnlocked
-                    ? "border-yellow-500 bg-yellow-50 dark:bg-yellow-950/20"
-                    : "border-gray-200 bg-gray-50 dark:bg-gray-900/50"
+                    ? "border-yellow-500 bg-yellow-950/20"
+                    : "border-slate-700 bg-slate-800/50"
                 } ${!isUnlocked ? "opacity-75" : ""}`}
               >
                 {/* Achievement Icon and Status */}
                 <div className="flex items-center justify-between mb-3">
                   <IconComponent
                     className={`h-8 w-8 ${
-                      isUnlocked ? "text-yellow-500" : "text-gray-400"
+                      isUnlocked ? "text-yellow-500" : "text-slate-500"
                     }`}
                   />
                   {isUnlocked && (
@@ -135,7 +133,10 @@ export default function AchievementsSection() {
                     </Badge>
                   )}
                   {achievement.reward_gems > 0 && !isUnlocked && (
-                    <Badge variant="outline" className="text-xs">
+                    <Badge
+                      variant="outline"
+                      className="text-xs border-slate-600 text-slate-300"
+                    >
                       +{achievement.reward_gems} 💎
                     </Badge>
                   )}
@@ -143,23 +144,28 @@ export default function AchievementsSection() {
 
                 {/* Achievement Info */}
                 <div className="space-y-2">
-                  <h4 className="font-medium text-sm">{achievement.name}</h4>
-                  <p className="text-xs text-muted-foreground">
+                  <h4 className="font-medium text-sm text-white">
+                    {achievement.name}
+                  </h4>
+                  <p className="text-xs text-slate-400">
                     {achievement.description}
                   </p>
 
                   {/* Progress Bar for non-unlocked achievements */}
                   {!isUnlocked && (
                     <div className="space-y-1">
-                      <div className="flex justify-between text-xs">
+                      <div className="flex justify-between text-xs text-slate-400">
                         <span>Fortschritt</span>
                         <span>
                           {achievement.current_progress} /{" "}
                           {achievement.condition_value}
                         </span>
                       </div>
-                      <Progress value={progressPercentage} className="h-1.5" />
-                      <p className="text-xs text-muted-foreground">
+                      <Progress
+                        value={progressPercentage}
+                        className="h-1.5 bg-slate-700"
+                      />
+                      <p className="text-xs text-slate-400">
                         {progressPercentage.toFixed(0)}% erreicht
                       </p>
 
@@ -187,7 +193,7 @@ export default function AchievementsSection() {
 
                   {/* Unlock date for completed achievements */}
                   {isUnlocked && achievement.unlocked_at && (
-                    <p className="text-xs text-yellow-600 dark:text-yellow-400">
+                    <p className="text-xs text-yellow-400">
                       Erreicht am{" "}
                       {new Date(achievement.unlocked_at).toLocaleDateString(
                         "de-DE"
@@ -213,30 +219,30 @@ export default function AchievementsSection() {
         </div>
 
         {/* Summary Stats */}
-        <div className="mt-6 pt-4 border-t">
+        <div className="mt-6 pt-4 border-t border-slate-700">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
             <div>
               <div className="text-2xl font-bold text-yellow-500">
                 {achievements.filter((a) => a.is_unlocked).length}
               </div>
-              <p className="text-xs text-muted-foreground">Erreicht</p>
+              <p className="text-xs text-slate-400">Erreicht</p>
             </div>
             <div>
-              <div className="text-2xl font-bold">{achievements.length}</div>
-              <p className="text-xs text-muted-foreground">Gesamt</p>
+              <div className="text-2xl font-bold text-white">
+                {achievements.length}
+              </div>
+              <p className="text-xs text-slate-400">Gesamt</p>
             </div>
             <div>
-              <div className="text-2xl font-bold text-blue-500">
+              <div className="text-2xl font-bold text-blue-400">
                 {achievements
                   .filter((a) => a.is_unlocked)
                   .reduce((sum, a) => sum + a.reward_gems, 0)}
               </div>
-              <p className="text-xs text-muted-foreground">
-                Edelsteine erhalten
-              </p>
+              <p className="text-xs text-slate-400">Edelsteine erhalten</p>
             </div>
             <div>
-              <div className="text-2xl font-bold text-green-500">
+              <div className="text-2xl font-bold text-green-400">
                 {Math.round(
                   (achievements.filter((a) => a.is_unlocked).length /
                     achievements.length) *
@@ -244,7 +250,7 @@ export default function AchievementsSection() {
                 )}
                 %
               </div>
-              <p className="text-xs text-muted-foreground">Abgeschlossen</p>
+              <p className="text-xs text-slate-400">Abgeschlossen</p>
             </div>
           </div>
         </div>

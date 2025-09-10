@@ -31,10 +31,10 @@ export default function StreakSection({ stats }: StreakSectionProps) {
   };
 
   return (
-    <Card>
+    <Card className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 border-slate-700/50 backdrop-blur-sm">
       <CardHeader>
         <div className="flex items-center justify-between">
-          <CardTitle className="flex items-center gap-2">
+          <CardTitle className="flex items-center gap-2 text-white">
             <Flame className="h-5 w-5 text-amber-500" />
             Streak & Multiplikator
           </CardTitle>
@@ -42,7 +42,7 @@ export default function StreakSection({ stats }: StreakSectionProps) {
             variant="ghost"
             size="sm"
             onClick={() => setIsStreakExpanded(!isStreakExpanded)}
-            className="flex items-center gap-1"
+            className="flex items-center gap-1 text-slate-300 hover:text-white"
           >
             {isStreakExpanded ? (
               <>
@@ -62,11 +62,11 @@ export default function StreakSection({ stats }: StreakSectionProps) {
             <div className="text-3xl font-bold text-amber-500">
               {current_streak}
             </div>
-            <p className="text-sm text-muted-foreground">Tage in Folge</p>
+            <p className="text-sm text-slate-400">Tage in Folge</p>
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-2xl font-bold">
+              <span className="text-2xl font-bold text-white">
                 x{streak_multiplier.toFixed(1)}
               </span>
               {streak_multiplier > 1.0 && (
@@ -75,14 +75,14 @@ export default function StreakSection({ stats }: StreakSectionProps) {
                 </Badge>
               )}
             </div>
-            <p className="text-sm text-muted-foreground">XP Multiplikator</p>
+            <p className="text-sm text-slate-400">XP Multiplikator</p>
           </div>
         </div>
 
         {/* Expanded Streak Multiplier Tiers */}
         {isStreakExpanded && streakMultipliers && (
-          <div className="mt-6 pt-6 border-t">
-            <h4 className="text-lg font-semibold mb-4 flex items-center gap-2">
+          <div className="mt-6 pt-6 border-t border-slate-700">
+            <h4 className="text-lg font-semibold mb-4 flex items-center gap-2 text-white">
               <Trophy className="h-5 w-5 text-yellow-500" />
               Streak Multiplikator Stufen
             </h4>
@@ -100,10 +100,10 @@ export default function StreakSection({ stats }: StreakSectionProps) {
                       key={tier.id}
                       className={`p-4 rounded-lg border-2 transition-all ${
                         tierInfo.isActive
-                          ? "border-amber-500 bg-amber-50 dark:bg-amber-950/20"
+                          ? "border-amber-500 bg-amber-950/20"
                           : tierInfo.isNext
-                          ? "border-amber-300 bg-amber-25 dark:bg-amber-950/10"
-                          : "border-gray-200 bg-gray-50 dark:bg-gray-900/50"
+                          ? "border-amber-300 bg-amber-950/10"
+                          : "border-slate-700 bg-slate-800/50"
                       }`}
                     >
                       <div className="flex items-center justify-between mb-2">
@@ -114,10 +114,10 @@ export default function StreakSection({ stats }: StreakSectionProps) {
                                 ? "text-amber-500"
                                 : tierInfo.isNext
                                 ? "text-amber-400"
-                                : "text-gray-400"
+                                : "text-slate-500"
                             }`}
                           />
-                          <span className="font-semibold">
+                          <span className="font-semibold text-white">
                             x{tier.multiplier.toFixed(1)}
                           </span>
                         </div>
@@ -132,20 +132,20 @@ export default function StreakSection({ stats }: StreakSectionProps) {
                       </div>
 
                       <div className="space-y-1">
-                        <p className="text-sm font-medium">
+                        <p className="text-sm font-medium text-white">
                           {tier.min_streak_days === 0
                             ? "Standard"
                             : `${tier.min_streak_days}+ Tage`}
                         </p>
 
                         {!tierInfo.isActive && tierInfo.daysNeeded > 0 && (
-                          <p className="text-xs text-muted-foreground">
+                          <p className="text-xs text-slate-400">
                             Noch {tierInfo.daysNeeded} Tage
                           </p>
                         )}
 
                         {tierInfo.isActive && tier.min_streak_days > 0 && (
-                          <p className="text-xs text-amber-600 dark:text-amber-400">
+                          <p className="text-xs text-amber-400">
                             Seit {current_streak - tier.min_streak_days + 1}{" "}
                             Tagen aktiv
                           </p>
@@ -156,8 +156,8 @@ export default function StreakSection({ stats }: StreakSectionProps) {
                 })}
             </div>
 
-            <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-950/20 rounded-lg border border-blue-200 dark:border-blue-800">
-              <p className="text-sm text-blue-700 dark:text-blue-300">
+            <div className="mt-4 p-3 bg-blue-950/20 rounded-lg border border-blue-800">
+              <p className="text-sm text-blue-300">
                 <strong>Tipp:</strong> Halte deine Streak aufrecht, um höhere
                 XP-Multiplikatoren zu erhalten! Jede erledigte Aufgabe gibt dir
                 mehr Erfahrungspunkte.

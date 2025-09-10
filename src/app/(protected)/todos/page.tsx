@@ -1,9 +1,9 @@
-import CalendarView from "@/components/CalendarView";
+import TodoView from "@/components/TodoView";
 
-export default async function Calendar() {
+export default async function TodosPage() {
   return (
     <div className="container mx-auto p-6 space-y-6">
-      <CalendarView />
+      <TodoView />
     </div>
   );
 }

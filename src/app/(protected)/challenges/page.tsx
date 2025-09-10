@@ -52,6 +52,17 @@ export default function ChallengesPage() {
       completed: false,
       timeLeft: "4h 23m",
     },
+    {
+      id: 4,
+      title: "Wochenkrieger",
+      description: "Erledige 25 Todos diese Woche",
+      progress: 0,
+      target: 25,
+      xpReward: 300,
+      gemReward: 5,
+      completed: false,
+      timeLeft: "4h 23m",
+    },
   ];
 
   // Mock data for weekly challenges
@@ -102,13 +113,13 @@ export default function ChallengesPage() {
 
     return (
       <Card
-        className={`relative overflow-hidden ${
+        className={`relative overflow-hidden h-full flex flex-col justify-center ${
           challenge.completed ? "bg-green-50 border-green-200" : ""
         }`}
       >
         <CardHeader className="pb-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
+          <div className="flex items-start justify-between">
+            <div className="flex items-start gap-2">
               <div
                 className={`p-2 rounded-lg ${
                   type === "daily"
@@ -135,7 +146,7 @@ export default function ChallengesPage() {
           </div>
         </CardHeader>
 
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-4 flex-1 flex flex-col justify-center">
           <div className="space-y-2">
             <div className="flex justify-between text-sm">
               <span>Fortschritt</span>
@@ -200,14 +211,14 @@ export default function ChallengesPage() {
           </Badge>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {dailyChallenges.map((challenge) => (
-            <ChallengeCard
-              key={challenge.id}
-              challenge={challenge}
-              type="daily"
-            />
-          ))}
+        <div className="overflow-x-auto">
+          <div className="flex gap-4 pb-4 min-w-max">
+            {dailyChallenges.map((challenge) => (
+              <div key={challenge.id} className="flex-none w-80 h-52">
+                <ChallengeCard challenge={challenge} type="daily" />
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -223,59 +234,14 @@ export default function ChallengesPage() {
           </Badge>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {weeklyChallenges.map((challenge) => (
-            <ChallengeCard
-              key={challenge.id}
-              challenge={challenge}
-              type="weekly"
-            />
-          ))}
-        </div>
-      </section>
-
-      {/* Stats Overview */}
-      <section className="space-y-4">
-        <h2 className="text-2xl font-semibold">Herausforderungs-Statistiken</h2>
-
-        <div className="grid gap-4 md:grid-cols-3">
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium">
-                Heute abgeschlossen
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">1/3</div>
-              <p className="text-xs text-muted-foreground">+75 XP verdient</p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium">
-                Diese Woche abgeschlossen
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">0/3</div>
-              <p className="text-xs text-muted-foreground">0 XP verdient</p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium">
-                Gesamt-Streak
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">7 Tage</div>
-              <p className="text-xs text-muted-foreground">
-                Persönlicher Rekord!
-              </p>
-            </CardContent>
-          </Card>
+        <div className="overflow-x-auto">
+          <div className="flex gap-4 pb-4 min-w-max">
+            {weeklyChallenges.map((challenge) => (
+              <div key={challenge.id} className="flex-none w-80 h-52">
+                <ChallengeCard challenge={challenge} type="weekly" />
+              </div>
+            ))}
+          </div>
         </div>
       </section>
     </div>

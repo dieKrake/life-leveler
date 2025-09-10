@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import AddTodoSheet from "./AddTodoSheet";
 
-export default function CalendarView() {
+export default function TodoView() {
   const [isSyncing, setIsSyncing] = useState(false);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const supabase = createClientComponentClient();
@@ -75,47 +75,51 @@ export default function CalendarView() {
         mutate={mutate}
       />
 
-      <div className="flex flex-col md:flex-row gap-16 w-full">
+      <div className="flex flex-col md:flex-row gap-16 w-full h-[67vh]">
         {/* Offene Aufgaben */}
-        <div className="w-full">
+        <div className="w-full flex flex-col">
           <h2 className="text-2xl font-semibold mb-4">Offene Aufgaben</h2>
-          {incompleteTodos.length > 0 ? (
-            <ul className="space-y-3">
-              {incompleteTodos.map((todo) => (
-                <TodoItem
-                  key={todo.id}
-                  todo={todo}
-                  todos={todos}
-                  mutate={mutate}
-                />
-              ))}
-            </ul>
-          ) : (
-            <p className="text-muted-foreground">
-              Super! Keine offenen Aufgaben.
-            </p>
-          )}
+          <div className="flex-1 overflow-y-auto">
+            {incompleteTodos.length > 0 ? (
+              <ul className="space-y-3 pr-2">
+                {incompleteTodos.map((todo) => (
+                  <TodoItem
+                    key={todo.id}
+                    todo={todo}
+                    todos={todos}
+                    mutate={mutate}
+                  />
+                ))}
+              </ul>
+            ) : (
+              <p className="text-muted-foreground">
+                Super! Keine offenen Aufgaben.
+              </p>
+            )}
+          </div>
         </div>
 
         {/* Erledigte Aufgaben */}
-        <div className="w-full">
+        <div className="w-full flex flex-col">
           <h2 className="text-2xl font-semibold mb-4">Erledigte Aufgaben</h2>
-          {completedTodos.length > 0 ? (
-            <ul className="space-y-3">
-              {completedTodos.map((todo) => (
-                <TodoItem
-                  key={todo.id}
-                  todo={todo}
-                  todos={todos}
-                  mutate={mutate}
-                />
-              ))}
-            </ul>
-          ) : (
-            <p className="text-muted-foreground">
-              Noch keine Aufgaben erledigt.
-            </p>
-          )}
+          <div className="flex-1 overflow-y-auto">
+            {completedTodos.length > 0 ? (
+              <ul className="space-y-3 pr-2">
+                {completedTodos.map((todo) => (
+                  <TodoItem
+                    key={todo.id}
+                    todo={todo}
+                    todos={todos}
+                    mutate={mutate}
+                  />
+                ))}
+              </ul>
+            ) : (
+              <p className="text-muted-foreground">
+                Noch keine Aufgaben erledigt.
+              </p>
+            )}
+          </div>
         </div>
       </div>
     </div>

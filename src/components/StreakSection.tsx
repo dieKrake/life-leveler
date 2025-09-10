@@ -35,14 +35,14 @@ export default function StreakSection({ stats }: StreakSectionProps) {
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2 text-white">
-            <Flame className="h-5 w-5 text-amber-500" />
+            <Flame className="h-5 w-5 text-orange-400" />
             Streak & Multiplikator
           </CardTitle>
           <Button
             variant="ghost"
             size="sm"
             onClick={() => setIsStreakExpanded(!isStreakExpanded)}
-            className="flex items-center gap-1 text-slate-300 hover:text-white"
+            className="flex items-center gap-1 text-slate-300 hover:bg-transparent hover:text-white"
           >
             {isStreakExpanded ? (
               <>
@@ -59,7 +59,7 @@ export default function StreakSection({ stats }: StreakSectionProps) {
       <CardContent>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <div className="text-3xl font-bold text-amber-500">
+            <div className="text-3xl font-bold text-orange-400">
               {current_streak}
             </div>
             <p className="text-sm text-slate-400">Tage in Folge</p>
@@ -70,7 +70,7 @@ export default function StreakSection({ stats }: StreakSectionProps) {
                 x{streak_multiplier.toFixed(1)}
               </span>
               {streak_multiplier > 1.0 && (
-                <Badge variant="secondary" className="bg-amber-500 text-white">
+                <Badge variant="secondary" className="bg-orange-500 text-white">
                   Aktiv
                 </Badge>
               )}
@@ -83,7 +83,7 @@ export default function StreakSection({ stats }: StreakSectionProps) {
         {isStreakExpanded && streakMultipliers && (
           <div className="mt-6 pt-6 border-t border-slate-700">
             <h4 className="text-lg font-semibold mb-4 flex items-center gap-2 text-white">
-              <Trophy className="h-5 w-5 text-yellow-500" />
+              <Trophy className="h-5 w-5 text-orange-500" />
               Streak Multiplikator Stufen
             </h4>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -100,20 +100,16 @@ export default function StreakSection({ stats }: StreakSectionProps) {
                       key={tier.id}
                       className={`p-4 rounded-lg border-2 transition-all ${
                         tierInfo.isActive
-                          ? "border-amber-500 bg-amber-950/20"
-                          : tierInfo.isNext
-                          ? "border-amber-300 bg-amber-950/10"
+                          ? "border-yellow-100 border-opacity-20 bg-amber-950/20"
                           : "border-slate-700 bg-slate-800/50"
-                      }`}
+                      } ${!tierInfo.isActive ? "opacity-75" : ""}`}
                     >
                       <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center gap-2">
                           <Flame
                             className={`h-5 w-5 ${
                               tierInfo.isActive
-                                ? "text-amber-500"
-                                : tierInfo.isNext
-                                ? "text-amber-400"
+                                ? "text-orange-500"
                                 : "text-slate-500"
                             }`}
                           />
@@ -124,7 +120,7 @@ export default function StreakSection({ stats }: StreakSectionProps) {
                         {tierInfo.isActive && (
                           <Badge
                             variant="secondary"
-                            className="bg-amber-500 text-white text-xs"
+                            className="bg-orange-500 text-white text-xs"
                           >
                             Erreicht
                           </Badge>
@@ -145,7 +141,7 @@ export default function StreakSection({ stats }: StreakSectionProps) {
                         )}
 
                         {tierInfo.isActive && tier.min_streak_days > 0 && (
-                          <p className="text-xs text-amber-400">
+                          <p className="text-xs text-orange-400">
                             Seit {current_streak - tier.min_streak_days + 1}{" "}
                             Tagen aktiv
                           </p>

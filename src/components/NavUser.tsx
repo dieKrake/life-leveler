@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import AuthButton from "./AuthButton";
 import type { User } from "@supabase/supabase-js";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export default function NavUser() {
   const [user, setUser] = useState<User | null>(null);
@@ -33,11 +34,49 @@ export default function NavUser() {
     return () => subscription.unsubscribe();
   }, [supabase.auth]);
 
-  return (
-    <div className="flex flex-row gap-4 items-center h-full">
-      {user && <p className="">{user.email}</p>}
+  if (!user && !isOnLoginPage) {
+    return <AuthButton user={user} />;
+  }
 
-      {!isOnLoginPage && <AuthButton user={user} />}
+  if (!user) {
+    return null;
+  }
+
+  if (isOnLoginPage) {
+    return null;
+  }
+
+  return (
+    <div className="flex items-center gap-3">
+      {/* User Avatar & Info */}
+      <div className="flex items-center gap-3">
+        <div className="hidden sm:flex flex-col items-end">
+          <span className="text-sm font-medium text-slate-200">
+            {user.user_metadata?.full_name ||
+              user.email?.split("@")[0] ||
+              "Player"}
+          </span>
+        </div>
+
+        <div className="relative">
+          <Avatar className="w-8 h-8 border-2 border-gradient-to-r from-purple-400 to-pink-400 shadow-lg">
+            <AvatarImage
+              src={
+                user.user_metadata?.avatar_url || user.user_metadata?.picture
+              }
+              alt="Profile"
+            />
+            <AvatarFallback className="bg-gradient-to-br from-purple-500 to-pink-500 text-white font-semibold text-xs">
+              {(user.user_metadata?.full_name ||
+                user.email ||
+                "P")[0].toUpperCase()}
+            </AvatarFallback>
+          </Avatar>
+          <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-slate-900 animate-pulse"></div>
+        </div>
+      </div>
+
+      <AuthButton user={user} />
     </div>
   );
 }

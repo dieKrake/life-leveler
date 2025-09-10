@@ -24,6 +24,11 @@ export default function AuthButton({ user }: { user: User | null }) {
       Abmelden
     </Button>
   ) : (
-    <Button onClick={handleSignIn}>Anmelden</Button>
+    <Button
+      className="bg-gradient-to-br from-purple-400 via-pink-500 to-red-500"
+      onClick={handleSignIn}
+    >
+      Anmelden
+    </Button>
   );
 }

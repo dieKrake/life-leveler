@@ -33,7 +33,7 @@ export default async function RootLayout({
       <body className={`${inter.className} antialiased`}>
         <SWRProvider>
           <Navbar />
-          {session && <PlayerStatsBar />} {children}
+          {children}
         </SWRProvider>
       </body>
     </html>

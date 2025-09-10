@@ -14,6 +14,7 @@ import {
   Target,
   Zap,
   CheckCircle2,
+  Gem,
 } from "lucide-react";
 
 export default function ChallengesPage() {
@@ -166,7 +167,7 @@ export default function ChallengesPage() {
                 </span>
               </div>
               <div className="flex items-center gap-1">
-                <div className="w-4 h-4 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full" />
+                <Gem className="w-4 h-4 text-blue-500" />
                 <span className="text-sm font-medium">
                   {challenge.gemReward} Gems
                 </span>

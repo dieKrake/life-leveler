@@ -1,7 +1,6 @@
 import useSWR, { mutate as globalMutate } from "swr";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { Target, Trophy, Flame, Gem, TrendingUp, Unlock } from "lucide-react";
 import { UserAchievement } from "@/types";
@@ -113,7 +112,7 @@ export default function AchievementsSection() {
                 key={achievement.achievement_id}
                 className={`relative p-4 border rounded-lg transition-all ${
                   isUnlocked
-                    ? "border-yellow-500 bg-yellow-950/20"
+                    ? "border-purple-400 bg-amber-950/20"
                     : "border-slate-700 bg-slate-800/50"
                 } ${!isUnlocked ? "opacity-75" : ""}`}
               >
@@ -121,13 +120,13 @@ export default function AchievementsSection() {
                 <div className="flex items-center justify-between mb-3">
                   <IconComponent
                     className={`h-8 w-8 ${
-                      isUnlocked ? "text-yellow-500" : "text-slate-500"
+                      isUnlocked ? "text-purple-400" : "text-slate-500"
                     }`}
                   />
                   {isUnlocked && (
                     <Badge
                       variant="secondary"
-                      className="bg-yellow-500 text-white text-xs"
+                      className="bg-purple-600 text-white text-xs"
                     >
                       Erreicht
                     </Badge>
@@ -137,7 +136,9 @@ export default function AchievementsSection() {
                       variant="outline"
                       className="text-xs border-slate-600 text-slate-300"
                     >
-                      +{achievement.reward_gems} 💎
+                      <div className="flex items-center gap-1">
+                        +{achievement.reward_gems} <Gem className="h-3 w-3" />
+                      </div>
                     </Badge>
                   )}
                 </div>
@@ -161,10 +162,12 @@ export default function AchievementsSection() {
                           {achievement.condition_value}
                         </span>
                       </div>
-                      <Progress
-                        value={progressPercentage}
-                        className="h-1.5 bg-slate-700"
-                      />
+                      <div className="relative w-full h-1.5 bg-slate-700 rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-gradient-to-r from-purple-400 to-pink-400 rounded-full transition-all duration-300"
+                          style={{ width: `${progressPercentage}%` }}
+                        />
+                      </div>
                       <p className="text-xs text-slate-400">
                         {progressPercentage.toFixed(0)}% erreicht
                       </p>
@@ -193,7 +196,7 @@ export default function AchievementsSection() {
 
                   {/* Unlock date for completed achievements */}
                   {isUnlocked && achievement.unlocked_at && (
-                    <p className="text-xs text-yellow-400">
+                    <p className="text-xs text-purple-400">
                       Erreicht am{" "}
                       {new Date(achievement.unlocked_at).toLocaleDateString(
                         "de-DE"
@@ -201,18 +204,6 @@ export default function AchievementsSection() {
                     </p>
                   )}
                 </div>
-
-                {/* Reward gems display for unlocked achievements */}
-                {isUnlocked && achievement.reward_gems > 0 && (
-                  <div className="absolute top-2 right-2">
-                    <Badge
-                      variant="secondary"
-                      className="bg-blue-500 text-white text-xs"
-                    >
-                      +{achievement.reward_gems} 💎
-                    </Badge>
-                  </div>
-                )}
               </div>
             );
           })}
@@ -222,7 +213,7 @@ export default function AchievementsSection() {
         <div className="mt-6 pt-4 border-t border-slate-700">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
             <div>
-              <div className="text-2xl font-bold text-yellow-500">
+              <div className="text-2xl font-bold text-purple-400">
                 {achievements.filter((a) => a.is_unlocked).length}
               </div>
               <p className="text-xs text-slate-400">Erreicht</p>

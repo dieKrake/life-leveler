@@ -125,15 +125,10 @@ export default function ProfilePicture({
             {xp - xpForCurrentLevel} / {xpForNextLevel - xpForCurrentLevel}
           </span>
         </div>
-        <div className="relative">
-          <Progress
-            value={xpProgress}
-            className="h-3 bg-slate-800 border border-slate-700"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full opacity-75 blur-sm"></div>
-          <Progress
-            value={xpProgress}
-            className="h-3 bg-transparent relative z-10"
+        <div className="relative w-full h-3 bg-slate-800 rounded-full border border-slate-700 overflow-hidden">
+          <div
+            className="h-full bg-gradient-to-r from-blue-500 to-purple-500 rounded-full transition-all duration-300"
+            style={{ width: `${xpProgress}%` }}
           />
         </div>
       </div>

@@ -9,7 +9,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { formatTodoDate } from "@/lib/dateUtils";
-import { getTodoTimingColor, getTodoTimingBadge } from "@/lib/todoUtils";
+import { getTodoTimingColor } from "@/lib/todoUtils";
 import DeleteTodoButton from "./DeleteTodoButton";
 import { DifficultySelector } from "./DifficultySelector";
 import { Flame, Gem } from "lucide-react";
@@ -32,7 +32,7 @@ export default function TodoItem({ todo, todos, mutate }: TodoItemProps) {
 
   if (!stats) {
     return (
-      <div className="w-full bg-gradient-to-br from-slate-800/50 to-slate-900/50 border border-slate-700/50 rounded-lg p-3 backdrop-blur-sm">
+      <div className="w-full bg-gradient-to-br from-slate-800/50 to-slate-900/50 border border-slate-700/50 rounded-lg p-3">
         <div className="text-slate-400">Lade Stats...</div>
       </div>
     );
@@ -103,12 +103,9 @@ export default function TodoItem({ todo, todos, mutate }: TodoItemProps) {
 
   const todoId = `todo-${todo.id}`;
   const timingColor = getTodoTimingColor(todo);
-  const timingBadge = getTodoTimingBadge(todo);
 
   return (
-    <div
-      className={`relative p-4 border rounded-lg transition-all duration-300 hover:shadow-lg backdrop-blur-sm ${timingColor}`}
-    >
+    <div className={`relative p-4 rounded-lg ${timingColor}`}>
       <div className="flex items-start space-x-3">
         <Checkbox
           id={todoId}
@@ -132,15 +129,6 @@ export default function TodoItem({ todo, todos, mutate }: TodoItemProps) {
             </Label>
 
             <div className="flex items-center gap-2 flex-shrink-0">
-              {timingBadge && (
-                <Badge
-                  variant="secondary"
-                  className={`text-xs px-2 py-1 ${timingBadge.className}`}
-                >
-                  {timingBadge.text}
-                </Badge>
-              )}
-
               {/* XP Value Badge */}
               <Badge
                 variant="outline"

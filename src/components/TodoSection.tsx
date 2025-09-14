@@ -45,7 +45,7 @@ export default function TodoSection({
         </div>
       </CardHeader>
       <CardContent>
-        <div className="max-h-[60vh] overflow-y-auto pr-2">
+        <div className="max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
           {todos.length > 0 ? (
             <div className="space-y-3">
               {todos.map((todo) => (

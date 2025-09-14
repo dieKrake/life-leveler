@@ -10,9 +10,9 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { formatTodoDate } from "@/lib/dateUtils";
 import { getTodoTimingColor } from "@/lib/todoUtils";
-import DeleteTodoButton from "./DeleteTodoButton";
 import { DifficultySelector } from "./DifficultySelector";
 import { Flame, Gem } from "lucide-react";
+import ArchiveTodoDialog from "./ArchiveTodoDialog";
 
 type TodoItemProps = {
   todo: Todo;
@@ -162,7 +162,8 @@ export default function TodoItem({ todo, todos, mutate }: TodoItemProps) {
                 </div>
               )}
 
-              <DeleteTodoButton todo={todo} todos={todos} mutate={mutate} />
+              {/* Archive Button - for all todos */}
+              <ArchiveTodoDialog todo={todo} todos={todos} mutate={mutate} />
             </div>
           </div>
         </div>

@@ -5,10 +5,10 @@ import { useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 import { format } from "date-fns";
 import { addHours } from "date-fns/addHours";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, Gem } from "lucide-react";
 import { useState, useEffect } from "react";
 import type { Todo } from "@/types";
-import { handleCalendarSelect, handleTimeInputChange } from "@/lib/dateUtils";
+import { handleCalendarSelect } from "@/lib/dateUtils";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -24,12 +24,38 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Calendar } from "@/components/ui/calendar";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+
+// Generate 15-minute intervals for time selection
+const generateTimeOptions = () => {
+  const options = [];
+  for (let hour = 0; hour < 24; hour++) {
+    for (let minute = 0; minute < 60; minute += 15) {
+      const timeString = `${hour.toString().padStart(2, "0")}:${minute
+        .toString()
+        .padStart(2, "0")}`;
+      const displayString = `${hour.toString().padStart(2, "0")}:${minute
+        .toString()
+        .padStart(2, "0")}`;
+      options.push({ value: timeString, label: displayString });
+    }
+  }
+  return options;
+};
+
+const timeOptions = generateTimeOptions();
 
 const formSchema = z
   .object({
@@ -81,6 +107,18 @@ export default function AddTodoForm({ onSuccess }: AddTodoFormProps) {
     }
   }, [taskType, startDateTimeValue, form]);
 
+  const handleTimeChange = (
+    timeString: string,
+    currentDate: Date | undefined
+  ) => {
+    if (!currentDate) return new Date();
+
+    const [hours, minutes] = timeString.split(":").map(Number);
+    const newDate = new Date(currentDate);
+    newDate.setHours(hours, minutes, 0, 0);
+    return newDate;
+  };
+
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsSubmitting(true);
     try {
@@ -116,28 +154,44 @@ export default function AddTodoForm({ onSuccess }: AddTodoFormProps) {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         <FormField
           control={form.control}
           name="type"
           render={({ field }) => (
-            <FormItem className="space-y-3">
-              <FormLabel>Typ</FormLabel>
+            <FormItem className="space-y-4">
+              <FormLabel className="text-slate-200 font-semibold">
+                Typ
+              </FormLabel>
               <FormControl>
                 <RadioGroup
                   onValueChange={field.onChange}
                   defaultValue={field.value}
-                  className="flex space-x-4"
+                  className="flex space-x-6"
                 >
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="event" id="type-event" />
-                    <Label htmlFor="type-event" className="font-normal">
+                  <div className="flex items-center space-x-3">
+                    <RadioGroupItem
+                      value="event"
+                      id="type-event"
+                      className="border-purple-500 text-purple-200"
+                    />
+                    <Label
+                      htmlFor="type-event"
+                      className="font-normal text-slate-300 cursor-pointer"
+                    >
                       Termin
                     </Label>
                   </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="task" id="type-task" />
-                    <Label htmlFor="type-task" className="font-normal">
+                  <div className="flex items-center space-x-3">
+                    <RadioGroupItem
+                      value="task"
+                      id="type-task"
+                      className="border-purple-500 text-purple-200"
+                    />
+                    <Label
+                      htmlFor="type-task"
+                      className="font-normal text-slate-300 cursor-pointer"
+                    >
                       Aufgabe
                     </Label>
                   </div>
@@ -153,9 +207,15 @@ export default function AddTodoForm({ onSuccess }: AddTodoFormProps) {
           name="title"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Titel</FormLabel>
+              <FormLabel className="text-slate-200 font-semibold">
+                Titel
+              </FormLabel>
               <FormControl>
-                <Input placeholder="Neues Todo..." {...field} />
+                <Input
+                  placeholder="Neues Todo..."
+                  {...field}
+                  className="bg-slate-800/50 border-slate-600 text-slate-200 placeholder:text-slate-400 focus:border-purple-500 focus:ring-purple-500/20"
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -167,15 +227,17 @@ export default function AddTodoForm({ onSuccess }: AddTodoFormProps) {
           name="startDateTime"
           render={({ field }) => (
             <FormItem className="flex flex-col">
-              <FormLabel>Start</FormLabel>
+              <FormLabel className="text-slate-200 font-semibold">
+                Start
+              </FormLabel>
               <FormControl>
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button
                       variant={"outline"}
                       className={cn(
-                        "pl-3 text-left font-normal",
-                        !field.value && "text-muted-foreground"
+                        "pl-3 text-left font-normal bg-slate-800/50 border-slate-600 text-slate-200 hover:bg-slate-700/50 hover:border-purple-500 hover:text-white",
+                        !field.value && "text-slate-400"
                       )}
                     >
                       {field.value ? (
@@ -183,10 +245,13 @@ export default function AddTodoForm({ onSuccess }: AddTodoFormProps) {
                       ) : (
                         <span>Wähle ein Datum</span>
                       )}
-                      <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                      <CalendarIcon className="ml-auto h-4 w-4 text-white" />
                     </Button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
+                  <PopoverContent
+                    className="w-auto p-0 bg-slate-800 border-slate-600"
+                    align="start"
+                  >
                     <Calendar
                       mode="single"
                       selected={field.value}
@@ -210,22 +275,34 @@ export default function AddTodoForm({ onSuccess }: AddTodoFormProps) {
                         }
                       }}
                       initialFocus
+                      className="bg-slate-800 text-slate-200"
                     />
-                    <div className="p-3 border-t border-border">
-                      <Input
-                        type="time"
-                        defaultValue={format(
-                          field.value || new Date(),
-                          "HH:mm"
-                        )}
-                        onChange={(e) => {
-                          const newDateTime = handleTimeInputChange(
-                            e.target.value,
+                    <div className="p-3 border-t border-slate-600">
+                      <Select
+                        value={field.value ? format(field.value, "HH:mm") : ""}
+                        onValueChange={(timeString) => {
+                          const newDateTime = handleTimeChange(
+                            timeString,
                             field.value
                           );
                           field.onChange(newDateTime);
                         }}
-                      />
+                      >
+                        <SelectTrigger className="bg-slate-700/50 border-slate-600 text-slate-200 hover:bg-slate-700/50 hover:border-purple-500 hover:text-white">
+                          <SelectValue placeholder="Zeit wählen" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-slate-800 border-slate-600 text-slate-200 max-h-60">
+                          {timeOptions.map((option) => (
+                            <SelectItem
+                              key={option.value}
+                              value={option.value}
+                              className="text-slate-200 hover:bg-purple-500/20 hover:text-purple-300 focus:bg-purple-500/30 focus:text-purple-200"
+                            >
+                              {option.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     </div>
                   </PopoverContent>
                 </Popover>
@@ -241,15 +318,17 @@ export default function AddTodoForm({ onSuccess }: AddTodoFormProps) {
             name="endDateTime"
             render={({ field }) => (
               <FormItem className="flex flex-col">
-                <FormLabel>Ende</FormLabel>
+                <FormLabel className="text-slate-200 font-semibold">
+                  Ende
+                </FormLabel>
                 <FormControl>
                   <Popover>
                     <PopoverTrigger asChild>
                       <Button
                         variant={"outline"}
                         className={cn(
-                          "pl-3 text-left font-normal",
-                          !field.value && "text-muted-foreground"
+                          "pl-3 text-left font-normal bg-slate-800/50 border-slate-600 text-slate-200 hover:bg-slate-700/50 hover:border-purple-500 hover:text-white",
+                          !field.value && "text-slate-400"
                         )}
                       >
                         {field.value ? (
@@ -257,10 +336,13 @@ export default function AddTodoForm({ onSuccess }: AddTodoFormProps) {
                         ) : (
                           <span>Wähle ein Datum</span>
                         )}
-                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                        <CalendarIcon className="ml-auto h-4 w-4 text-white" />
                       </Button>
                     </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
+                    <PopoverContent
+                      className="w-auto p-0 bg-slate-800 border-slate-600"
+                      align="start"
+                    >
                       <Calendar
                         mode="single"
                         selected={field.value}
@@ -272,27 +354,36 @@ export default function AddTodoForm({ onSuccess }: AddTodoFormProps) {
                             ? date < new Date(startDate.toDateString())
                             : false;
                         }}
+                        className="bg-slate-800 text-slate-200"
                       />
-                      <div className="p-3 border-t border-border">
-                        <Input
-                          type="time"
-                          defaultValue={format(
-                            field.value ||
-                              addHours(
-                                form.getValues("startDateTime") || new Date(),
-                                1
-                              ),
-                            "HH:mm"
-                          )}
-                          onChange={(e) => {
-                            const [hours, minutes] = e.target.value
-                              .split(":")
-                              .map(Number);
-                            const newDate = new Date(field.value || new Date());
-                            newDate.setHours(hours, minutes);
-                            field.onChange(newDate);
+                      <div className="p-3 border-t border-slate-600">
+                        <Select
+                          value={
+                            field.value ? format(field.value, "HH:mm") : ""
+                          }
+                          onValueChange={(timeString) => {
+                            const newDateTime = handleTimeChange(
+                              timeString,
+                              field.value
+                            );
+                            field.onChange(newDateTime);
                           }}
-                        />
+                        >
+                          <SelectTrigger className="bg-slate-700/50 border-slate-600 text-slate-200">
+                            <SelectValue placeholder="Zeit wählen" />
+                          </SelectTrigger>
+                          <SelectContent className="bg-slate-800 border-slate-600 text-slate-200 max-h-60">
+                            {timeOptions.map((option) => (
+                              <SelectItem
+                                key={option.value}
+                                value={option.value}
+                                className="text-slate-200 hover:bg-purple-500/20 hover:text-purple-300 focus:bg-purple-500/30 focus:text-purple-200"
+                              >
+                                {option.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
                       </div>
                     </PopoverContent>
                   </Popover>
@@ -308,21 +399,46 @@ export default function AddTodoForm({ onSuccess }: AddTodoFormProps) {
           name="xp_value"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Schwierigkeit</FormLabel>
+              <FormLabel className="text-slate-200 font-semibold flex items-center gap-2">
+                <Gem className="w-4 h-4 text-purple-400" />
+                Schwierigkeit
+              </FormLabel>
               <FormControl className="flex justify-start gap-2">
                 <ToggleGroup
                   type="single"
                   variant="outline"
                   onValueChange={field.onChange}
+                  className="justify-start"
                 >
-                  <ToggleGroupItem value="10" aria-label="Leicht">
-                    Easy
+                  <ToggleGroupItem
+                    value="10"
+                    aria-label="Leicht"
+                    className="bg-slate-800/50 border-slate-600 text-slate-300 hover:bg-green-500/20 hover:border-green-500 data-[state=on]:bg-green-500/30 data-[state=on]:border-green-400 data-[state=on]:text-green-300 hover:text-white px-4 py-2 h-auto min-w-[100px]"
+                  >
+                    <div className="flex flex-col items-center justify-center w-full">
+                      <p>Easy</p>
+                      <p className="text-xs opacity-80">(10 XP)</p>
+                    </div>
                   </ToggleGroupItem>
-                  <ToggleGroupItem value="20" aria-label="Mittel">
-                    Medium
+                  <ToggleGroupItem
+                    value="20"
+                    aria-label="Mittel"
+                    className="bg-slate-800/50 border-slate-600 text-slate-300 hover:bg-yellow-500/20 hover:border-yellow-500 data-[state=on]:bg-yellow-500/30 data-[state=on]:border-yellow-400 data-[state=on]:text-yellow-300 hover:text-white px-4 py-2 h-auto min-w-[100px]"
+                  >
+                    <div className="flex flex-col items-center justify-center w-full">
+                      <p>Medium</p>
+                      <p className="text-xs opacity-80">(20 XP)</p>
+                    </div>
                   </ToggleGroupItem>
-                  <ToggleGroupItem value="30" aria-label="Schwer">
-                    Hard
+                  <ToggleGroupItem
+                    value="30"
+                    aria-label="Schwer"
+                    className="bg-slate-800/50 border-slate-600 text-slate-300 hover:bg-red-500/20 hover:border-red-500 data-[state=on]:bg-red-500/30 data-[state=on]:border-red-400 data-[state=on]:text-red-300 hover:text-white px-4 py-2 h-auto min-w-[100px]"
+                  >
+                    <div className="flex flex-col items-center justify-center w-full">
+                      <p>Hard</p>
+                      <p className="text-xs opacity-80">(30 XP)</p>
+                    </div>
                   </ToggleGroupItem>
                 </ToggleGroup>
               </FormControl>
@@ -331,7 +447,11 @@ export default function AddTodoForm({ onSuccess }: AddTodoFormProps) {
           )}
         />
 
-        <Button type="submit" disabled={isSubmitting}>
+        <Button
+          type="submit"
+          disabled={isSubmitting}
+          className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold py-3 text-lg shadow-lg hover:shadow-purple-500/25 transition-all duration-200"
+        >
           {isSubmitting ? "Speichere..." : "Todo erstellen"}
         </Button>
       </form>

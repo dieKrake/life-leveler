@@ -61,20 +61,25 @@ export function DifficultySelector({
         <Button
           variant="ghost"
           size="sm"
-          className={`h-6 px-2 text-xs font-medium ${currentDifficulty.color} hover:bg-muted`}
+          className={`h-6 px-2 text-xs font-medium ${currentDifficulty.color} hover:${currentDifficulty.color}/50 hover:bg-purple-500/10 transition-colors`}
           disabled={isLoading}
         >
           {currentDifficulty.label}
           <ChevronDown className="ml-1 h-3 w-3" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-32">
+      <DropdownMenuContent
+        align="end"
+        className="w-32 bg-slate-800 border-none"
+      >
         {difficultyOptions.map((option) => (
           <DropdownMenuItem
             key={option.value}
             onClick={() => handleDifficultyChange(option.value)}
             className={`${option.color} ${
-              option.value === todo.xp_value ? "bg-muted" : ""
+              option.value === todo.xp_value ? "bg-purple-500/10" : ""
+            } hover:bg-transparent focus:bg-purple-500/20 focus:text-${
+              option.color
             }`}
           >
             <span className="flex justify-between items-center w-full">

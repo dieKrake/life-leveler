@@ -1,17 +1,17 @@
 "use client";
 
 import useSWR from "swr";
-import TodoItem from "./TodoItem";
 import type { Todo } from "@/types";
 import { useMemo, useState } from "react";
-import { Button } from "@/components/ui/button";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { CheckSquare, Clock } from "lucide-react";
 import AddTodoSheet from "./AddTodoSheet";
+import TodoViewHeader from "./TodoViewHeader";
+import TodoSection from "./TodoSection";
+import ArchiveAllDialog from "./ArchiveAllDialog";
+import { useTodoOperations } from "@/hooks/useTodoOperations";
 
 export default function TodoView() {
-  const [isSyncing, setIsSyncing] = useState(false);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
-  const supabase = createClientComponentClient();
 
   const {
     data: todos,
@@ -20,106 +20,90 @@ export default function TodoView() {
     mutate,
   } = useSWR<Todo[]>("/api/get-todos");
 
+  const { isSyncing, isArchiving, handleSync, handleArchiveAllCompleted } =
+    useTodoOperations(mutate);
+
   const incompleteTodos = useMemo(
     () => todos?.filter((todo) => !todo.is_completed) || [],
     [todos]
   );
+
   const completedTodos = useMemo(
     () => todos?.filter((todo) => todo.is_completed) || [],
     [todos]
   );
 
-  const handleSync = async () => {
-    setIsSyncing(true);
-    try {
-      const response = await fetch("/api/sync-events", { method: "POST" });
-
-      if (!response.ok) {
-        if (response.status === 401) {
-          await supabase.auth.signOut();
-          window.location.href = "/login";
-        }
-        throw new Error("Synchronisierung fehlgeschlagen");
-      }
-
-      mutate();
-    } catch (err) {
-      console.error("Fehler bei der Synchronisierung:", err);
-    } finally {
-      setIsSyncing(false);
-    }
-  };
-
   if (isLoading) {
-    return <p>Lade Todos...</p>;
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-6">
+        <div className="container mx-auto max-w-6xl">
+          <div className="text-center text-white">Lade Todos...</div>
+        </div>
+      </div>
+    );
   }
+
   if (error) {
-    return <p className="text-red-500">Fehler: {error.message}</p>;
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-6">
+        <div className="container mx-auto max-w-6xl">
+          <div className="text-center text-red-400">
+            Fehler: {error.message}
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="w-full space-y-8">
-      <div className="flex flex-col md:flex-row justify-end gap-2">
-        <Button onClick={() => setIsSheetOpen(true)}>Todo hinzufügen</Button>
-        <Button onClick={handleSync} disabled={isSyncing}>
-          {isSyncing
-            ? "Synchronisiere..."
-            : "Mit Google Kalender synchronisieren"}
-        </Button>
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-6">
+      <div className="container mx-auto max-w-8xl space-y-8">
+        <TodoViewHeader
+          onAddTodo={() => setIsSheetOpen(true)}
+          onSync={handleSync}
+          isSyncing={isSyncing}
+        />
 
-      <AddTodoSheet
-        open={isSheetOpen}
-        onOpenChange={setIsSheetOpen}
-        todos={todos}
-        mutate={mutate}
-      />
+        <AddTodoSheet
+          open={isSheetOpen}
+          onOpenChange={setIsSheetOpen}
+          todos={todos}
+          mutate={mutate}
+        />
 
-      <div className="flex flex-col md:flex-row gap-16 w-full h-[67vh]">
-        {/* Offene Aufgaben */}
-        <div className="w-full flex flex-col">
-          <h2 className="text-2xl font-semibold mb-4">Offene Aufgaben</h2>
-          <div className="flex-1 overflow-y-auto">
-            {incompleteTodos.length > 0 ? (
-              <ul className="space-y-3 pr-2">
-                {incompleteTodos.map((todo) => (
-                  <TodoItem
-                    key={todo.id}
-                    todo={todo}
-                    todos={todos}
-                    mutate={mutate}
-                  />
-                ))}
-              </ul>
-            ) : (
-              <p className="text-muted-foreground">
-                Super! Keine offenen Aufgaben.
-              </p>
-            )}
-          </div>
-        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <TodoSection
+            title="Offene Aufgaben"
+            icon="clock"
+            iconColor="text-blue-400"
+            todos={incompleteTodos}
+            allTodos={todos}
+            mutate={mutate}
+            emptyMessage="Super! Keine offenen Aufgaben."
+            emptyIcon={
+              <CheckSquare className="h-12 w-12 text-slate-600 mx-auto mb-3" />
+            }
+          />
 
-        {/* Erledigte Aufgaben */}
-        <div className="w-full flex flex-col">
-          <h2 className="text-2xl font-semibold mb-4">Erledigte Aufgaben</h2>
-          <div className="flex-1 overflow-y-auto">
-            {completedTodos.length > 0 ? (
-              <ul className="space-y-3 pr-2">
-                {completedTodos.map((todo) => (
-                  <TodoItem
-                    key={todo.id}
-                    todo={todo}
-                    todos={todos}
-                    mutate={mutate}
-                  />
-                ))}
-              </ul>
-            ) : (
-              <p className="text-muted-foreground">
-                Noch keine Aufgaben erledigt.
-              </p>
-            )}
-          </div>
+          <TodoSection
+            title="Erledigte Aufgaben"
+            icon="checkSquare"
+            iconColor="text-green-400"
+            todos={completedTodos}
+            allTodos={todos}
+            mutate={mutate}
+            emptyMessage="Noch keine Aufgaben erledigt."
+            emptyIcon={
+              <Clock className="h-12 w-12 text-slate-600 mx-auto mb-3" />
+            }
+            headerActions={
+              <ArchiveAllDialog
+                completedCount={completedTodos.length}
+                onArchiveAll={handleArchiveAllCompleted}
+                isArchiving={isArchiving}
+              />
+            }
+          />
         </div>
       </div>
     </div>

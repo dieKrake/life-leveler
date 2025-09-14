@@ -7,9 +7,12 @@ import useSWR, { KeyedMutator, useSWRConfig } from "swr";
 import { PlayerStats } from "@/types";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
 import { formatTodoDate } from "@/lib/dateUtils";
+import { getTodoTimingColor, getTodoTimingBadge } from "@/lib/todoUtils";
 import DeleteTodoButton from "./DeleteTodoButton";
 import { DifficultySelector } from "./DifficultySelector";
+import { Flame, Gem } from "lucide-react";
 
 type TodoItemProps = {
   todo: Todo;
@@ -28,7 +31,11 @@ export default function TodoItem({ todo, todos, mutate }: TodoItemProps) {
   }, [todo.is_completed]);
 
   if (!stats) {
-    return <div className="w-full bg-muted border-b">Lade Stats...</div>;
+    return (
+      <div className="w-full bg-gradient-to-br from-slate-800/50 to-slate-900/50 border border-slate-700/50 rounded-lg p-3 backdrop-blur-sm">
+        <div className="text-slate-400">Lade Stats...</div>
+      </div>
+    );
   }
 
   const {
@@ -95,47 +102,83 @@ export default function TodoItem({ todo, todos, mutate }: TodoItemProps) {
   };
 
   const todoId = `todo-${todo.id}`;
+  const timingColor = getTodoTimingColor(todo);
+  const timingBadge = getTodoTimingBadge(todo);
 
   return (
-    <li className="flex items-center space-x-3 p-3 border rounded-md bg-card">
-      <Checkbox
-        id={todoId}
-        checked={isChecked}
-        onCheckedChange={handleToggleComplete}
-        className="mt-1 self-start"
-      />
-      <div className="grid gap-1.5 leading-none flex-1">
-        <div className="flex justify-between items-center">
-          <Label
-            htmlFor={todoId}
-            className={`text-sm font-medium ${
-              isChecked ? "line-through text-muted-foreground" : ""
-            }`}
-          >
-            {todo.title}
-          </Label>
-          <div className="flex items-center gap-3">
-            <DifficultySelector
-              todo={todo}
-              onDifficultyChange={handleDifficultyChange}
-            />
-            <div className="flex font-bold items-center gap-2 text-sm text-muted-foreground">
-              {streak_multiplier > 1.0 && (
-                <span className="text-xs font-semibold bg-amber-500 text-white px-1.5 py-0.5 rounded-full">
-                  x{streak_multiplier.toFixed(1)}
-                </span>
+    <div
+      className={`relative p-4 border rounded-lg transition-all duration-300 hover:shadow-lg backdrop-blur-sm ${timingColor}`}
+    >
+      <div className="flex items-start space-x-3">
+        <Checkbox
+          id={todoId}
+          checked={isChecked}
+          onCheckedChange={handleToggleComplete}
+          className="border-blue-400 mt-1 self-start data-[state=checked]:bg-green-600 data-[state=checked]:border-green-600"
+        />
+
+        <div className="flex-1 space-y-2">
+          {/* Title and Badges Row */}
+          <div className="flex items-start justify-between gap-3 text-xl">
+            <Label
+              htmlFor={todoId}
+              className={`text-base font-medium leading-relaxed cursor-pointer ${
+                isChecked
+                  ? "line-through text-slate-400"
+                  : "text-white hover:text-slate-200"
+              }`}
+            >
+              {todo.title}
+            </Label>
+
+            <div className="flex items-center gap-2 flex-shrink-0">
+              {timingBadge && (
+                <Badge
+                  variant="secondary"
+                  className={`text-xs px-2 py-1 ${timingBadge.className}`}
+                >
+                  {timingBadge.text}
+                </Badge>
               )}
+
+              {/* XP Value Badge */}
+              <Badge
+                variant="outline"
+                className="text-xs border-purple-500/50 text-purple-300 bg-purple-900/20"
+              >
+                <Gem className="w-3 h-3 mr-1" />
+                {todo.xp_value} XP
+              </Badge>
+            </div>
+          </div>
+
+          {/* Date and Controls Row */}
+          <div className="flex items-center justify-between">
+            <p className="text-xs text-slate-400">
+              {formatTodoDate(todo.start_time, todo.end_time)}
+            </p>
+
+            <div className="flex items-center gap-3">
+              <DifficultySelector
+                todo={todo}
+                onDifficultyChange={handleDifficultyChange}
+              />
+
+              {/* Streak Multiplier */}
+              {streak_multiplier > 1.0 && !isChecked && (
+                <div className="flex items-center gap-1">
+                  <Flame className="w-3 h-3 text-orange-400" />
+                  <span className="text-xs font-semibold bg-gradient-to-r from-orange-400 to-red-400 bg-clip-text text-transparent">
+                    x{streak_multiplier.toFixed(1)}
+                  </span>
+                </div>
+              )}
+
+              <DeleteTodoButton todo={todo} todos={todos} mutate={mutate} />
             </div>
           </div>
         </div>
-        <p className="text-sm text-muted-foreground">
-          {formatTodoDate(todo.start_time, todo.end_time)}
-        </p>
       </div>
-
-      <div className="ml-auto">
-        <DeleteTodoButton todo={todo} todos={todos} mutate={mutate} />
-      </div>
-    </li>
+    </div>
   );
 }

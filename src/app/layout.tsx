@@ -5,7 +5,7 @@ import SWRProvider from "@/components/SWRProvider";
 import Navbar from "@/components/Navbar";
 import { cookies } from "next/headers";
 import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
-import PlayerStatsBar from "@/components/PlayerStatsBar";
+import { Toaster } from "sonner";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -34,6 +34,7 @@ export default async function RootLayout({
         <SWRProvider>
           <Navbar />
           {children}
+          <Toaster position="bottom-center" richColors closeButton />
         </SWRProvider>
       </body>
     </html>

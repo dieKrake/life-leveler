@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ChevronDown } from "lucide-react";
 import { Todo } from "@/types";
+import { toast } from "sonner";
 
 interface DifficultySelectorProps {
   todo: Todo;
@@ -40,8 +41,17 @@ export function DifficultySelector({
     setIsLoading(true);
     try {
       await onDifficultyChange(todo.id, newXpValue);
+      const newDifficulty = difficultyOptions.find(
+        (opt) => opt.value === newXpValue
+      );
+      toast.success(
+        `Schwierigkeit auf ${newDifficulty?.label} (${newXpValue} XP) geändert!`
+      );
     } catch (error) {
       console.error("Fehler beim Ändern der Schwierigkeit:", error);
+      toast.error(
+        "Fehler beim Ändern der Schwierigkeit. Bitte versuche es erneut."
+      );
     } finally {
       setIsLoading(false);
     }

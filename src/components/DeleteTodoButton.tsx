@@ -7,6 +7,7 @@ import { Archive } from "lucide-react";
 import type { Todo } from "@/types";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 import {
   AlertDialog,
@@ -58,6 +59,9 @@ export default function DeleteTodoButton({
       // Check for authentication errors (401 or 403)
       if (response.status === 401 || response.status === 403) {
         await handleTokenExpiration();
+        toast.error(
+          "Deine Sitzung ist abgelaufen. Bitte melde dich erneut an."
+        );
         return;
       }
 
@@ -70,8 +74,10 @@ export default function DeleteTodoButton({
 
       // Re-validiere die Daten nach erfolgreichem Archivieren
       mutate();
+      toast.success("Todo erfolgreich archiviert!");
     } catch (error) {
       console.error(error);
+      toast.error("Ein unerwarteter Fehler ist aufgetreten.");
       // Bei einem Fehler: Setze die UI auf den ursprünglichen Zustand zurück
       mutate(todos, false);
     } finally {

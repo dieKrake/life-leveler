@@ -1,5 +1,10 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { Plus, RefreshCw } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { checkSession } from "@/lib/authUtils";
+import { toast } from "sonner";
 
 interface TodoViewHeaderProps {
   onAddTodo: () => void;
@@ -12,6 +17,20 @@ export default function TodoViewHeader({
   onSync,
   isSyncing,
 }: TodoViewHeaderProps) {
+  const router = useRouter();
+
+  const handleAddTodo = async () => {
+    const { valid } = await checkSession();
+
+    if (!valid) {
+      toast.error("Deine Sitzung ist abgelaufen. Bitte melde dich erneut an.");
+      router.push("/auth/logout");
+      return;
+    }
+
+    onAddTodo();
+  };
+
   return (
     <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
       <div>
@@ -23,7 +42,7 @@ export default function TodoViewHeader({
 
       <div className="flex flex-col sm:flex-row gap-2">
         <Button
-          onClick={onAddTodo}
+          onClick={handleAddTodo}
           className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white"
         >
           <Plus className="w-4 h-4 mr-2" />

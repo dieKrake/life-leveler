@@ -16,6 +16,7 @@ import { KeyedMutator } from "swr";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { toast } from "sonner";
 
 interface ArchiveTodoDialogProps {
   todo: Todo;
@@ -66,10 +67,14 @@ export default function ArchiveTodoDialog({
 
       // Re-validiere die Daten nach erfolgreichem Archivieren
       mutate();
+      toast.success("Todo erfolgreich archiviert.");
     } catch (error) {
       console.error(error);
       // Bei einem Fehler: Setze die UI auf den ursprünglichen Zustand zurück
       mutate(todos, false);
+      toast.error(
+        "Fehler beim Archivieren des Todos. Bitte versuche es erneut."
+      );
     } finally {
       setIsArchiving(false);
     }

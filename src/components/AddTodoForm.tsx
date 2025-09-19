@@ -37,6 +37,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { toast } from "sonner";
 
 // Generate 15-minute intervals for time selection
 const generateTimeOptions = () => {
@@ -119,7 +120,7 @@ export default function AddTodoForm({ onSuccess }: AddTodoFormProps) {
     return newDate;
   };
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsSubmitting(true);
     try {
       const response = await fetch("/api/create-todo", {
@@ -134,23 +135,33 @@ export default function AddTodoForm({ onSuccess }: AddTodoFormProps) {
         }),
       });
 
+      if (response.status === 401) {
+        toast.error(
+          "Deine Sitzung ist abgelaufen. Bitte melde dich erneut an."
+        );
+        await supabase.auth.signOut();
+        window.location.href = "/login";
+        return;
+      }
+
       if (!response.ok) {
-        if (response.status === 401) {
-          await supabase.auth.signOut();
-          window.location.href = "/login";
-          return;
-        }
-        throw new Error("Fehler beim Erstellen des Todos.");
+        toast.error(
+          "Fehler beim Erstellen des Todos. Bitte versuche es erneut."
+        );
+        throw new Error("Fehler beim Erstellen des Todos");
       }
 
       const newTodo: Todo = await response.json();
       onSuccess(newTodo);
+      form.reset();
+      toast.success("Todo erfolgreich erstellt!");
     } catch (error) {
-      console.error(error);
+      console.error("Fehler beim Erstellen des Todos:", error);
+      toast.error("Ein unerwarteter Fehler ist aufgetreten.");
     } finally {
       setIsSubmitting(false);
     }
-  }
+  };
 
   return (
     <Form {...form}>

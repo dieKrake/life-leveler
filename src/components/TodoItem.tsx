@@ -13,6 +13,7 @@ import { getTodoTimingColor } from "@/lib/todoUtils";
 import { DifficultySelector } from "./DifficultySelector";
 import { Flame, Gem } from "lucide-react";
 import ArchiveTodoDialog from "./ArchiveTodoDialog";
+import { toast } from "sonner";
 
 type TodoItemProps = {
   todo: Todo;
@@ -50,32 +51,44 @@ export default function TodoItem({ todo, todos, mutate }: TodoItemProps) {
   const handleToggleComplete = async (checked: boolean) => {
     setIsChecked(checked);
 
-    if (checked) {
-      const { error } = await supabase.rpc("complete_todo", {
-        todo_id: todo.id,
+    try {
+      const response = await fetch("/api/complete-todo", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          todoId: todo.id.toString(),
+          completed: checked,
+        }),
       });
 
-      if (error) {
-        console.error("Fehler beim Erledigen des Todos:", error);
-        setIsChecked(false);
-      } else {
-        mutate();
-        globalMutate("/api/player-stats");
-        globalMutate("/api/achievements"); // Refresh achievements progress
+      if (response.status === 401) {
+        toast.error(
+          "Deine Sitzung ist abgelaufen. Bitte melde dich erneut an."
+        );
+        // Handle session expiration
+        return;
       }
-    } else {
-      const { error } = await supabase.rpc("uncomplete_todo", {
-        todo_id: todo.id,
-      });
 
-      if (error) {
-        console.error("Fehler beim Rückgängigmachen des Todos:", error);
-        setIsChecked(true);
-      } else {
-        mutate();
-        globalMutate("/api/player-stats");
-        globalMutate("/api/achievements"); // Refresh achievements progress
+      if (!response.ok) {
+        throw new Error("Fehler beim Aktualisieren des Todos");
       }
+
+      // Success - refresh data
+      mutate();
+      globalMutate("/api/player-stats");
+      globalMutate("/api/achievements");
+
+      toast.success(
+        checked
+          ? "Todo erledigt und mit Google synchronisiert!"
+          : "Todo als unerledigt markiert"
+      );
+    } catch (error) {
+      console.error("Fehler beim Aktualisieren des Todos:", error);
+      setIsChecked(!checked); // Revert checkbox state
+      toast.error(
+        "Fehler beim Aktualisieren des Todos. Bitte versuche es erneut."
+      );
     }
   };
 

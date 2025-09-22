@@ -50,11 +50,6 @@ export async function GET() {
       .not("completed_at", "is", null)
       .order("completed_at", { ascending: false });
 
-    console.log(
-      "Completed todos with timestamps:",
-      completedTodosWithTimestamps?.length || 0
-    );
-
     // Process daily completions for current week (last 7 days)
     const dailyData = Array.from({ length: 7 }, (_, i) => {
       const date = new Date();
@@ -81,7 +76,9 @@ export async function GET() {
     // Process weekly trend (last 5 weeks)
     const weeklyData = Array.from({ length: 5 }, (_, i) => {
       const weekStart = new Date();
-      weekStart.setDate(weekStart.getDate() - (weekStart.getDay() + 7 * i));
+      // Calculate Monday of current week, then go back i weeks
+      const dayOfWeek = (weekStart.getDay() + 6) % 7; // Convert Sunday=0 to Monday=0
+      weekStart.setDate(weekStart.getDate() - dayOfWeek - 7 * i);
       weekStart.setHours(0, 0, 0, 0);
       const weekEnd = new Date(weekStart);
       weekEnd.setDate(weekEnd.getDate() + 6);

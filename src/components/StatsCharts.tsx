@@ -26,16 +26,16 @@ export function BarChart({ data, title, color = "bg-blue-500" }: ChartProps) {
 
   return (
     <div className="space-y-3">
-      <h4 className="font-medium text-sm">{title}</h4>
+      <h4 className="font-medium text-sm text-white">{title}</h4>
       <div className="flex items-end justify-between h-32 gap-2">
         {data.map((item, index) => (
           <div key={index} className="flex flex-col items-center gap-1 flex-1">
             <div
-              className="relative w-full bg-muted rounded-sm overflow-hidden"
+              className="relative w-full bg-slate-700 bg-opacity-50 rounded-sm overflow-hidden"
               style={{ height: "80px" }}
             >
               <div
-                className={`${color} rounded-sm transition-all duration-500 ease-out`}
+                className={`${color} bg-opacity-90 rounded-sm transition-all duration-500 ease-out`}
                 style={{
                   height: `${
                     ((item.completed || item.todos || item.count || 0) /
@@ -46,10 +46,10 @@ export function BarChart({ data, title, color = "bg-blue-500" }: ChartProps) {
                 }}
               />
             </div>
-            <span className="text-xs text-muted-foreground">
+            <span className="text-xs text-slate-300">
               {item.day || item.week || item.hour}
             </span>
-            <span className="text-xs font-medium">
+            <span className="text-xs font-medium text-slate-400">
               {item.completed || item.todos || item.count || 0}
             </span>
           </div>
@@ -69,7 +69,7 @@ export function SimpleBarChart({
 
   return (
     <div className="space-y-4">
-      <h4 className="font-medium text-sm">{title}</h4>
+      <h4 className="font-medium text-sm text-white">{title}</h4>
       <div className="grid grid-cols-7 gap-2 h-32">
         {data.map((item, index) => {
           const value = values[index];
@@ -81,19 +81,19 @@ export function SimpleBarChart({
               key={index}
               className="flex flex-col items-center justify-end space-y-1"
             >
-              <div className="w-full h-24 bg-gray-100 rounded flex items-end justify-center relative">
+              <div className="w-full h-24 bg-slate-700 bg-opacity-50 rounded flex items-end justify-center relative">
                 <div
-                  className={`${color} w-full rounded transition-all duration-300`}
+                  className={`${color} w-full bg-opacity-90 rounded transition-all duration-300`}
                   style={{
                     height: value > 0 ? `${Math.max(height, 8)}%` : "0%",
                   }}
                 />
               </div>
               <div className="text-xs text-center">
-                <div className="text-muted-foreground">
+                <div className="text-slate-300">
                   {item.day || item.week || item.hour}
                 </div>
-                <div className="font-medium">{value}</div>
+                <div className="font-medium text-slate-400">{value}</div>
               </div>
             </div>
           );
@@ -113,7 +113,7 @@ export function WeeklyBarChart({
 
   return (
     <div className="space-y-4">
-      <h4 className="font-medium text-sm">{title}</h4>
+      <h4 className="font-medium text-sm text-white">{title}</h4>
       <div className="grid grid-cols-5 gap-3 h-32">
         {data.map((item, index) => {
           const value = values[index];
@@ -125,17 +125,17 @@ export function WeeklyBarChart({
               key={index}
               className="flex flex-col items-center justify-end space-y-1"
             >
-              <div className="w-full h-24 bg-gray-100 rounded flex items-end justify-center relative">
+              <div className="w-full h-24 bg-slate-700 bg-opacity-50 rounded flex items-end justify-center relative">
                 <div
-                  className={`${color} w-full rounded transition-all duration-300`}
+                  className={`${color} w-full bg-opacity-90 rounded transition-all duration-300`}
                   style={{
                     height: value > 0 ? `${Math.max(height, 8)}%` : "0%",
                   }}
                 />
               </div>
               <div className="text-xs text-center">
-                <div className="text-muted-foreground">{item.week}</div>
-                <div className="font-medium">{value}</div>
+                <div className="text-slate-300">{item.week}</div>
+                <div className="font-medium text-slate-400">{value}</div>
               </div>
             </div>
           );
@@ -156,7 +156,6 @@ export function PieChart({
 
   return (
     <div className="space-y-4">
-      <h4 className="font-medium text-sm">{title}</h4>
       <div className="space-y-3">
         {data.map((item, index) => {
           const percentage = total > 0 ? ((item.count || 0) / total) * 100 : 0;
@@ -165,12 +164,19 @@ export function PieChart({
               <div className="flex justify-between items-center">
                 <div className="flex items-center gap-2">
                   <div className={`w-3 h-3 rounded-full ${item.color}`} />
-                  <span className="text-sm">{item.difficulty}</span>
+                  <span className="text-sm text-white">{item.difficulty}</span>
                 </div>
-                <span className="text-sm font-medium">{item.count || 0}</span>
+                <span className="text-sm font-medium text-slate-400">
+                  {item.count || 0}
+                </span>
               </div>
-              <Progress value={percentage} className="h-2" />
-              <div className="text-xs text-muted-foreground">
+              <div className="w-full h-2 bg-slate-700 rounded-full overflow-hidden">
+                <div
+                  className="h-full w-full bg-gradient-to-r from-blue-500 to-purple-500 rounded-full transition-all duration-300"
+                  style={{ width: `${percentage}%` }}
+                />
+              </div>
+              <div className="text-xs text-slate-400">
                 {percentage.toFixed(1)}% • {item.xp} XP pro Todo
               </div>
             </div>

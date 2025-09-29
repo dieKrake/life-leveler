@@ -18,9 +18,9 @@ export function getTodoTimingColor(todo: Todo): string {
     return "bg-gradient-to-br from-slate-800/70 to-red-900/40 border-red-800/30 border";
   }
 
-  // Due today - Subtle orange tint
+  // Due today - Subtle green tint
   if (daysDiff === 0) {
-    return "bg-gradient-to-br from-slate-800/70 to-orange-900/40 border-orange-800/30 border";
+    return "bg-gradient-to-br from-slate-800/70 to-green-900/40 border-green-800/30 border";
   }
 
   // Due tomorrow - Subtle yellow tint

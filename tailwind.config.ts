@@ -31,6 +31,8 @@ const config: Config = {
     "shadow-pink-500/50",
     "shadow-lg",
     "bg-red-500",
+    "to-green-900/40",
+    "border-green-800/30",
   ],
   theme: {
     extend: {

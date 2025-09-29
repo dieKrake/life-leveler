@@ -28,16 +28,6 @@ export function getTodoTimingColor(todo: Todo): string {
     return "bg-gradient-to-br from-slate-800/70 to-yellow-900/40 border-yellow-800/30 border";
   }
 
-  // Due within 3 days - Subtle blue tint
-  if (daysDiff <= 3) {
-    return "bg-gradient-to-br from-slate-800/70 to-blue-900/40 border-blue-800/30 border";
-  }
-
-  // Due within a week - Subtle cyan tint
-  if (daysDiff <= 7) {
-    return "bg-gradient-to-br from-slate-800/70 to-cyan-900/40 border-cyan-800/30 border";
-  }
-
   // Future (more than a week) - Subtle purple tint
   return "bg-gradient-to-br from-slate-800/70 to-purple-900/40 border-purple-800/30 border";
 }

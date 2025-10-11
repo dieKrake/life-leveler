@@ -107,6 +107,7 @@ export interface Challenge {
   xp_reward: number;
   gem_reward: number;
   completed: boolean;
+  claimed: boolean;
   expires_at: string;
   time_left: string;
 }

@@ -18,6 +18,18 @@ export async function GET() {
   }
 
   try {
+    // Reset expired challenges and create new ones
+    const { error: resetError } = await supabase.rpc(
+      "reset_expired_challenges",
+      {
+        p_user_id: session.user.id,
+      }
+    );
+
+    if (resetError) {
+      console.error("Error resetting challenges:", resetError);
+    }
+
     // Initialize challenges for user if they don't exist
     const { error: initError } = await supabase.rpc(
       "initialize_user_challenges",

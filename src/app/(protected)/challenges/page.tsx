@@ -1,8 +1,19 @@
 "use client";
 
 import { Badge } from "@/components/ui/badge";
-import { Calendar, Clock, Trophy, Zap, CheckCircle2, Gem } from "lucide-react";
-import useSWR from "swr";
+import { Button } from "@/components/ui/button";
+import {
+  Calendar,
+  Clock,
+  Trophy,
+  Zap,
+  CheckCircle2,
+  Gem,
+  Gift,
+} from "lucide-react";
+import useSWR, { useSWRConfig } from "swr";
+import { useState } from "react";
+import { toast } from "sonner";
 import type { Challenge, ChallengesResponse } from "@/types";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
@@ -14,8 +25,72 @@ export default function ChallengesPage() {
     isLoading,
     mutate,
   } = useSWR<ChallengesResponse>("/api/challenges", fetcher, {
-    refreshInterval: 30000, // Refresh every 30 seconds
+    refreshInterval: 60000, // Refresh every 60 seconds to update timers
+    revalidateOnFocus: true, // Revalidate when user returns to tab
   });
+
+  const { mutate: globalMutate } = useSWRConfig();
+  const [claimingId, setClaimingId] = useState<string | null>(null);
+
+  const handleClaim = async (challengeId: string) => {
+    setClaimingId(challengeId);
+
+    // Optimistic update: immediately mark as claimed in local state
+    const optimisticUpdate = (currentData: ChallengesResponse | undefined) => {
+      if (!currentData) return currentData;
+
+      const updateChallenges = (challenges: Challenge[]) =>
+        challenges.map((challenge) =>
+          challenge.id === challengeId
+            ? { ...challenge, claimed: true }
+            : challenge
+        );
+
+      return {
+        daily: updateChallenges(currentData.daily || []),
+        weekly: updateChallenges(currentData.weekly || []),
+      };
+    };
+
+    // Apply optimistic update
+    mutate(optimisticUpdate(challenges), false);
+
+    try {
+      const response = await fetch("/api/claim-challenge", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userChallengeId: challengeId }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        // Revert optimistic update on error
+        mutate();
+        toast.error(data.error || "Fehler beim Einfordern der Belohnung");
+        return;
+      }
+
+      toast.success(
+        `Belohnung eingefordert! +${data.xp_earned} XP, +${data.gems_earned} Gems`,
+        {
+          duration: 3000,
+        }
+      );
+
+      // Success - refresh data (same pattern as TodoItem)
+      mutate();
+      globalMutate("/api/player-stats");
+      globalMutate("/api/achievements");
+    } catch (error) {
+      console.error("Error claiming reward:", error);
+      // Revert optimistic update on error
+      mutate();
+      toast.error("Fehler beim Einfordern der Belohnung");
+    } finally {
+      setClaimingId(null);
+    }
+  };
 
   const ChallengeCard = ({
     challenge,
@@ -25,6 +100,7 @@ export default function ChallengesPage() {
     type: "daily" | "weekly";
   }) => {
     const progressPercentage = (challenge.progress / challenge.target) * 100;
+    const canClaim = challenge.completed && !challenge.claimed;
 
     return (
       <div
@@ -79,7 +155,7 @@ export default function ChallengesPage() {
             </div>
           </div>
 
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-1.5">
                 <Zap className="w-4 h-4 text-yellow-400" />
@@ -95,16 +171,34 @@ export default function ChallengesPage() {
               </div>
             </div>
 
-            <Badge
-              variant={challenge.completed ? "default" : "secondary"}
-              className={`text-xs ${
-                challenge.completed
-                  ? "bg-green-500/20 text-green-300 border-green-500/30"
-                  : "bg-slate-700/50 text-slate-300 border-slate-600/50"
-              }`}
-            >
-              {challenge.completed ? "Abgeschlossen" : challenge.time_left}
-            </Badge>
+            {canClaim ? (
+              <Button
+                size="sm"
+                onClick={() => handleClaim(challenge.id)}
+                disabled={claimingId === challenge.id}
+                className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white border-0 shadow-lg"
+              >
+                <Gift className="w-4 h-4 mr-1.5" />
+                {claimingId === challenge.id ? "..." : "Einfordern"}
+              </Button>
+            ) : (
+              <Badge
+                variant={challenge.claimed ? "default" : "secondary"}
+                className={`text-xs ${
+                  challenge.claimed
+                    ? "bg-green-500/20 text-green-300 border-green-500/30"
+                    : challenge.completed
+                    ? "bg-blue-500/20 text-blue-300 border-blue-500/30"
+                    : "bg-slate-700/50 text-slate-300 border-slate-600/50"
+                }`}
+              >
+                {challenge.claimed
+                  ? "Eingefordert"
+                  : challenge.completed
+                  ? "Abgeschlossen"
+                  : challenge.time_left}
+              </Badge>
+            )}
           </div>
         </div>
 
@@ -144,29 +238,28 @@ export default function ChallengesPage() {
   const dailyChallenges = challenges?.daily || [];
   const weeklyChallenges = challenges?.weekly || [];
 
-  // Calculate time until next daily reset (midnight)
-  const getDailyResetTime = () => {
-    const now = new Date();
-    const tomorrow = new Date(now);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    tomorrow.setHours(0, 0, 0, 0);
-    const diff = tomorrow.getTime() - now.getTime();
-    const hours = Math.floor(diff / (1000 * 60 * 60));
-    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-    return `${hours}h ${minutes}m`;
-  };
+  // Get reset time from the first challenge's expires_at
+  const getResetTime = (challengeList: Challenge[]) => {
+    if (challengeList.length === 0) return "--";
 
-  // Calculate time until next weekly reset (Sunday midnight)
-  const getWeeklyResetTime = () => {
+    const firstChallenge = challengeList[0];
+    const expiresAt = new Date(firstChallenge.expires_at);
     const now = new Date();
-    const daysUntilSunday = (7 - now.getDay()) % 7 || 7;
-    const nextSunday = new Date(now);
-    nextSunday.setDate(now.getDate() + daysUntilSunday);
-    nextSunday.setHours(0, 0, 0, 0);
-    const diff = nextSunday.getTime() - now.getTime();
+    const diff = expiresAt.getTime() - now.getTime();
+
+    if (diff <= 0) return "Abgelaufen";
+
     const days = Math.floor(diff / (1000 * 60 * 60 * 24));
     const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    return `${days}d ${hours}h`;
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+
+    if (days > 0) {
+      return `${days}d ${hours}h`;
+    } else if (hours > 0) {
+      return `${hours}h ${minutes}m`;
+    } else {
+      return `${minutes}m`;
+    }
   };
 
   return (
@@ -191,7 +284,7 @@ export default function ChallengesPage() {
               variant="outline"
               className="ml-2 bg-blue-500/20 text-blue-300 border-blue-500/30"
             >
-              Erneuert in {getDailyResetTime()}
+              Erneuert in {getResetTime(dailyChallenges)}
             </Badge>
           </div>
 
@@ -223,7 +316,7 @@ export default function ChallengesPage() {
               variant="outline"
               className="ml-2 bg-purple-500/20 text-purple-300 border-purple-500/30"
             >
-              Erneuert in {getWeeklyResetTime()}
+              Erneuert in {getResetTime(weeklyChallenges)}
             </Badge>
           </div>
 

@@ -6,7 +6,10 @@ import { Badge } from "@/components/ui/badge";
 import { Zap, Gem, Flame } from "lucide-react";
 
 export default function PlayerStatsBar() {
-  const { data: stats, isLoading } = useSWR<PlayerStats>("/api/player-stats");
+  const { data: stats, isLoading } = useSWR<PlayerStats>("/api/player-stats", {
+    refreshInterval: 30000, // Refresh every 30 seconds
+    revalidateOnFocus: true, // Refresh when user returns to tab
+  });
 
   if (isLoading || !stats) {
     return (

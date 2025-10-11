@@ -27,9 +27,14 @@ export default function AddTodoSheet({
 }: AddTodoSheetProps) {
   const handleSuccess = (newTodo: Todo) => {
     // Optimistisches Update: Füge das neue Todo sofort zur Liste hinzu
-    // und löse eine Neu-Validierung im Hintergrund aus.
+    // und sortiere die Liste nach start_time
     if (todos) {
-      mutate([...todos, newTodo], false);
+      const updatedTodos = [...todos, newTodo].sort((a, b) => {
+        const dateA = new Date(a.start_time);
+        const dateB = new Date(b.start_time);
+        return dateA.getTime() - dateB.getTime();
+      });
+      mutate(updatedTodos, false);
     } else {
       mutate([newTodo], false);
     }

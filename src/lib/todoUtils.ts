@@ -8,9 +8,17 @@ export function getTodoTimingColor(todo: Todo): string {
   const now = new Date();
   const endTime = new Date(todo.end_time);
 
-  // Calculate days difference
-  const daysDiff = Math.ceil(
-    (endTime.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
+  // Get dates without time for proper day comparison
+  const todayDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const endDate = new Date(
+    endTime.getFullYear(),
+    endTime.getMonth(),
+    endTime.getDate()
+  );
+
+  // Calculate days difference based on dates only
+  const daysDiff = Math.round(
+    (endDate.getTime() - todayDate.getTime()) / (1000 * 60 * 60 * 24)
   );
 
   // Overdue (past end time) - Subtle red tint

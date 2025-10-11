@@ -58,7 +58,7 @@ export function DifficultyDistributionSection({ stats }: StatsSectionProps) {
     <div className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 border border-slate-700/50 rounded-lg p-6 backdrop-blur-sm">
       <div className="mb-4">
         <h3 className="flex items-center gap-2 text-lg font-semibold text-white">
-          <BarChart3 className="h-5 w-5 text-purple-400" />
+          <BarChart3 className="h-5 w-5 text-orange-400" />
           Schwierigkeitsverteilung
         </h3>
         <p className="text-sm text-slate-400">
@@ -78,7 +78,7 @@ export function HourlyActivitySection({ stats }: StatsSectionProps) {
     <div className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 border border-slate-700/50 rounded-lg p-6 backdrop-blur-sm">
       <div className="mb-4">
         <h3 className="flex items-center gap-2 text-lg font-semibold text-white">
-          <Clock className="h-5 w-5 text-orange-400" />
+          <Clock className="h-5 w-5 text-purple-400" />
           Tagesaktivität
         </h3>
         <p className="text-sm text-slate-400">Produktivste Tageszeiten</p>

@@ -1,97 +1,27 @@
+"use client";
+
 import { Badge } from "@/components/ui/badge";
 import { Calendar, Clock, Trophy, Zap, CheckCircle2, Gem } from "lucide-react";
+import useSWR from "swr";
+import type { Challenge, ChallengesResponse } from "@/types";
+
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 export default function ChallengesPage() {
-  // Mock data for daily challenges
-  const dailyChallenges = [
-    {
-      id: 1,
-      title: "Komm in die Gänge",
-      description: "Erledige dein erstes Todo",
-      progress: 0,
-      target: 1,
-      xpReward: 50,
-      gemReward: 2,
-      completed: false,
-      timeLeft: "4h 23m",
-    },
-    {
-      id: 2,
-      title: "Früher Vogel",
-      description: "Erledige 3 Todos vor 12:00 Uhr",
-      progress: 2,
-      target: 3,
-      xpReward: 50,
-      gemReward: 2,
-      completed: false,
-      timeLeft: "4h 23m",
-    },
-    {
-      id: 3,
-      title: "Schwere Aufgaben",
-      description: "Erledige 2 Hard-Difficulty Todos",
-      progress: 0,
-      target: 2,
-      xpReward: 100,
-      gemReward: 5,
-      completed: false,
-      timeLeft: "4h 23m",
-    },
-    {
-      id: 4,
-      title: "Wochenkrieger",
-      description: "Erledige 25 Todos diese Woche",
-      progress: 0,
-      target: 25,
-      xpReward: 300,
-      gemReward: 5,
-      completed: false,
-      timeLeft: "4h 23m",
-    },
-  ];
-
-  // Mock data for weekly challenges
-  const weeklyChallenges = [
-    {
-      id: 4,
-      title: "Wochenkrieger",
-      description: "Erledige 25 Todos diese Woche",
-      progress: 18,
-      target: 25,
-      xpReward: 300,
-      gemReward: 15,
-      completed: false,
-      timeLeft: "3d 12h",
-    },
-    {
-      id: 5,
-      title: "Konsistenz-Meister",
-      description: "Erledige jeden Tag mindestens 3 Todos",
-      progress: 5,
-      target: 7,
-      xpReward: 250,
-      gemReward: 12,
-      completed: false,
-      timeLeft: "3d 12h",
-    },
-    {
-      id: 6,
-      title: "XP-Sammler",
-      description: "Sammle 500 XP diese Woche",
-      progress: 350,
-      target: 500,
-      xpReward: 200,
-      gemReward: 10,
-      completed: false,
-      timeLeft: "3d 12h",
-    },
-  ];
+  const {
+    data: challenges,
+    error,
+    isLoading,
+    mutate,
+  } = useSWR<ChallengesResponse>("/api/challenges", fetcher, {
+    refreshInterval: 30000, // Refresh every 30 seconds
+  });
 
   const ChallengeCard = ({
     challenge,
     type,
   }: {
-    challenge: any;
+    challenge: Challenge;
     type: "daily" | "weekly";
   }) => {
     const progressPercentage = (challenge.progress / challenge.target) * 100;
@@ -154,13 +84,13 @@ export default function ChallengesPage() {
               <div className="flex items-center gap-1.5">
                 <Zap className="w-4 h-4 text-yellow-400" />
                 <span className="text-sm font-medium text-white">
-                  {challenge.xpReward} XP
+                  {challenge.xp_reward} XP
                 </span>
               </div>
               <div className="flex items-center gap-1.5">
                 <Gem className="w-4 h-4 text-cyan-400" />
                 <span className="text-sm font-medium text-white">
-                  {challenge.gemReward} Gems
+                  {challenge.gem_reward} Gems
                 </span>
               </div>
             </div>
@@ -173,7 +103,7 @@ export default function ChallengesPage() {
                   : "bg-slate-700/50 text-slate-300 border-slate-600/50"
               }`}
             >
-              {challenge.completed ? "Abgeschlossen" : challenge.timeLeft}
+              {challenge.completed ? "Abgeschlossen" : challenge.time_left}
             </Badge>
           </div>
         </div>
@@ -187,9 +117,61 @@ export default function ChallengesPage() {
     );
   };
 
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-6">
+        <div className="container mx-auto max-w-6xl">
+          <div className="text-center text-white">
+            Lade Herausforderungen...
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-6">
+        <div className="container mx-auto max-w-6xl">
+          <div className="text-center text-red-400">
+            Fehler beim Laden der Herausforderungen
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const dailyChallenges = challenges?.daily || [];
+  const weeklyChallenges = challenges?.weekly || [];
+
+  // Calculate time until next daily reset (midnight)
+  const getDailyResetTime = () => {
+    const now = new Date();
+    const tomorrow = new Date(now);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    tomorrow.setHours(0, 0, 0, 0);
+    const diff = tomorrow.getTime() - now.getTime();
+    const hours = Math.floor(diff / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    return `${hours}h ${minutes}m`;
+  };
+
+  // Calculate time until next weekly reset (Sunday midnight)
+  const getWeeklyResetTime = () => {
+    const now = new Date();
+    const daysUntilSunday = (7 - now.getDay()) % 7 || 7;
+    const nextSunday = new Date(now);
+    nextSunday.setDate(now.getDate() + daysUntilSunday);
+    nextSunday.setHours(0, 0, 0, 0);
+    const diff = nextSunday.getTime() - now.getTime();
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    return `${days}d ${hours}h`;
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-6">
-      <div className="container mx-auto p-6 space-y-8">
+      <div className="container mx-auto max-w-6xl space-y-8">
         <div className="text-center space-y-2">
           <h1 className="text-4xl font-bold text-white">Herausforderungen</h1>
           <p className="text-slate-300 text-lg">
@@ -209,17 +191,23 @@ export default function ChallengesPage() {
               variant="outline"
               className="ml-2 bg-blue-500/20 text-blue-300 border-blue-500/30"
             >
-              Erneuert in 4h 23m
+              Erneuert in {getDailyResetTime()}
             </Badge>
           </div>
 
           <div className="overflow-x-auto">
             <div className="flex gap-4 pb-4 min-w-max">
-              {dailyChallenges.map((challenge) => (
-                <div key={challenge.id} className="flex-none w-80 h-52">
-                  <ChallengeCard challenge={challenge} type="daily" />
+              {dailyChallenges.length > 0 ? (
+                dailyChallenges.map((challenge) => (
+                  <div key={challenge.id} className="flex-none w-80 h-52">
+                    <ChallengeCard challenge={challenge} type="daily" />
+                  </div>
+                ))
+              ) : (
+                <div className="text-slate-400 text-center w-full py-8">
+                  Keine täglichen Herausforderungen verfügbar
                 </div>
-              ))}
+              )}
             </div>
           </div>
         </section>
@@ -235,17 +223,23 @@ export default function ChallengesPage() {
               variant="outline"
               className="ml-2 bg-purple-500/20 text-purple-300 border-purple-500/30"
             >
-              Erneuert in 3d 12h
+              Erneuert in {getWeeklyResetTime()}
             </Badge>
           </div>
 
           <div className="overflow-x-auto">
             <div className="flex gap-4 pb-4 min-w-max">
-              {weeklyChallenges.map((challenge) => (
-                <div key={challenge.id} className="flex-none w-80 h-52">
-                  <ChallengeCard challenge={challenge} type="weekly" />
+              {weeklyChallenges.length > 0 ? (
+                weeklyChallenges.map((challenge) => (
+                  <div key={challenge.id} className="flex-none w-80 h-52">
+                    <ChallengeCard challenge={challenge} type="weekly" />
+                  </div>
+                ))
+              ) : (
+                <div className="text-slate-400 text-center w-full py-8">
+                  Keine wöchentlichen Herausforderungen verfügbar
                 </div>
-              ))}
+              )}
             </div>
           </div>
         </section>

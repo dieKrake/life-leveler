@@ -51,7 +51,7 @@ export async function POST(request: Request) {
       );
     }
 
-    // 2. Update local database first
+    // 2. Update local database first (this now triggers challenge updates automatically)
     if (completed) {
       const { error } = await supabase.rpc("complete_todo", {
         todo_id: todoId,
@@ -68,7 +68,6 @@ export async function POST(request: Request) {
     if (todo.google_event_id) {
       try {
         if (todo.google_event_id.startsWith("tsk-")) {
-          // Google Task - update completion status
           const taskId = todo.google_event_id.replace("tsk-", "");
           const taskUpdateUrl = `https://www.googleapis.com/tasks/v1/lists/@default/tasks/${taskId}`;
 
@@ -90,7 +89,6 @@ export async function POST(request: Request) {
             );
           }
         } else if (todo.google_event_id.startsWith("evt-")) {
-          // Google Calendar Event - mark as cancelled or restore
           const eventId = todo.google_event_id.replace("evt-", "");
           const eventUpdateUrl = `https://www.googleapis.com/calendar/v3/calendars/primary/events/${eventId}`;
 
@@ -114,7 +112,6 @@ export async function POST(request: Request) {
         }
       } catch (googleError) {
         console.error("Fehler bei der Google-Synchronisation:", googleError);
-        // Continue - don't fail the whole operation if Google sync fails
       }
     }
 
@@ -123,6 +120,8 @@ export async function POST(request: Request) {
       message: completed
         ? "Todo erfolgreich erledigt"
         : "Todo als unerledigt markiert",
+      // Signal that challenges might have been updated
+      challengesUpdated: completed,
     });
   } catch (error) {
     console.error("Fehler beim Aktualisieren des Todos:", error);

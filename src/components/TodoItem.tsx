@@ -77,6 +77,7 @@ export default function TodoItem({ todo, todos, mutate }: TodoItemProps) {
       mutate();
       globalMutate("/api/player-stats");
       globalMutate("/api/achievements");
+      globalMutate("/api/challenges");
 
       toast.success(
         checked

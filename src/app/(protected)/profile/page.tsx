@@ -5,6 +5,7 @@ import { PlayerStats } from "@/types";
 import ProfilePicture from "@/components/ProfilePicture";
 import StreakSection from "@/components/StreakSection";
 import AchievementsSection from "@/components/AchievementsSection";
+import ResetAchievementsButton from "@/components/ResetAchievementsButton";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { useEffect, useState } from "react";
 import type { User } from "@supabase/supabase-js";
@@ -68,6 +69,12 @@ export default function ProfilePage() {
             streak={stats.current_streak}
           />
         </div>
+        
+        {/* TEMPORARY: Reset button for testing */}
+        <div className="flex justify-center">
+          <ResetAchievementsButton />
+        </div>
+        
         <StreakSection stats={stats} />
         <AchievementsSection />
       </div>

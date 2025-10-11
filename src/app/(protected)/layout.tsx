@@ -2,6 +2,7 @@ import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { type ReactNode } from "react";
+import RewardProvider from "@/components/RewardProvider";
 
 export default async function ProtectedLayout({
   children,
@@ -38,8 +39,10 @@ export default async function ProtectedLayout({
   }
 
   return (
-    <div className="flex flex-col min-h-screen">
-      <main>{children}</main>
-    </div>
+    <RewardProvider>
+      <div className="flex flex-col min-h-screen">
+        <main>{children}</main>
+      </div>
+    </RewardProvider>
   );
 }

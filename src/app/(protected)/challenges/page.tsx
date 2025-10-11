@@ -15,6 +15,7 @@ import useSWR, { useSWRConfig } from "swr";
 import { useState } from "react";
 import { toast } from "sonner";
 import type { Challenge, ChallengesResponse } from "@/types";
+import { useReward } from "@/components/RewardProvider";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -31,6 +32,7 @@ export default function ChallengesPage() {
 
   const { mutate: globalMutate } = useSWRConfig();
   const [claimingId, setClaimingId] = useState<string | null>(null);
+  const { showChallengeReward } = useReward();
 
   const handleClaim = async (challengeId: string) => {
     setClaimingId(challengeId);
@@ -70,6 +72,19 @@ export default function ChallengesPage() {
         toast.error(data.error || "Fehler beim Einfordern der Belohnung");
         return;
       }
+
+      // Find the challenge for the title
+      const challenge = [
+        ...(challenges?.daily || []),
+        ...(challenges?.weekly || [])
+      ].find(c => c.id === challengeId);
+
+      // Show reward notification
+      showChallengeReward(
+        data.xp_earned, 
+        data.gems_earned, 
+        challenge?.title
+      );
 
       toast.success(
         `Belohnung eingefordert! +${data.xp_earned} XP, +${data.gems_earned} Gems`,

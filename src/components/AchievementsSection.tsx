@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Target, Trophy, Flame, Gem, TrendingUp, Unlock } from "lucide-react";
 import { UserAchievement } from "@/types";
 import { useState } from "react";
+import { useReward } from "@/components/RewardProvider";
 
 const iconMap = {
   Trophy,
@@ -21,8 +22,10 @@ export default function AchievementsSection() {
     mutate,
   } = useSWR<UserAchievement[]>("/api/achievements");
   const [unlockingIds, setUnlockingIds] = useState<Set<number>>(new Set());
+  const { showAchievementReward } = useReward();
 
   const unlockAchievement = async (achievementId: number) => {
+    console.log("Attempting to unlock achievement:", achievementId);
     setUnlockingIds((prev) => new Set(prev).add(achievementId));
 
     try {
@@ -35,6 +38,16 @@ export default function AchievementsSection() {
       });
 
       if (response.ok) {
+        const data = await response.json();
+        
+        // Show achievement reward notification
+        if (data.achievement) {
+          showAchievementReward(
+            data.achievement.reward_gems,
+            data.achievement.title
+          );
+        }
+        
         // Refresh achievements data
         mutate();
         // Also refresh player stats to update gems in UI
@@ -42,6 +55,8 @@ export default function AchievementsSection() {
       } else {
         const error = await response.json();
         console.error("Fehler beim Freischalten:", error);
+        console.error("Response status:", response.status);
+        console.error("Full response:", response);
       }
     } catch (error) {
       console.error("Fehler beim Freischalten:", error);

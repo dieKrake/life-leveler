@@ -14,6 +14,7 @@ import { DifficultySelector } from "./DifficultySelector";
 import { Flame, Gem } from "lucide-react";
 import ArchiveTodoDialog from "./ArchiveTodoDialog";
 import { toast } from "sonner";
+import { useReward } from "@/components/RewardProvider";
 
 type TodoItemProps = {
   todo: Todo;
@@ -26,6 +27,7 @@ export default function TodoItem({ todo, todos, mutate }: TodoItemProps) {
   const [isChecked, setIsChecked] = useState(todo.is_completed);
   const { mutate: globalMutate } = useSWRConfig();
   const { data: stats, isLoading } = useSWR<PlayerStats>("/api/player-stats");
+  const { showTodoReward, showXpLoss } = useReward();
 
   useEffect(() => {
     setIsChecked(todo.is_completed);
@@ -78,6 +80,19 @@ export default function TodoItem({ todo, todos, mutate }: TodoItemProps) {
       globalMutate("/api/player-stats");
       globalMutate("/api/achievements");
       globalMutate("/api/challenges");
+
+      // Calculate XP and gems for reward notification
+      const baseXp = todo.xp_value || 10;
+      const baseGems = baseXp === 10 ? 1 : baseXp === 20 ? 2 : 4;
+      const finalXp = Math.round(baseXp * streak_multiplier);
+      
+      // Show reward notification
+      if (checked) {
+        showTodoReward(finalXp, baseGems, todo.title || undefined);
+      } else {
+        // Show XP loss when unchecking
+        showXpLoss(finalXp, baseGems, `"${todo.title || 'Todo'}" rückgängig gemacht`);
+      }
 
       toast.success(
         checked

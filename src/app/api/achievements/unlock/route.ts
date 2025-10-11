@@ -32,14 +32,37 @@ export async function POST(request: Request) {
     // Check if achievement exists and is active
     const { data: achievement, error: achievementError } = await supabase
       .from("achievements")
-      .select("id, reward_gems")
+      .select("id, name, description, reward_gems")
       .eq("id", achievementId)
       .eq("is_active", true)
       .single();
 
+    // Debug logging
+    console.log("Achievement lookup:", {
+      achievementId,
+      achievement,
+      achievementError,
+    });
+
     if (achievementError || !achievement) {
+      // Also check if achievement exists without is_active filter
+      const { data: anyAchievement } = await supabase
+        .from("achievements")
+        .select("id, name, is_active")
+        .eq("id", achievementId)
+        .single();
+      
+      console.log("Achievement exists check:", anyAchievement);
+      
       return NextResponse.json(
-        { error: "Achievement nicht gefunden" },
+        { 
+          error: "Achievement nicht gefunden",
+          debug: {
+            achievementId,
+            achievementError: achievementError?.message,
+            existsButInactive: anyAchievement && !anyAchievement.is_active
+          }
+        },
         { status: 404 }
       );
     }
@@ -101,8 +124,13 @@ export async function POST(request: Request) {
 
     return NextResponse.json({
       success: true,
-      message: "Achievement freigeschaltet!",
-      gemsAwarded: achievement.reward_gems,
+      message: `Achievement ${achievementId} erfolgreich freigeschaltet`,
+      achievement: {
+        id: achievement.id,
+        title: achievement.name, // Use 'name' from database as 'title' for frontend
+        description: achievement.description,
+        reward_gems: achievement.reward_gems,
+      },
     });
   } catch (error) {
     console.error("Unerwarteter Fehler:", error);

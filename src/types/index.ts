@@ -87,3 +87,45 @@ export type UserAchievement = {
   progress_percentage: number;
   unlocked_at: string | null;
 };
+
+export type ChallengeType = "daily" | "weekly";
+
+export type ChallengeConditionType =
+  | "complete_count"
+  | "complete_before_time"
+  | "complete_difficulty"
+  | "earn_xp";
+
+export interface Challenge {
+  id: string;
+  challenge_id: string;
+  title: string;
+  description: string;
+  type: ChallengeType;
+  progress: number;
+  target: number;
+  xp_reward: number;
+  gem_reward: number;
+  completed: boolean;
+  expires_at: string;
+  time_left: string;
+}
+
+export interface ChallengesResponse {
+  daily: Challenge[];
+  weekly: Challenge[];
+}
+
+export interface ChallengeCompletion {
+  id: string;
+  user_id: string;
+  challenge_id: string;
+  completed_at: string;
+  xp_earned: number;
+  gems_earned: number;
+  challenges: {
+    title: string;
+    description: string;
+    type: ChallengeType;
+  };
+}

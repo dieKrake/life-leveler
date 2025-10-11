@@ -53,13 +53,16 @@ export async function POST(request: Request) {
 
     // 2. Update local database first (this now triggers challenge updates automatically)
     if (completed) {
-      const { error } = await supabase.rpc("complete_todo", {
-        todo_id: todoId,
+      const { data, error } = await supabase.rpc("complete_todo", {
+        todo_id: parseInt(todoId),
       });
-      if (error) throw error;
+      if (error) {
+        console.error("Error completing todo:", error);
+        throw error;
+      }
     } else {
       const { error } = await supabase.rpc("uncomplete_todo", {
-        todo_id: todoId,
+        todo_id: parseInt(todoId),
       });
       if (error) throw error;
     }

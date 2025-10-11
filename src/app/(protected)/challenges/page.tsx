@@ -1,21 +1,5 @@
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
-import {
-  Calendar,
-  Clock,
-  Trophy,
-  Target,
-  Zap,
-  CheckCircle2,
-  Gem,
-} from "lucide-react";
+import { Calendar, Clock, Trophy, Zap, CheckCircle2, Gem } from "lucide-react";
 
 export default function ChallengesPage() {
   // Mock data for daily challenges
@@ -113,62 +97,69 @@ export default function ChallengesPage() {
     const progressPercentage = (challenge.progress / challenge.target) * 100;
 
     return (
-      <Card
-        className={`relative overflow-hidden h-full flex flex-col justify-center ${
-          challenge.completed ? "bg-green-50 border-green-200" : ""
+      <div
+        className={`relative overflow-hidden h-full flex flex-col justify-center bg-gradient-to-br from-slate-800/50 to-slate-900/50 border border-slate-700/50 rounded-lg p-6 backdrop-blur-sm ${
+          challenge.completed ? "border-green-500/50" : ""
         }`}
       >
-        <CardHeader className="pb-3">
+        <div className="pb-3">
           <div className="flex items-start justify-between">
-            <div className="flex items-start gap-2">
+            <div className="flex items-start gap-3">
               <div
                 className={`p-2 rounded-lg ${
                   type === "daily"
-                    ? "bg-blue-100 text-blue-600"
-                    : "bg-purple-100 text-purple-600"
+                    ? "bg-blue-500/20 border border-blue-500/30"
+                    : "bg-purple-500/20 border border-purple-500/30"
                 }`}
               >
                 {type === "daily" ? (
-                  <Clock className="w-4 h-4" />
+                  <Clock className="w-5 h-5 text-blue-400" />
                 ) : (
-                  <Calendar className="w-4 h-4" />
+                  <Calendar className="w-5 h-5 text-purple-400" />
                 )}
               </div>
               <div>
-                <CardTitle className="text-lg">{challenge.title}</CardTitle>
-                <CardDescription className="text-sm">
+                <h3 className="text-lg font-semibold text-white">
+                  {challenge.title}
+                </h3>
+                <p className="text-sm text-slate-400">
                   {challenge.description}
-                </CardDescription>
+                </p>
               </div>
             </div>
             {challenge.completed && (
-              <CheckCircle2 className="w-6 h-6 text-green-600" />
+              <CheckCircle2 className="w-6 h-6 text-green-400" />
             )}
           </div>
-        </CardHeader>
+        </div>
 
-        <CardContent className="space-y-4 flex-1 flex flex-col justify-center">
+        <div className="space-y-4 flex-1 flex flex-col justify-center">
           <div className="space-y-2">
             <div className="flex justify-between text-sm">
-              <span>Fortschritt</span>
-              <span className="font-medium">
+              <span className="text-slate-300">Fortschritt</span>
+              <span className="font-medium text-white">
                 {challenge.progress}/{challenge.target}
               </span>
             </div>
-            <Progress value={progressPercentage} className="h-2" />
+            <div className="w-full h-2 bg-slate-700/50 rounded-full overflow-hidden">
+              <div
+                className="h-full bg-gradient-to-r from-purple-500 to-pink-500 rounded-full transition-all duration-300"
+                style={{ width: `${progressPercentage}%` }}
+              />
+            </div>
           </div>
 
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <div className="flex items-center gap-1">
-                <Zap className="w-4 h-4 text-yellow-500" />
-                <span className="text-sm font-medium">
+              <div className="flex items-center gap-1.5">
+                <Zap className="w-4 h-4 text-yellow-400" />
+                <span className="text-sm font-medium text-white">
                   {challenge.xpReward} XP
                 </span>
               </div>
-              <div className="flex items-center gap-1">
-                <Gem className="w-4 h-4 text-blue-500" />
-                <span className="text-sm font-medium">
+              <div className="flex items-center gap-1.5">
+                <Gem className="w-4 h-4 text-cyan-400" />
+                <span className="text-sm font-medium text-white">
                   {challenge.gemReward} Gems
                 </span>
               </div>
@@ -176,75 +167,89 @@ export default function ChallengesPage() {
 
             <Badge
               variant={challenge.completed ? "default" : "secondary"}
-              className="text-xs"
+              className={`text-xs ${
+                challenge.completed
+                  ? "bg-green-500/20 text-green-300 border-green-500/30"
+                  : "bg-slate-700/50 text-slate-300 border-slate-600/50"
+              }`}
             >
               {challenge.completed ? "Abgeschlossen" : challenge.timeLeft}
             </Badge>
           </div>
-        </CardContent>
+        </div>
 
         {challenge.completed && (
-          <div className="absolute top-0 right-0 w-16 h-16 bg-green-500 transform rotate-45 translate-x-8 -translate-y-8">
-            <Trophy className="w-4 h-4 text-white absolute bottom-2 left-2 transform -rotate-45" />
+          <div className="absolute top-0 right-0 w-16 h-16 bg-green-500/30 transform rotate-45 translate-x-8 -translate-y-8 border-l border-b border-green-400/50">
+            <Trophy className="w-4 h-4 text-green-400 absolute bottom-2 left-2 transform -rotate-45" />
           </div>
         )}
-      </Card>
+      </div>
     );
   };
 
   return (
-    <div className="container mx-auto p-6 space-y-8">
-      <div className="space-y-2">
-        <h1 className="text-3xl font-bold">Herausforderungen</h1>
-        <p className="text-muted-foreground">
-          Stelle dich täglichen und wöchentlichen Herausforderungen und verdiene
-          zusätzliche Belohnungen!
-        </p>
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-6">
+      <div className="container mx-auto p-6 space-y-8">
+        <div className="text-center space-y-2">
+          <h1 className="text-4xl font-bold text-white">Herausforderungen</h1>
+          <p className="text-slate-300 text-lg">
+            Stelle dich täglichen und wöchentlichen Herausforderungen und
+            verdiene zusätzliche Belohnungen!
+          </p>
+        </div>
+
+        {/* Daily Challenges */}
+        <section className="space-y-4">
+          <div className="flex items-center gap-3">
+            <Clock className="w-6 h-6 text-blue-400" />
+            <h2 className="text-2xl font-semibold text-white">
+              Tägliche Herausforderungen
+            </h2>
+            <Badge
+              variant="outline"
+              className="ml-2 bg-blue-500/20 text-blue-300 border-blue-500/30"
+            >
+              Erneuert in 4h 23m
+            </Badge>
+          </div>
+
+          <div className="overflow-x-auto">
+            <div className="flex gap-4 pb-4 min-w-max">
+              {dailyChallenges.map((challenge) => (
+                <div key={challenge.id} className="flex-none w-80 h-52">
+                  <ChallengeCard challenge={challenge} type="daily" />
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Weekly Challenges */}
+        <section className="space-y-4">
+          <div className="flex items-center gap-3">
+            <Calendar className="w-6 h-6 text-purple-400" />
+            <h2 className="text-2xl font-semibold text-white">
+              Wöchentliche Herausforderungen
+            </h2>
+            <Badge
+              variant="outline"
+              className="ml-2 bg-purple-500/20 text-purple-300 border-purple-500/30"
+            >
+              Erneuert in 3d 12h
+            </Badge>
+          </div>
+
+          <div className="overflow-x-auto">
+            <div className="flex gap-4 pb-4 min-w-max">
+              {weeklyChallenges.map((challenge) => (
+                <div key={challenge.id} className="flex-none w-80 h-52">
+                  <ChallengeCard challenge={challenge} type="weekly" />
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
       </div>
-
-      {/* Daily Challenges */}
-      <section className="space-y-4">
-        <div className="flex items-center gap-2">
-          <Clock className="w-5 h-5 text-blue-600" />
-          <h2 className="text-2xl font-semibold">Tägliche Herausforderungen</h2>
-          <Badge variant="outline" className="ml-2">
-            Erneuert in 4h 23m
-          </Badge>
-        </div>
-
-        <div className="overflow-x-auto">
-          <div className="flex gap-4 pb-4 min-w-max">
-            {dailyChallenges.map((challenge) => (
-              <div key={challenge.id} className="flex-none w-80 h-52">
-                <ChallengeCard challenge={challenge} type="daily" />
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Weekly Challenges */}
-      <section className="space-y-4">
-        <div className="flex items-center gap-2">
-          <Calendar className="w-5 h-5 text-purple-600" />
-          <h2 className="text-2xl font-semibold">
-            Wöchentliche Herausforderungen
-          </h2>
-          <Badge variant="outline" className="ml-2">
-            Erneuert in 3d 12h
-          </Badge>
-        </div>
-
-        <div className="overflow-x-auto">
-          <div className="flex gap-4 pb-4 min-w-max">
-            {weeklyChallenges.map((challenge) => (
-              <div key={challenge.id} className="flex-none w-80 h-52">
-                <ChallengeCard challenge={challenge} type="weekly" />
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
     </div>
   );
 }

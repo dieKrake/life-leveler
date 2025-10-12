@@ -94,11 +94,7 @@ export default function TodoItem({ todo, todos, mutate }: TodoItemProps) {
         showXpLoss(finalXp, baseGems, `"${todo.title || 'Todo'}" rückgängig gemacht`);
       }
 
-      toast.success(
-        checked
-          ? "Todo erledigt und mit Google synchronisiert!"
-          : "Todo als unerledigt markiert"
-      );
+      // Success - removed toast notification, using reward notification instead
     } catch (error) {
       console.error("Fehler beim Aktualisieren des Todos:", error);
       setIsChecked(!checked); // Revert checkbox state

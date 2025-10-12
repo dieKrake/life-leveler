@@ -29,7 +29,7 @@ interface RewardProviderProps {
 
 export default function RewardProvider({ children }: RewardProviderProps) {
   const {
-    currentReward,
+    rewards,
     hideReward,
     showReward,
     showTodoReward,
@@ -51,7 +51,17 @@ export default function RewardProvider({ children }: RewardProviderProps) {
       }}
     >
       {children}
-      <RewardNotification reward={currentReward} onComplete={hideReward} />
+      {/* Render all active rewards as a stack */}
+      <div className="fixed top-20 left-1/2 transform -translate-x-1/2 z-[9999] pointer-events-none flex flex-col gap-3 w-[400px]">
+        {rewards.map((reward, index) => (
+          <RewardNotification
+            key={reward.id}
+            reward={reward}
+            index={index}
+            onComplete={() => hideReward(reward.id)}
+          />
+        ))}
+      </div>
     </RewardContext.Provider>
   );
 }

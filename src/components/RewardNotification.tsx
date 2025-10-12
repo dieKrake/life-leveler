@@ -15,27 +15,48 @@ export interface RewardData {
 
 interface RewardNotificationProps {
   reward: RewardData | null;
+  index: number;
   onComplete: () => void;
 }
 
 export default function RewardNotification({
   reward,
+  index,
   onComplete,
 }: RewardNotificationProps) {
   const [isVisible, setIsVisible] = useState(false);
+  const [hasShown, setHasShown] = useState(false);
 
   useEffect(() => {
-    if (reward) {
-      setIsVisible(true);
-      // Auto-hide after 4 seconds
-      const timer = setTimeout(() => {
+    if (reward && !hasShown) {
+      // Small delay based on index for staggered appearance
+      const showTimer = setTimeout(() => {
+        setIsVisible(true);
+        setHasShown(true);
+      }, index * 100);
+
+      return () => clearTimeout(showTimer);
+    }
+  }, [reward, hasShown, index]);
+
+  useEffect(() => {
+    if (isVisible) {
+      // Auto-hide after 4 seconds (independent of index)
+      const hideTimer = setTimeout(() => {
         setIsVisible(false);
-        setTimeout(onComplete, 500); // Wait for exit animation
       }, 4000);
 
-      return () => clearTimeout(timer);
+      return () => clearTimeout(hideTimer);
     }
-  }, [reward, onComplete]);
+  }, [isVisible]);
+
+  useEffect(() => {
+    if (hasShown && !isVisible) {
+      // Call onComplete after exit animation
+      const completeTimer = setTimeout(onComplete, 500);
+      return () => clearTimeout(completeTimer);
+    }
+  }, [hasShown, isVisible, onComplete]);
 
   if (!reward) return null;
 
@@ -96,48 +117,25 @@ export default function RewardNotification({
     <AnimatePresence>
       {isVisible && (
         <motion.div
-          initial={{ opacity: 0, scale: 0.8, y: -50 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.8, y: -50 }}
+          initial={{ opacity: 0, scale: 0.8, x: -20 }}
+          animate={{ opacity: 1, scale: 1, x: 0 }}
+          exit={{ opacity: 0, scale: 0.8, x: 20 }}
           transition={{
             type: "spring",
             stiffness: 300,
             damping: 25,
           }}
-          className="fixed top-20 left-1/2 transform -translate-x-1/2 z-[9999] pointer-events-none"
+          className="w-full"
         >
           <div
             className={cn(
               "relative overflow-hidden rounded-2xl border backdrop-blur-xl shadow-2xl",
               `bg-gradient-to-br ${config.bgColor}`,
               config.borderColor,
-              "min-w-[320px] max-w-[400px]"
+              "w-full"
             )}
           >
-            {/* Animated background sparkles */}
-            <div className="absolute inset-0 overflow-hidden">
-              {[...Array(6)].map((_, i) => (
-                <motion.div
-                  key={i}
-                  className="absolute w-1 h-1 bg-white rounded-full opacity-60"
-                  initial={{
-                    x: Math.random() * 400,
-                    y: Math.random() * 200,
-                    scale: 0,
-                  }}
-                  animate={{
-                    scale: [0, 1, 0],
-                    rotate: [0, 180, 360],
-                  }}
-                  transition={{
-                    duration: 2,
-                    delay: i * 0.2,
-                    repeat: Infinity,
-                    repeatDelay: 1,
-                  }}
-                />
-              ))}
-            </div>
+            {/* Removed sparkles animation */}
 
             {/* Main content */}
             <div className="relative p-6">

@@ -1,15 +1,23 @@
 import { useState, useCallback } from "react";
 import { RewardData } from "@/components/RewardNotification";
 
+interface RewardWithId extends RewardData {
+  id: string;
+}
+
 export function useRewardNotification() {
-  const [currentReward, setCurrentReward] = useState<RewardData | null>(null);
+  const [rewards, setRewards] = useState<RewardWithId[]>([]);
 
   const showReward = useCallback((reward: RewardData) => {
-    setCurrentReward(reward);
+    const rewardWithId: RewardWithId = {
+      ...reward,
+      id: `${Date.now()}-${Math.random()}`,
+    };
+    setRewards((prev) => [...prev, rewardWithId]);
   }, []);
 
-  const hideReward = useCallback(() => {
-    setCurrentReward(null);
+  const hideReward = useCallback((id: string) => {
+    setRewards((prev) => prev.filter((r) => r.id !== id));
   }, []);
 
   // Convenience methods for different reward types
@@ -62,7 +70,7 @@ export function useRewardNotification() {
   }, [showReward]);
 
   return {
-    currentReward,
+    rewards,
     showReward,
     hideReward,
     showTodoReward,

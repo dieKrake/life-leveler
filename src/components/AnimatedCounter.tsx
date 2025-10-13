@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, ReactNode } from "react";
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 
 interface AnimatedCounterProps {
@@ -8,6 +8,7 @@ interface AnimatedCounterProps {
   type: "xp" | "gems" | "streak";
   className?: string;
   formatValue?: (value: number) => string;
+  renderWrapper?: (children: ReactNode, isAnimating: boolean, scaleIntensity: number) => ReactNode;
 }
 
 export default function AnimatedCounter({
@@ -15,10 +16,12 @@ export default function AnimatedCounter({
   type,
   className = "",
   formatValue = (val) => val.toLocaleString(),
+  renderWrapper,
 }: AnimatedCounterProps) {
   const [displayValue, setDisplayValue] = useState(value);
   const [isAnimating, setIsAnimating] = useState(false);
   const prevValueRef = useRef(value);
+  const targetValueRef = useRef(value);
 
   // Motion value for the counter
   const motionValue = useMotionValue(value);
@@ -43,7 +46,7 @@ export default function AnimatedCounter({
           duration: 1500,
           stiffness: 60,
           damping: 25,
-          scaleIntensity: 1.3,
+          scaleIntensity: 1.4, // Increased for more prominence
         };
       
       case "xp":
@@ -52,7 +55,7 @@ export default function AnimatedCounter({
           duration: Math.min(800, Math.max(400, diff * 8)),
           stiffness: 150,
           damping: 20,
-          scaleIntensity: 1.15,
+          scaleIntensity: 1.25, // Increased for more visibility
         };
       
       case "gems":
@@ -62,7 +65,7 @@ export default function AnimatedCounter({
           duration: Math.min(1200, Math.max(300, baseDuration)),
           stiffness: diff <= 5 ? 120 : diff <= 20 ? 100 : 80,
           damping: 25,
-          scaleIntensity: diff <= 5 ? 1.2 : diff <= 20 ? 1.15 : 1.1,
+          scaleIntensity: diff <= 5 ? 1.3 : diff <= 20 ? 1.25 : 1.2, // Increased for all ranges
         };
       
       default:
@@ -86,22 +89,22 @@ export default function AnimatedCounter({
       
       // Update motion value to trigger spring animation
       motionValue.set(value);
-      
-      // Stop animation after duration
-      const timeout = setTimeout(() => {
-        setIsAnimating(false);
-      }, config.duration);
 
       prevValueRef.current = value;
-      
-      return () => clearTimeout(timeout);
+      targetValueRef.current = value;
     }
   }, [value, motionValue, type]);
 
-  // Update display value from animated value
+  // Update display value from animated value and handle animation state
   useEffect(() => {
     const unsubscribe = animatedValue.on("change", (latest) => {
-      setDisplayValue(latest);
+      const roundedLatest = Math.round(latest);
+      setDisplayValue(roundedLatest);
+      
+      // Stop animation when we reach the current target value
+      if (Math.abs(latest - targetValueRef.current) < 0.01) {
+        setIsAnimating(false);
+      }
     });
 
     return unsubscribe;
@@ -123,11 +126,11 @@ export default function AnimatedCounter({
     }
   };
 
-  return (
+  const counterElement = (
     <motion.span
       className={className}
       animate={{
-        scale: isAnimating ? config.scaleIntensity : 1,
+        scale: renderWrapper ? 1 : (isAnimating ? config.scaleIntensity : 1),
       }}
       transition={{
         type: "spring",
@@ -145,4 +148,10 @@ export default function AnimatedCounter({
       {formatValue(displayValue)}
     </motion.span>
   );
+
+  if (renderWrapper) {
+    return renderWrapper(counterElement, isAnimating, config.scaleIntensity) as JSX.Element;
+  }
+
+  return counterElement;
 }

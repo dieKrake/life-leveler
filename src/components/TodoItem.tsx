@@ -28,7 +28,7 @@ export default function TodoItem({ todo, todos, mutate }: TodoItemProps) {
   const [isChecked, setIsChecked] = useState(todo.is_completed);
   const { mutate: globalMutate } = useSWRConfig();
   const { data: stats, isLoading } = useSWR<PlayerStats>("/api/player-stats");
-  const { showTodoReward, showXpLoss, showLevelUpReward, showAchievementUnlockable, showChallengeReward } = useReward();
+  const { showTodoReward, showXpLoss, showLevelUpReward, showAchievementUnlockable, showChallengeCompletable } = useReward();
 
   useEffect(() => {
     setIsChecked(todo.is_completed);
@@ -105,10 +105,10 @@ export default function TodoItem({ todo, todos, mutate }: TodoItemProps) {
           });
         }
         
-        // Show notifications for completed challenges
+        // Show notifications for completed challenges (not yet claimed)
         if (responseData.levelUp?.completed_challenges?.length > 0) {
           responseData.levelUp.completed_challenges.forEach((challenge: any) => {
-            showChallengeReward(challenge.xp_reward, challenge.gem_reward, challenge.title);
+            showChallengeCompletable(challenge.xp_reward, challenge.gem_reward, challenge.title);
           });
         }
       } else {

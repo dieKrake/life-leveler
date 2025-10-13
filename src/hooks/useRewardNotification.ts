@@ -105,11 +105,28 @@ export function useRewardNotification() {
     (gems: number, achievementTitle?: string) => {
       showReward({
         type: "achievement",
-        gems,
+        // Don't show gems for "unlockable" notification - only show when actually claimed
+        gems: undefined,
         title: achievementTitle
           ? `"${achievementTitle}" kann freigeschaltet werden!`
           : "Erfolg kann freigeschaltet werden!",
         description: "Gehe zur Erfolge-Seite, um deine Belohnung abzuholen!",
+      });
+    },
+    [showReward]
+  );
+
+  const showChallengeCompletable = useCallback(
+    (xp: number, gems: number, challengeTitle?: string) => {
+      showReward({
+        type: "challenge",
+        // Don't show rewards for "completable" notification - only show when actually claimed
+        xp: undefined,
+        gems: undefined,
+        title: challengeTitle
+          ? `"${challengeTitle}" abgeschlossen!`
+          : "Challenge abgeschlossen!",
+        description: "Gehe zur Herausforderungen-Seite, um deine Belohnung einzufordern!",
       });
     },
     [showReward]
@@ -121,6 +138,7 @@ export function useRewardNotification() {
     hideReward,
     showTodoReward,
     showChallengeReward,
+    showChallengeCompletable,
     showAchievementReward,
     showAchievementUnlockable,
     showLevelUpReward,

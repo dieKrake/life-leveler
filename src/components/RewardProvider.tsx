@@ -13,6 +13,11 @@ interface RewardContextType {
     gems: number,
     challengeTitle?: string
   ) => void;
+  showChallengeCompletable: (
+    xp: number,
+    gems: number,
+    challengeTitle?: string
+  ) => void;
   showAchievementReward: (gems: number, achievementTitle?: string) => void;
   showAchievementUnlockable: (gems: number, achievementTitle?: string) => void;
   showLevelUpReward: (newLevel: number, bonusGems?: number) => void;
@@ -41,6 +46,7 @@ export default function RewardProvider({ children }: RewardProviderProps) {
     showReward,
     showTodoReward,
     showChallengeReward,
+    showChallengeCompletable,
     showAchievementReward,
     showAchievementUnlockable,
     showLevelUpReward,
@@ -54,6 +60,7 @@ export default function RewardProvider({ children }: RewardProviderProps) {
         showReward,
         showTodoReward,
         showChallengeReward,
+        showChallengeCompletable,
         showAchievementReward,
         showAchievementUnlockable,
         showLevelUpReward,

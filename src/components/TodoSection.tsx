@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CheckSquare, Clock } from "lucide-react";
 import TodoItem from "./TodoItem";
 import type { Todo } from "@/types";
+import { AnimatePresence } from "framer-motion";
 
 interface TodoSectionProps {
   title: string;
@@ -48,14 +49,16 @@ export default function TodoSection({
         <div className="max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
           {todos.length > 0 ? (
             <div className="space-y-3">
-              {todos.map((todo) => (
-                <TodoItem
-                  key={todo.id}
-                  todo={todo}
-                  todos={allTodos}
-                  mutate={mutate}
-                />
-              ))}
+              <AnimatePresence mode="popLayout">
+                {todos.map((todo) => (
+                  <TodoItem
+                    key={todo.id}
+                    todo={todo}
+                    todos={allTodos}
+                    mutate={mutate}
+                  />
+                ))}
+              </AnimatePresence>
             </div>
           ) : (
             <div className="text-center py-8">

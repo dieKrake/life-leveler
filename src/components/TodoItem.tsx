@@ -15,6 +15,7 @@ import { Flame, Gem } from "lucide-react";
 import ArchiveTodoDialog from "./ArchiveTodoDialog";
 import { toast } from "sonner";
 import { useReward } from "@/components/RewardProvider";
+import { motion, AnimatePresence } from "framer-motion";
 
 type TodoItemProps = {
   todo: Todo;
@@ -151,13 +152,42 @@ export default function TodoItem({ todo, todos, mutate }: TodoItemProps) {
   const timingColor = getTodoTimingColor(todo);
 
   return (
-    <div className={`relative p-4 rounded-lg ${timingColor}`}>
+    <motion.div
+      layout
+      layoutId={`todo-${todo.id}`}
+      initial={{ opacity: 0, y: 20, scale: 0.95 }}
+      animate={{ 
+        opacity: 1, 
+        y: 0, 
+        scale: isChecked ? 0.98 : 1,
+      }}
+      exit={{ 
+        opacity: 0, 
+        y: -20, 
+        scale: 0.95,
+        transition: { duration: 0.3 }
+      }}
+      transition={{ 
+        duration: 0.4, 
+        ease: "easeInOut",
+        layout: { duration: 0.3, ease: "easeInOut" }
+      }}
+      whileHover={{ 
+        scale: isChecked ? 0.99 : 1.01,
+        transition: { duration: 0.2 }
+      }}
+      className={`relative p-4 rounded-lg ${timingColor} ${
+        isChecked 
+          ? 'opacity-75 bg-gradient-to-br from-slate-800/30 to-slate-900/30' 
+          : 'opacity-100 hover:shadow-lg hover:shadow-slate-900/20'
+      }`}
+    >
       <div className="flex items-start space-x-3">
         <Checkbox
           id={todoId}
           checked={isChecked}
           onCheckedChange={handleToggleComplete}
-          className="border-blue-400 mt-1 self-start data-[state=checked]:bg-green-600 data-[state=checked]:border-green-600"
+          className="border-blue-400 mt-1 self-start data-[state=checked]:bg-green-600 data-[state=checked]:border-green-600 transition-all duration-300"
         />
 
         <div className="flex-1 space-y-2">
@@ -165,7 +195,7 @@ export default function TodoItem({ todo, todos, mutate }: TodoItemProps) {
           <div className="flex items-start justify-between gap-3 text-xl">
             <Label
               htmlFor={todoId}
-              className={`text-base font-medium leading-relaxed cursor-pointer ${
+              className={`text-base font-medium leading-relaxed cursor-pointer transition-all duration-300 ${
                 isChecked
                   ? "line-through text-slate-400"
                   : "text-white hover:text-slate-200"
@@ -178,7 +208,9 @@ export default function TodoItem({ todo, todos, mutate }: TodoItemProps) {
               {/* XP Value Badge */}
               <Badge
                 variant="outline"
-                className="text-xs border-purple-500/50 text-purple-300 bg-purple-900/20"
+                className={`text-xs border-purple-500/50 text-purple-300 bg-purple-900/20 transition-all duration-300 ${
+                  isChecked ? 'opacity-60 scale-95' : 'opacity-100 scale-100'
+                }`}
               >
                 <Gem className="w-3 h-3 mr-1" />
                 {todo.xp_value} XP
@@ -187,8 +219,10 @@ export default function TodoItem({ todo, todos, mutate }: TodoItemProps) {
           </div>
 
           {/* Date and Controls Row */}
-          <div className="flex items-center justify-between">
-            <p className="text-xs text-slate-400">
+          <div className={`flex items-center justify-between transition-all duration-300 ${
+            isChecked ? 'opacity-60' : 'opacity-100'
+          }`}>
+            <p className="text-xs text-slate-400 transition-colors duration-300">
               {formatTodoDate(todo.start_time, todo.end_time)}
             </p>
 
@@ -200,9 +234,9 @@ export default function TodoItem({ todo, todos, mutate }: TodoItemProps) {
 
               {/* Streak Multiplier */}
               {streak_multiplier > 1.0 && !isChecked && (
-                <div className="flex items-center gap-1">
-                  <Flame className="w-3 h-3 text-orange-400" />
-                  <span className="text-xs font-semibold bg-gradient-to-r from-orange-400 to-red-400 bg-clip-text text-transparent">
+                <div className="flex items-center gap-1 animate-pulse">
+                  <Flame className="w-3 h-3 text-orange-400 transition-all duration-300" />
+                  <span className="text-xs font-semibold bg-gradient-to-r from-orange-400 to-red-400 bg-clip-text text-transparent transition-all duration-300">
                     x{streak_multiplier.toFixed(1)}
                   </span>
                 </div>
@@ -214,6 +248,6 @@ export default function TodoItem({ todo, todos, mutate }: TodoItemProps) {
           </div>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }

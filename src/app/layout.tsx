@@ -36,7 +36,19 @@ export default async function RootLayout({
           <RewardProvider>
             <Navbar />
             {children}
-            <Toaster position="bottom-center" richColors closeButton />
+            <Toaster 
+              position="bottom-center" 
+              theme="dark"
+              toastOptions={{
+                style: {
+                  background: 'rgb(30 41 59)', // slate-800
+                  border: '1px solid rgb(51 65 85)', // slate-700
+                  color: 'rgb(226 232 240)', // slate-200
+                },
+                className: 'font-medium',
+              }}
+              closeButton 
+            />
           </RewardProvider>
         </SWRProvider>
       </body>

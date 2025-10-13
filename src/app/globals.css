@@ -112,3 +112,58 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Custom Toaster/Sonner Styling */
+@layer components {
+  [data-sonner-toast] {
+    @apply bg-slate-800 border-slate-700 text-slate-200;
+  }
+
+  [data-sonner-toast][data-type='success'] {
+    @apply bg-gradient-to-br from-emerald-900/80 to-slate-800 border-emerald-700/50;
+  }
+
+  [data-sonner-toast][data-type='success'] [data-icon] {
+    @apply text-emerald-400;
+  }
+
+  [data-sonner-toast][data-type='error'] {
+    @apply bg-gradient-to-br from-red-900/80 to-slate-800 border-red-700/50;
+  }
+
+  [data-sonner-toast][data-type='error'] [data-icon] {
+    @apply text-red-400;
+  }
+
+  [data-sonner-toast][data-type='info'] {
+    @apply bg-gradient-to-br from-blue-900/80 to-slate-800 border-blue-700/50;
+  }
+
+  [data-sonner-toast][data-type='info'] [data-icon] {
+    @apply text-blue-400;
+  }
+
+  [data-sonner-toast][data-type='warning'] {
+    @apply bg-gradient-to-br from-amber-900/80 to-slate-800 border-amber-700/50;
+  }
+
+  [data-sonner-toast][data-type='warning'] [data-icon] {
+    @apply text-amber-400;
+  }
+
+  [data-sonner-toast] [data-title] {
+    @apply text-slate-100 font-semibold;
+  }
+
+  [data-sonner-toast] [data-description] {
+    @apply text-slate-300;
+  }
+
+  [data-sonner-toast] [data-button] {
+    @apply bg-slate-700 hover:bg-slate-600 text-slate-100 border-slate-600;
+  }
+
+  [data-sonner-toast] [data-close-button] {
+    @apply bg-slate-700/50 hover:bg-slate-600/50 border-slate-600 text-slate-300;
+  }
+}

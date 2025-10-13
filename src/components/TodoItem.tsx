@@ -27,7 +27,7 @@ export default function TodoItem({ todo, todos, mutate }: TodoItemProps) {
   const [isChecked, setIsChecked] = useState(todo.is_completed);
   const { mutate: globalMutate } = useSWRConfig();
   const { data: stats, isLoading } = useSWR<PlayerStats>("/api/player-stats");
-  const { showTodoReward, showXpLoss, showLevelUpReward } = useReward();
+  const { showTodoReward, showXpLoss, showLevelUpReward, showAchievementUnlockable, showChallengeReward } = useReward();
 
   useEffect(() => {
     setIsChecked(todo.is_completed);
@@ -95,6 +95,20 @@ export default function TodoItem({ todo, todos, mutate }: TodoItemProps) {
         // Check for level-up and show notification
         if (responseData.levelUp?.level_up) {
           showLevelUpReward(responseData.levelUp.new_level);
+        }
+        
+        // Show notifications for unlockable achievements
+        if (responseData.levelUp?.unlockable_achievements?.length > 0) {
+          responseData.levelUp.unlockable_achievements.forEach((achievement: any) => {
+            showAchievementUnlockable(achievement.reward_gems, achievement.name);
+          });
+        }
+        
+        // Show notifications for completed challenges
+        if (responseData.levelUp?.completed_challenges?.length > 0) {
+          responseData.levelUp.completed_challenges.forEach((challenge: any) => {
+            showChallengeReward(challenge.xp_reward, challenge.gem_reward, challenge.title);
+          });
         }
       } else {
         // Show XP loss when unchecking

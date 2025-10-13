@@ -14,6 +14,7 @@ interface RewardContextType {
     challengeTitle?: string
   ) => void;
   showAchievementReward: (gems: number, achievementTitle?: string) => void;
+  showAchievementUnlockable: (gems: number, achievementTitle?: string) => void;
   showLevelUpReward: (newLevel: number, bonusGems?: number) => void;
   showXpLoss: (xp: number, gems: number, reason?: string) => void;
   showPrestigeReward: (prestigeLevel: number, bonusGems: number) => void;
@@ -41,6 +42,7 @@ export default function RewardProvider({ children }: RewardProviderProps) {
     showTodoReward,
     showChallengeReward,
     showAchievementReward,
+    showAchievementUnlockable,
     showLevelUpReward,
     showXpLoss,
     showPrestigeReward,
@@ -53,6 +55,7 @@ export default function RewardProvider({ children }: RewardProviderProps) {
         showTodoReward,
         showChallengeReward,
         showAchievementReward,
+        showAchievementUnlockable,
         showLevelUpReward,
         showXpLoss,
         showPrestigeReward,

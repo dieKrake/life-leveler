@@ -101,6 +101,20 @@ export function useRewardNotification() {
     [showReward]
   );
 
+  const showAchievementUnlockable = useCallback(
+    (gems: number, achievementTitle?: string) => {
+      showReward({
+        type: "achievement",
+        gems,
+        title: achievementTitle
+          ? `"${achievementTitle}" kann freigeschaltet werden!`
+          : "Erfolg kann freigeschaltet werden!",
+        description: "Gehe zur Erfolge-Seite, um deine Belohnung abzuholen!",
+      });
+    },
+    [showReward]
+  );
+
   return {
     rewards,
     showReward,
@@ -108,6 +122,7 @@ export function useRewardNotification() {
     showTodoReward,
     showChallengeReward,
     showAchievementReward,
+    showAchievementUnlockable,
     showLevelUpReward,
     showXpLoss,
     showPrestigeReward,

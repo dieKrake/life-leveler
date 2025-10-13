@@ -27,7 +27,7 @@ export default function TodoItem({ todo, todos, mutate }: TodoItemProps) {
   const [isChecked, setIsChecked] = useState(todo.is_completed);
   const { mutate: globalMutate } = useSWRConfig();
   const { data: stats, isLoading } = useSWR<PlayerStats>("/api/player-stats");
-  const { showTodoReward, showXpLoss } = useReward();
+  const { showTodoReward, showXpLoss, showLevelUpReward } = useReward();
 
   useEffect(() => {
     setIsChecked(todo.is_completed);
@@ -75,6 +75,8 @@ export default function TodoItem({ todo, todos, mutate }: TodoItemProps) {
         throw new Error("Fehler beim Aktualisieren des Todos");
       }
 
+      const responseData = await response.json();
+
       // Success - refresh data
       mutate();
       globalMutate("/api/player-stats");
@@ -89,6 +91,11 @@ export default function TodoItem({ todo, todos, mutate }: TodoItemProps) {
       // Show reward notification
       if (checked) {
         showTodoReward(finalXp, baseGems, todo.title || undefined);
+        
+        // Check for level-up and show notification
+        if (responseData.levelUp?.level_up) {
+          showLevelUpReward(responseData.levelUp.new_level);
+        }
       } else {
         // Show XP loss when unchecking
         showXpLoss(finalXp, baseGems, `"${todo.title || 'Todo'}" rückgängig gemacht`);

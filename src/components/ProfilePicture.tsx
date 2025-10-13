@@ -16,6 +16,7 @@ interface ProfilePictureProps {
   xpForCurrentLevel: number;
   gems: number;
   streak: number;
+  prestige?: number;
   isOnline?: boolean;
 }
 
@@ -27,6 +28,7 @@ export default function ProfilePicture({
   xpForCurrentLevel,
   gems,
   streak,
+  prestige = 0,
   isOnline = true,
 }: ProfilePictureProps) {
   const xpProgress =
@@ -98,7 +100,7 @@ export default function ProfilePicture({
           {user.name || user.email?.split("@")[0] || "Player"}
         </h2>
 
-        <div className="flex items-center justify-center gap-2">
+        <div className="flex items-center justify-center gap-2 flex-wrap">
           <Badge
             variant="outline"
             className={`bg-gradient-to-r ${getLevelBadgeColor(
@@ -106,6 +108,13 @@ export default function ProfilePicture({
             )} border-none text-white font-bold px-3 py-1`}
           >
             Level {level}
+          </Badge>
+          <Badge
+            variant="outline"
+            className="bg-gradient-to-r from-yellow-500 to-orange-500 border-none text-white font-bold px-3 py-1 flex items-center gap-1"
+          >
+            <Star className="w-3 h-3" />
+            Prestige {prestige}
           </Badge>
           <Badge
             variant="outline"

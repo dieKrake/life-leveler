@@ -16,6 +16,7 @@ interface RewardContextType {
   showAchievementReward: (gems: number, achievementTitle?: string) => void;
   showLevelUpReward: (newLevel: number, bonusGems?: number) => void;
   showXpLoss: (xp: number, gems: number, reason?: string) => void;
+  showPrestigeReward: (prestigeLevel: number, bonusGems: number) => void;
 }
 
 const RewardContext = createContext<RewardContextType | undefined>(undefined);
@@ -42,6 +43,7 @@ export default function RewardProvider({ children }: RewardProviderProps) {
     showAchievementReward,
     showLevelUpReward,
     showXpLoss,
+    showPrestigeReward,
   } = useRewardNotification();
 
   return (
@@ -53,6 +55,7 @@ export default function RewardProvider({ children }: RewardProviderProps) {
         showAchievementReward,
         showLevelUpReward,
         showXpLoss,
+        showPrestigeReward,
       }}
     >
       {children}

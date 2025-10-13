@@ -76,15 +76,11 @@ export default function ChallengesPage() {
       // Find the challenge for the title
       const challenge = [
         ...(challenges?.daily || []),
-        ...(challenges?.weekly || [])
-      ].find(c => c.id === challengeId);
+        ...(challenges?.weekly || []),
+      ].find((c) => c.id === challengeId);
 
       // Show reward notification
-      showChallengeReward(
-        data.xp_earned, 
-        data.gems_earned, 
-        challenge?.title
-      );
+      showChallengeReward(data.xp_earned, data.gems_earned, challenge?.title);
 
       toast.success(
         `Belohnung eingefordert! +${data.xp_earned} XP, +${data.gems_earned} Gems`,
@@ -216,12 +212,6 @@ export default function ChallengesPage() {
             )}
           </div>
         </div>
-
-        {challenge.completed && (
-          <div className="absolute top-0 right-0 w-16 h-16 bg-green-500/30 transform rotate-45 translate-x-8 -translate-y-8 border-l border-b border-green-400/50">
-            <Trophy className="w-4 h-4 text-green-400 absolute bottom-2 left-2 transform -rotate-45" />
-          </div>
-        )}
       </div>
     );
   };

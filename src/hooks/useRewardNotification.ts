@@ -89,6 +89,18 @@ export function useRewardNotification() {
     [showReward]
   );
 
+  const showPrestigeReward = useCallback(
+    (prestigeLevel: number, bonusGems: number) => {
+      showReward({
+        type: "level_up",
+        gems: bonusGems,
+        title: `Prestige ${prestigeLevel} erreicht!`,
+        description: "Unglaublich! Du hast einen neuen Prestige-Level erreicht!",
+      });
+    },
+    [showReward]
+  );
+
   return {
     rewards,
     showReward,
@@ -98,5 +110,6 @@ export function useRewardNotification() {
     showAchievementReward,
     showLevelUpReward,
     showXpLoss,
+    showPrestigeReward,
   };
 }

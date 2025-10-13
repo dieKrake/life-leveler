@@ -67,6 +67,7 @@ export default function ProfilePage() {
             }
             gems={stats.gems}
             streak={stats.current_streak}
+            prestige={stats.prestige || 0}
           />
         </div>
         

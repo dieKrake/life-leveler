@@ -25,7 +25,6 @@ export default function AchievementsSection() {
   const { showAchievementReward } = useReward();
 
   const unlockAchievement = async (achievementId: number) => {
-    console.log("Attempting to unlock achievement:", achievementId);
     setUnlockingIds((prev) => new Set(prev).add(achievementId));
 
     try {
@@ -39,7 +38,7 @@ export default function AchievementsSection() {
 
       if (response.ok) {
         const data = await response.json();
-        
+
         // Show achievement reward notification
         if (data.achievement) {
           showAchievementReward(
@@ -47,7 +46,7 @@ export default function AchievementsSection() {
             data.achievement.title
           );
         }
-        
+
         // Refresh achievements data
         mutate();
         // Also refresh player stats to update gems in UI

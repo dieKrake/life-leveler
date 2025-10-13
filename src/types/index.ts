@@ -20,6 +20,9 @@ export type PlayerStats = {
   current_streak: number;
   streak_multiplier: number;
   gems: number;
+  prestige: number;
+  max_level_reached: number;
+  can_prestige?: boolean;
 };
 
 export type TodoStats = {

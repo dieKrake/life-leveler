@@ -52,6 +52,7 @@ export async function POST(request: Request) {
     }
 
     // 2. Update local database first (this now triggers challenge updates automatically)
+    let levelUpInfo = null;
     if (completed) {
       const { data, error } = await supabase.rpc("complete_todo", {
         todo_id: parseInt(todoId),
@@ -60,6 +61,7 @@ export async function POST(request: Request) {
         console.error("Error completing todo:", error);
         throw error;
       }
+      levelUpInfo = data?.[0]; // Get the first (and only) result
     } else {
       const { error } = await supabase.rpc("uncomplete_todo", {
         todo_id: parseInt(todoId),
@@ -125,6 +127,8 @@ export async function POST(request: Request) {
         : "Todo als unerledigt markiert",
       // Signal that challenges might have been updated
       challengesUpdated: completed,
+      // Include level-up information if available
+      levelUp: levelUpInfo,
     });
   } catch (error) {
     console.error("Fehler beim Aktualisieren des Todos:", error);

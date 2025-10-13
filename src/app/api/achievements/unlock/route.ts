@@ -37,13 +37,6 @@ export async function POST(request: Request) {
       .eq("is_active", true)
       .single();
 
-    // Debug logging
-    console.log("Achievement lookup:", {
-      achievementId,
-      achievement,
-      achievementError,
-    });
-
     if (achievementError || !achievement) {
       // Also check if achievement exists without is_active filter
       const { data: anyAchievement } = await supabase
@@ -51,17 +44,15 @@ export async function POST(request: Request) {
         .select("id, name, is_active")
         .eq("id", achievementId)
         .single();
-      
-      console.log("Achievement exists check:", anyAchievement);
-      
+
       return NextResponse.json(
-        { 
+        {
           error: "Achievement nicht gefunden",
           debug: {
             achievementId,
             achievementError: achievementError?.message,
-            existsButInactive: anyAchievement && !anyAchievement.is_active
-          }
+            existsButInactive: anyAchievement && !anyAchievement.is_active,
+          },
         },
         { status: 404 }
       );
@@ -107,8 +98,8 @@ export async function POST(request: Request) {
     const { error: gemsError } = await supabase.rpc(
       "update_player_xp_and_gems",
       {
-        xp_change: 0,
-        gems_change: achievement.reward_gems,
+        p_xp_to_add: 0,
+        p_gems_to_add: achievement.reward_gems,
       }
     );
 

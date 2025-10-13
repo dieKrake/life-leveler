@@ -3,7 +3,8 @@
 import useSWR from "swr";
 import { PlayerStats } from "@/types";
 import { Badge } from "@/components/ui/badge";
-import { Zap, Gem, Flame } from "lucide-react";
+import { Zap, Gem, Flame, Star } from "lucide-react";
+import PrestigeButton from "./PrestigeButton";
 
 export default function PlayerStatsBar() {
   const { data: stats, isLoading } = useSWR<PlayerStats>("/api/player-stats", {
@@ -28,7 +29,10 @@ export default function PlayerStatsBar() {
     xp_for_next_level,
     current_streak,
     gems,
+    prestige = 0,
+    can_prestige = false,
   } = stats;
+
 
   const isMaxLevel = xp_for_next_level === null;
 
@@ -47,13 +51,22 @@ export default function PlayerStatsBar() {
     <div className="flex justify-center w-full bg-gradient-to-r from-slate-900 via-purple-900 to-slate-900 border-b border-slate-700/50 px-4 sticky top-16 z-50 backdrop-blur-sm">
       <div className="container flex items-center justify-between h-12 text-sm">
         <div className="flex items-center gap-6">
-          {/* Level Badge */}
-          <Badge
-            variant="outline"
-            className="bg-gradient-to-r from-purple-500/20 to-pink-500/20 border-purple-500/30 text-purple-100 font-bold"
-          >
-            Level {level}
-          </Badge>
+          {/* Level Badge with Prestige */}
+          <div className="flex items-center gap-2">
+            <Badge
+              variant="outline"
+              className="bg-gradient-to-r from-purple-500/20 to-pink-500/20 border-purple-500/30 text-purple-100 font-bold"
+            >
+              Level {level}
+            </Badge>
+            <Badge
+              variant="outline"
+              className="bg-gradient-to-r from-yellow-500/20 to-orange-500/20 border-yellow-500/30 text-yellow-100 font-bold flex items-center gap-1"
+            >
+              <Star className="w-3 h-3" />
+              Prestige {prestige}
+            </Badge>
+          </div>
 
           {/* XP Progress */}
           <div className="flex items-center gap-3">
@@ -100,6 +113,14 @@ export default function PlayerStatsBar() {
               {current_streak}
             </span>
           </div>
+
+          {/* Prestige Button */}
+          <PrestigeButton
+            canPrestige={can_prestige}
+            currentLevel={level}
+            currentPrestige={prestige}
+          />
+
         </div>
       </div>
     </div>

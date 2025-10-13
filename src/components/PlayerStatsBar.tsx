@@ -5,6 +5,7 @@ import { PlayerStats } from "@/types";
 import { Badge } from "@/components/ui/badge";
 import { Zap, Gem, Flame, Star } from "lucide-react";
 import PrestigeButton from "./PrestigeButton";
+import AnimatedCounter from "./AnimatedCounter";
 
 export default function PlayerStatsBar() {
   const { data: stats, isLoading } = useSWR<PlayerStats>("/api/player-stats", {
@@ -95,23 +96,31 @@ export default function PlayerStatsBar() {
           {/* XP Display */}
           <div className="flex items-center gap-1 px-3 py-1 bg-gradient-to-r from-yellow-500/20 to-orange-500/20 rounded-full border border-yellow-500/30">
             <Zap className="w-4 h-4 text-yellow-400" />
-            <span className="text-sm font-medium text-yellow-100">
-              {xp.toLocaleString()}
-            </span>
+            <AnimatedCounter
+              value={xp}
+              type="xp"
+              className="text-sm font-medium text-yellow-100"
+            />
           </div>
 
           {/* Gems Display */}
           <div className="flex items-center gap-1 px-3 py-1 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-full border border-blue-500/30">
             <Gem className="w-4 h-4 text-blue-400" />
-            <span className="text-sm font-medium text-blue-100">{gems}</span>
+            <AnimatedCounter
+              value={gems}
+              type="gems"
+              className="text-sm font-medium text-blue-100"
+            />
           </div>
 
           {/* Streak Display */}
           <div className="flex items-center gap-1 px-3 py-1 bg-gradient-to-r from-orange-500/20 to-red-500/20 rounded-full border border-orange-500/30">
             <Flame className="w-4 h-4 text-orange-400" />
-            <span className="text-sm font-medium text-orange-100">
-              {current_streak}
-            </span>
+            <AnimatedCounter
+              value={current_streak}
+              type="streak"
+              className="text-sm font-medium text-orange-100"
+            />
           </div>
 
           {/* Prestige Button */}

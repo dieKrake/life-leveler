@@ -5,7 +5,7 @@ import { useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 import { format } from "date-fns";
 import { addHours } from "date-fns/addHours";
-import { CalendarIcon, Gem } from "lucide-react";
+import { CalendarIcon, Gem, Bookmark } from "lucide-react";
 import { useState, useEffect } from "react";
 import type { Todo } from "@/types";
 import { handleCalendarSelect } from "@/lib/dateUtils";
@@ -80,14 +80,34 @@ type AddTodoFormProps = {
 export default function AddTodoForm({ onSuccess }: AddTodoFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const supabase = createClientComponentClient();
+  
+  // Load favorite type from localStorage immediately (not in useEffect)
+  const getInitialType = () => {
+    if (typeof window !== "undefined") {
+      const savedFavorite = localStorage.getItem("todo-favorite-type") as "event" | "task" | null;
+      return savedFavorite || "event";
+    }
+    return "event";
+  };
+  
+  const [favoriteType, setFavoriteType] = useState<"event" | "task">(getInitialType);
+  
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       title: "",
-      type: "event",
+      type: getInitialType(),
       xp_value: 20,
     },
   });
+  
+  const handleFavoriteClick = (type: "event" | "task") => {
+    setFavoriteType(type);
+    localStorage.setItem("todo-favorite-type", type);
+    toast.success(
+      `"${type === "event" ? "Termin" : "Aufgabe"}" als Favorit gespeichert!`
+    );
+  };
 
   const taskType = useWatch({ control: form.control, name: "type" });
   const startDateTimeValue = useWatch({
@@ -177,10 +197,10 @@ export default function AddTodoForm({ onSuccess }: AddTodoFormProps) {
               <FormControl>
                 <RadioGroup
                   onValueChange={field.onChange}
-                  defaultValue={field.value}
+                  value={field.value}
                   className="flex space-x-6"
                 >
-                  <div className="flex items-center space-x-3">
+                  <div className="flex items-center space-x-3 group">
                     <RadioGroupItem
                       value="event"
                       id="type-event"
@@ -192,8 +212,29 @@ export default function AddTodoForm({ onSuccess }: AddTodoFormProps) {
                     >
                       Termin
                     </Label>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handleFavoriteClick("event");
+                      }}
+                      className={cn(
+                        "ml-1 transition-opacity",
+                        favoriteType === "event" ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+                      )}
+                      title="Als Favorit markieren"
+                    >
+                      <Bookmark
+                        className={cn(
+                          "w-4 h-4 transition-all",
+                          favoriteType === "event"
+                            ? "fill-yellow-400 text-yellow-400"
+                            : "text-slate-400 hover:text-yellow-400"
+                        )}
+                      />
+                    </button>
                   </div>
-                  <div className="flex items-center space-x-3">
+                  <div className="flex items-center space-x-3 group">
                     <RadioGroupItem
                       value="task"
                       id="type-task"
@@ -205,6 +246,27 @@ export default function AddTodoForm({ onSuccess }: AddTodoFormProps) {
                     >
                       Aufgabe
                     </Label>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handleFavoriteClick("task");
+                      }}
+                      className={cn(
+                        "ml-1 transition-opacity",
+                        favoriteType === "task" ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+                      )}
+                      title="Als Favorit markieren"
+                    >
+                      <Bookmark
+                        className={cn(
+                          "w-4 h-4 transition-all",
+                          favoriteType === "task"
+                            ? "fill-yellow-400 text-yellow-400"
+                            : "text-slate-400 hover:text-yellow-400"
+                        )}
+                      />
+                    </button>
                   </div>
                 </RadioGroup>
               </FormControl>

@@ -4,7 +4,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 import { format } from "date-fns";
-import { addHours } from "date-fns/addHours";
 import { CalendarIcon, Gem, Bookmark } from "lucide-react";
 import { useState, useEffect } from "react";
 import type { Todo } from "@/types";
@@ -80,27 +79,58 @@ type AddTodoFormProps = {
 export default function AddTodoForm({ onSuccess }: AddTodoFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const supabase = createClientComponentClient();
-  
+
   // Load favorite type from localStorage immediately (not in useEffect)
   const getInitialType = () => {
     if (typeof window !== "undefined") {
-      const savedFavorite = localStorage.getItem("todo-favorite-type") as "event" | "task" | null;
+      const savedFavorite = localStorage.getItem("todo-favorite-type") as
+        | "event"
+        | "task"
+        | null;
       return savedFavorite || "event";
     }
     return "event";
   };
-  
-  const [favoriteType, setFavoriteType] = useState<"event" | "task">(getInitialType);
-  
+
+  // Round current time to next 15-minute interval (00, 15, 30, 45)
+  const getRoundedCurrentTime = () => {
+    const now = new Date();
+    const minutes = now.getMinutes();
+    const roundedMinutes = Math.ceil(minutes / 15) * 15;
+    
+    // If rounding goes to 60, add an hour and set minutes to 0
+    if (roundedMinutes === 60) {
+      now.setHours(now.getHours() + 1);
+      now.setMinutes(0);
+    } else {
+      now.setMinutes(roundedMinutes);
+    }
+    
+    now.setSeconds(0);
+    now.setMilliseconds(0);
+    return now;
+  };
+
+  const [favoriteType, setFavoriteType] = useState<"event" | "task">(
+    getInitialType
+  );
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       title: "",
       type: getInitialType(),
       xp_value: 20,
+      startDateTime: getRoundedCurrentTime(),
+      endDateTime: (() => {
+        const start = getRoundedCurrentTime();
+        // Add 30 minutes for events
+        start.setMinutes(start.getMinutes() + 30);
+        return start;
+      })(),
     },
   });
-  
+
   const handleFavoriteClick = (type: "event" | "task") => {
     setFavoriteType(type);
     localStorage.setItem("todo-favorite-type", type);
@@ -220,7 +250,9 @@ export default function AddTodoForm({ onSuccess }: AddTodoFormProps) {
                       }}
                       className={cn(
                         "ml-1 transition-opacity",
-                        favoriteType === "event" ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+                        favoriteType === "event"
+                          ? "opacity-100"
+                          : "opacity-0 group-hover:opacity-100"
                       )}
                       title="Als Favorit markieren"
                     >
@@ -228,8 +260,8 @@ export default function AddTodoForm({ onSuccess }: AddTodoFormProps) {
                         className={cn(
                           "w-4 h-4 transition-all",
                           favoriteType === "event"
-                            ? "fill-yellow-400 text-yellow-400"
-                            : "text-slate-400 hover:text-yellow-400"
+                            ? "fill-blue-400 text-blue-400"
+                            : "text-slate-400 hover:text-blue-400"
                         )}
                       />
                     </button>
@@ -254,7 +286,9 @@ export default function AddTodoForm({ onSuccess }: AddTodoFormProps) {
                       }}
                       className={cn(
                         "ml-1 transition-opacity",
-                        favoriteType === "task" ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+                        favoriteType === "task"
+                          ? "opacity-100"
+                          : "opacity-0 group-hover:opacity-100"
                       )}
                       title="Als Favorit markieren"
                     >
@@ -262,8 +296,8 @@ export default function AddTodoForm({ onSuccess }: AddTodoFormProps) {
                         className={cn(
                           "w-4 h-4 transition-all",
                           favoriteType === "task"
-                            ? "fill-yellow-400 text-yellow-400"
-                            : "text-slate-400 hover:text-yellow-400"
+                            ? "fill-blue-400 text-blue-400"
+                            : "text-slate-400 hover:text-blue-400"
                         )}
                       />
                     </button>
@@ -338,10 +372,9 @@ export default function AddTodoForm({ onSuccess }: AddTodoFormProps) {
                         if (newDateTime) {
                           const currentType = form.getValues("type");
                           if (currentType === "event") {
-                            form.setValue(
-                              "endDateTime",
-                              addHours(newDateTime, 1)
-                            );
+                            const endTime = new Date(newDateTime);
+                            endTime.setMinutes(endTime.getMinutes() + 30);
+                            form.setValue("endDateTime", endTime);
                           } else {
                             form.setValue("endDateTime", newDateTime);
                           }

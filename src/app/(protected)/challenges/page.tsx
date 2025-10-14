@@ -16,6 +16,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import type { Challenge, ChallengesResponse } from "@/types";
 import { useReward } from "@/components/RewardProvider";
+import { motion, AnimatePresence } from "framer-motion";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -106,15 +107,26 @@ export default function ChallengesPage() {
   const ChallengeCard = ({
     challenge,
     type,
+    index,
   }: {
     challenge: Challenge;
     type: "daily" | "weekly";
+    index: number;
   }) => {
     const progressPercentage = (challenge.progress / challenge.target) * 100;
     const canClaim = challenge.completed && !challenge.claimed;
 
     return (
-      <div
+      <motion.div
+        initial={{ opacity: 0, y: 30, scale: 0.9 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ 
+          duration: 0.4, 
+          delay: index * 0.1,
+          type: "spring",
+          stiffness: 100
+        }}
+        whileHover={{ scale: 1.02, y: -4 }}
         className={`relative overflow-hidden h-full flex flex-col justify-center bg-gradient-to-br from-slate-800/50 to-slate-900/50 border border-slate-700/50 rounded-lg p-6 backdrop-blur-sm ${
           challenge.completed ? "border-green-500/50" : ""
         }`}
@@ -159,9 +171,15 @@ export default function ChallengesPage() {
               </span>
             </div>
             <div className="w-full h-2 bg-slate-700/50 rounded-full overflow-hidden">
-              <div
-                className="h-full bg-gradient-to-r from-purple-500 to-pink-500 rounded-full transition-all duration-300"
-                style={{ width: `${progressPercentage}%` }}
+              <motion.div
+                className="h-full bg-gradient-to-r from-purple-500 to-pink-500 rounded-full"
+                initial={{ width: 0 }}
+                animate={{ width: `${progressPercentage}%` }}
+                transition={{ 
+                  duration: 1.2, 
+                  delay: index * 0.1 + 0.5,
+                  ease: "easeOut"
+                }}
               />
             </div>
           </div>
@@ -183,15 +201,42 @@ export default function ChallengesPage() {
             </div>
 
             {canClaim ? (
-              <Button
-                size="sm"
-                onClick={() => handleClaim(challenge.id)}
-                disabled={claimingId === challenge.id}
-                className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white border-0 shadow-lg"
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ 
+                  duration: 0.6, 
+                  delay: index * 0.1 + 0.8,
+                  type: "spring",
+                  stiffness: 200
+                }}
               >
-                <Gift className="w-4 h-4 mr-1.5" />
-                {claimingId === challenge.id ? "..." : "Einfordern"}
-              </Button>
+                <motion.div
+                  animate={{ 
+                    scale: [1, 1.05, 1],
+                    boxShadow: [
+                      "0 0 0px rgba(168, 85, 247, 0)",
+                      "0 0 20px rgba(168, 85, 247, 0.4)",
+                      "0 0 0px rgba(168, 85, 247, 0)"
+                    ]
+                  }}
+                  transition={{ 
+                    duration: 2,
+                    repeat: Infinity,
+                    repeatType: "loop"
+                  }}
+                >
+                  <Button
+                    size="sm"
+                    onClick={() => handleClaim(challenge.id)}
+                    disabled={claimingId === challenge.id}
+                    className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white border-0 shadow-lg"
+                  >
+                    <Gift className="w-4 h-4 mr-1.5" />
+                    {claimingId === challenge.id ? "..." : "Einfordern"}
+                  </Button>
+                </motion.div>
+              </motion.div>
             ) : (
               <Badge
                 variant={challenge.claimed ? "default" : "secondary"}
@@ -212,7 +257,7 @@ export default function ChallengesPage() {
             )}
           </div>
         </div>
-      </div>
+      </motion.div>
     );
   };
 
@@ -270,16 +315,26 @@ export default function ChallengesPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-6">
       <div className="container mx-auto max-w-6xl space-y-8">
-        <div className="text-center space-y-2">
+        <motion.div 
+          className="text-center space-y-2"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
           <h1 className="text-4xl font-bold text-white">Herausforderungen</h1>
           <p className="text-slate-300 text-lg">
             Stelle dich täglichen und wöchentlichen Herausforderungen und
             verdiene zusätzliche Belohnungen!
           </p>
-        </div>
+        </motion.div>
 
         {/* Daily Challenges */}
-        <section className="space-y-4">
+        <motion.section 
+          className="space-y-4"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+        >
           <div className="flex items-center gap-3">
             <Clock className="w-6 h-6 text-blue-400" />
             <h2 className="text-2xl font-semibold text-white">
@@ -296,9 +351,9 @@ export default function ChallengesPage() {
           <div className="overflow-x-auto">
             <div className="flex gap-4 pb-4 min-w-max">
               {dailyChallenges.length > 0 ? (
-                dailyChallenges.map((challenge) => (
+                dailyChallenges.map((challenge, index) => (
                   <div key={challenge.id} className="flex-none w-80 h-52">
-                    <ChallengeCard challenge={challenge} type="daily" />
+                    <ChallengeCard challenge={challenge} type="daily" index={index} />
                   </div>
                 ))
               ) : (
@@ -308,10 +363,15 @@ export default function ChallengesPage() {
               )}
             </div>
           </div>
-        </section>
+        </motion.section>
 
         {/* Weekly Challenges */}
-        <section className="space-y-4">
+        <motion.section 
+          className="space-y-4"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.4 }}
+        >
           <div className="flex items-center gap-3">
             <Calendar className="w-6 h-6 text-purple-400" />
             <h2 className="text-2xl font-semibold text-white">
@@ -328,9 +388,9 @@ export default function ChallengesPage() {
           <div className="overflow-x-auto">
             <div className="flex gap-4 pb-4 min-w-max">
               {weeklyChallenges.length > 0 ? (
-                weeklyChallenges.map((challenge) => (
+                weeklyChallenges.map((challenge, index) => (
                   <div key={challenge.id} className="flex-none w-80 h-52">
-                    <ChallengeCard challenge={challenge} type="weekly" />
+                    <ChallengeCard challenge={challenge} type="weekly" index={index} />
                   </div>
                 ))
               ) : (
@@ -340,7 +400,7 @@ export default function ChallengesPage() {
               )}
             </div>
           </div>
-        </section>
+        </motion.section>
       </div>
     </div>
   );

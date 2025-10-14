@@ -119,217 +119,232 @@ export default function AchievementsSection() {
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {achievements.map((achievement, index) => {
-            const IconComponent =
-              iconMap[achievement.icon as keyof typeof iconMap] || Target;
-            const isUnlocked = achievement.is_unlocked;
-            const progressPercentage = Math.min(
-              achievement.progress_percentage,
-              100
-            );
+              const IconComponent =
+                iconMap[achievement.icon as keyof typeof iconMap] || Target;
+              const isUnlocked = achievement.is_unlocked;
+              const progressPercentage = Math.min(
+                achievement.progress_percentage,
+                100
+              );
 
-            return (
-              <motion.div
-                key={achievement.achievement_id}
-                initial={{ opacity: 0, y: 30, scale: 0.9 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                transition={{ 
-                  duration: 0.4, 
-                  delay: index * 0.1,
-                  type: "spring",
-                  stiffness: 100
-                }}
-                whileHover={{ scale: 1.02, y: -2 }}
-                className={`relative p-4 border rounded-lg transition-all ${
-                  isUnlocked
-                    ? "border-purple-400 bg-amber-950/20"
-                    : "border-slate-700 bg-slate-800/50"
-                } ${!isUnlocked ? "opacity-75" : ""}`}
-              >
-                {/* Achievement Icon and Status */}
-                <div className="flex items-center justify-between mb-3">
-                  <IconComponent
-                    className={`h-8 w-8 ${
-                      isUnlocked ? "text-purple-400" : "text-slate-500"
-                    }`}
-                  />
-                  {isUnlocked && (
-                    <Badge
-                      variant="secondary"
-                      className="bg-purple-600 text-white text-xs"
-                    >
-                      Erreicht
-                    </Badge>
-                  )}
-                  {achievement.reward_gems > 0 && !isUnlocked && (
-                    <Badge
-                      variant="outline"
-                      className="text-xs border-slate-600 text-slate-300"
-                    >
-                      <div className="flex items-center gap-1">
-                        +{achievement.reward_gems} <Gem className="h-3 w-3" />
-                      </div>
-                    </Badge>
-                  )}
-                </div>
+              return (
+                <motion.div
+                  key={achievement.achievement_id}
+                  initial={{ opacity: 0, y: 30, scale: 0.9 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  transition={{
+                    duration: 0.4,
+                    delay: index * 0.1,
+                    type: "spring",
+                    stiffness: 100,
+                  }}
+                  whileHover={{ scale: 1.02, y: -2 }}
+                  className={`relative p-4 border rounded-lg transition-all ${
+                    isUnlocked
+                      ? "border-purple-400 bg-amber-950/20"
+                      : "border-slate-700 bg-slate-800/50"
+                  } ${!isUnlocked ? "opacity-75" : ""}`}
+                >
+                  {/* Achievement Icon and Status */}
+                  <div className="flex items-center justify-between mb-3">
+                    <IconComponent
+                      className={`h-8 w-8 ${
+                        isUnlocked ? "text-purple-400" : "text-slate-500"
+                      }`}
+                    />
+                    {isUnlocked && (
+                      <Badge
+                        variant="secondary"
+                        className="bg-purple-600 text-white text-xs"
+                      >
+                        Erreicht
+                      </Badge>
+                    )}
+                    {achievement.reward_gems > 0 && !isUnlocked && (
+                      <Badge
+                        variant="outline"
+                        className="text-xs border-slate-600 text-slate-300"
+                      >
+                        <div className="flex items-center gap-1">
+                          +{achievement.reward_gems} <Gem className="h-3 w-3" />
+                        </div>
+                      </Badge>
+                    )}
+                  </div>
 
-                {/* Achievement Info */}
-                <div className="space-y-2">
-                  <h4 className="font-medium text-sm text-white">
-                    {achievement.name}
-                  </h4>
-                  <p className="text-xs text-slate-400">
-                    {achievement.description}
-                  </p>
+                  {/* Achievement Info */}
+                  <div className="space-y-2">
+                    <h4 className="font-medium text-sm text-white">
+                      {achievement.name}
+                    </h4>
+                    <p className="text-xs text-slate-400">
+                      {achievement.description}
+                    </p>
 
-                  {/* Progress Bar for non-unlocked achievements */}
-                  {!isUnlocked && (
-                    <div className="space-y-1">
-                      <div className="flex justify-between text-xs text-slate-400">
-                        <span>Fortschritt</span>
-                        <span>
-                          {achievement.current_progress} /{" "}
-                          {achievement.condition_value}
-                        </span>
-                      </div>
-                      <div className="relative w-full h-1.5 bg-slate-700 rounded-full overflow-hidden">
-                        <motion.div
-                          className="h-full bg-gradient-to-r from-purple-400 to-pink-400 rounded-full"
-                          initial={{ width: 0 }}
-                          animate={{ width: `${progressPercentage}%` }}
-                          transition={{ 
-                            duration: 1.2, 
-                            delay: index * 0.1 + 0.5,
-                            ease: "easeOut"
-                          }}
-                        />
-                      </div>
-                      <p className="text-xs text-slate-400">
-                        {progressPercentage.toFixed(0)}% erreicht
-                      </p>
-
-                      {/* Unlock button if achievement is completed but not unlocked */}
-                      {achievement.current_progress >=
-                        achievement.condition_value && (
-                        <motion.div
-                          initial={{ opacity: 0, scale: 0.8 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          transition={{ 
-                            duration: 0.6, 
-                            delay: index * 0.1 + 0.8,
-                            type: "spring",
-                            stiffness: 200
-                          }}
-                        >
+                    {/* Progress Bar for non-unlocked achievements */}
+                    {!isUnlocked && (
+                      <div className="space-y-1">
+                        <div className="flex justify-between text-xs text-slate-400">
+                          <span>Fortschritt</span>
+                          <span>
+                            {achievement.current_progress} /{" "}
+                            {achievement.condition_value}
+                          </span>
+                        </div>
+                        <div className="relative w-full h-1.5 bg-slate-700 rounded-full overflow-hidden">
                           <motion.div
-                            animate={{ 
-                              scale: [1, 1.05, 1],
-                              boxShadow: [
-                                "0 0 0px rgba(168, 85, 247, 0)",
-                                "0 0 20px rgba(168, 85, 247, 0.4)",
-                                "0 0 0px rgba(168, 85, 247, 0)"
-                              ]
+                            className="h-full bg-gradient-to-r from-purple-400 to-pink-400 rounded-full"
+                            initial={{ width: 0 }}
+                            animate={{ width: `${progressPercentage}%` }}
+                            transition={{
+                              duration: 1.2,
+                              delay: index * 0.1 + 0.5,
+                              ease: "easeOut",
                             }}
-                            transition={{ 
-                              duration: 2,
-                              repeat: Infinity,
-                              repeatType: "loop"
+                          />
+                        </div>
+                        <p className="text-xs text-slate-400">
+                          {progressPercentage.toFixed(0)}% erreicht
+                        </p>
+
+                        {/* Unlock button if achievement is completed but not unlocked */}
+                        {achievement.current_progress >=
+                          achievement.condition_value && (
+                          <motion.div
+                            initial={{ opacity: 0, scale: 0.8 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            transition={{
+                              duration: 0.6,
+                              delay: index * 0.1 + 0.8,
+                              type: "spring",
+                              stiffness: 200,
                             }}
                           >
-                            <Button
-                              size="sm"
-                              onClick={() =>
-                                unlockAchievement(achievement.achievement_id)
-                              }
-                              disabled={unlockingIds.has(
-                                achievement.achievement_id
-                              )}
-                              className="w-full mt-2 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
+                            <motion.div
+                              animate={{
+                                scale: [1, 1.05, 1],
+                                boxShadow: [
+                                  "0 0 0px rgba(168, 85, 247, 0)",
+                                  "0 0 20px rgba(168, 85, 247, 0.4)",
+                                  "0 0 0px rgba(168, 85, 247, 0)",
+                                ],
+                              }}
+                              transition={{
+                                duration: 2,
+                                repeat: Infinity,
+                                repeatType: "loop",
+                              }}
                             >
-                              <Unlock className="h-3 w-3 mr-1" />
-                              {unlockingIds.has(achievement.achievement_id)
-                                ? "Schalte frei..."
-                                : "Freischalten"}
-                            </Button>
+                              <Button
+                                size="sm"
+                                onClick={() =>
+                                  unlockAchievement(achievement.achievement_id)
+                                }
+                                disabled={unlockingIds.has(
+                                  achievement.achievement_id
+                                )}
+                                className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
+                              >
+                                <Unlock className="h-3 w-3 mr-1" />
+                                {unlockingIds.has(achievement.achievement_id)
+                                  ? "Schalte frei..."
+                                  : "Freischalten"}
+                              </Button>
+                            </motion.div>
                           </motion.div>
-                        </motion.div>
-                      )}
-                    </div>
-                  )}
+                        )}
+                      </div>
+                    )}
 
-                  {/* Unlock date for completed achievements */}
-                  {isUnlocked && achievement.unlocked_at && (
-                    <p className="text-xs text-purple-400">
-                      Erreicht am{" "}
-                      {new Date(achievement.unlocked_at).toLocaleDateString(
-                        "de-DE"
-                      )}
-                    </p>
-                  )}
-                </div>
-              </motion.div>
-            );
-          })}
-        </div>
-
-        {/* Summary Stats */}
-        <motion.div 
-          className="mt-6 pt-4 border-t border-slate-700"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: achievements.length * 0.1 + 0.5 }}
-        >
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.4, delay: achievements.length * 0.1 + 0.7 }}
-            >
-              <div className="text-2xl font-bold text-purple-400">
-                {achievements.filter((a) => a.is_unlocked).length}
-              </div>
-              <p className="text-xs text-slate-400">Erreicht</p>
-            </motion.div>
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.4, delay: achievements.length * 0.1 + 0.8 }}
-            >
-              <div className="text-2xl font-bold text-white">
-                {achievements.length}
-              </div>
-              <p className="text-xs text-slate-400">Gesamt</p>
-            </motion.div>
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.4, delay: achievements.length * 0.1 + 0.9 }}
-            >
-              <div className="text-2xl font-bold text-blue-400">
-                {achievements
-                  .filter((a) => a.is_unlocked)
-                  .reduce((sum, a) => sum + a.reward_gems, 0)}
-              </div>
-              <p className="text-xs text-slate-400">Edelsteine erhalten</p>
-            </motion.div>
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.4, delay: achievements.length * 0.1 + 1.0 }}
-            >
-              <div className="text-2xl font-bold text-green-400">
-                {Math.round(
-                  (achievements.filter((a) => a.is_unlocked).length /
-                    achievements.length) *
-                    100
-                )}
-                %
-              </div>
-              <p className="text-xs text-slate-400">Abgeschlossen</p>
-            </motion.div>
+                    {/* Unlock date for completed achievements */}
+                    {isUnlocked && achievement.unlocked_at && (
+                      <p className="text-xs text-purple-400">
+                        Erreicht am{" "}
+                        {new Date(achievement.unlocked_at).toLocaleDateString(
+                          "de-DE"
+                        )}
+                      </p>
+                    )}
+                  </div>
+                </motion.div>
+              );
+            })}
           </div>
-        </motion.div>
-      </CardContent>
-    </Card>
+
+          {/* Summary Stats */}
+          <motion.div
+            className="mt-6 pt-4 border-t border-slate-700"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{
+              duration: 0.5,
+              delay: achievements.length * 0.1 + 0.5,
+            }}
+          >
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{
+                  duration: 0.4,
+                  delay: achievements.length * 0.1 + 0.7,
+                }}
+              >
+                <div className="text-2xl font-bold text-purple-400">
+                  {achievements.filter((a) => a.is_unlocked).length}
+                </div>
+                <p className="text-xs text-slate-400">Erreicht</p>
+              </motion.div>
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{
+                  duration: 0.4,
+                  delay: achievements.length * 0.1 + 0.8,
+                }}
+              >
+                <div className="text-2xl font-bold text-white">
+                  {achievements.length}
+                </div>
+                <p className="text-xs text-slate-400">Gesamt</p>
+              </motion.div>
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{
+                  duration: 0.4,
+                  delay: achievements.length * 0.1 + 0.9,
+                }}
+              >
+                <div className="text-2xl font-bold text-blue-400">
+                  {achievements
+                    .filter((a) => a.is_unlocked)
+                    .reduce((sum, a) => sum + a.reward_gems, 0)}
+                </div>
+                <p className="text-xs text-slate-400">Edelsteine erhalten</p>
+              </motion.div>
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{
+                  duration: 0.4,
+                  delay: achievements.length * 0.1 + 1.0,
+                }}
+              >
+                <div className="text-2xl font-bold text-green-400">
+                  {Math.round(
+                    (achievements.filter((a) => a.is_unlocked).length /
+                      achievements.length) *
+                      100
+                  )}
+                  %
+                </div>
+                <p className="text-xs text-slate-400">Abgeschlossen</p>
+              </motion.div>
+            </div>
+          </motion.div>
+        </CardContent>
+      </Card>
     </motion.div>
   );
 }

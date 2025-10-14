@@ -321,6 +321,7 @@ export default function AddTodoForm({ onSuccess }: AddTodoFormProps) {
                 <Input
                   placeholder="Neues Todo..."
                   {...field}
+                  autoFocus
                   className="bg-slate-800/50 border-slate-600 text-slate-200 placeholder:text-slate-400 focus:border-purple-500 focus:ring-purple-500/20"
                 />
               </FormControl>

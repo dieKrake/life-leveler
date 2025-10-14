@@ -98,8 +98,8 @@ export async function POST(request: Request) {
     const { error: gemsError } = await supabase.rpc(
       "update_player_xp_and_gems",
       {
-        p_xp_to_add: 0,
-        p_gems_to_add: achievement.reward_gems,
+        p_xp_change: 0,
+        p_gems_change: achievement.reward_gems,
       }
     );
 

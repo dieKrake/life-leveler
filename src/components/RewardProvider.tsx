@@ -70,7 +70,7 @@ export default function RewardProvider({ children }: RewardProviderProps) {
     >
       {children}
       {/* Render all active rewards as a stack - bottom right corner */}
-      <div className="fixed bottom-6 right-6 z-[9999] pointer-events-none flex flex-col-reverse gap-3 w-[400px]">
+      <div className="fixed bottom-6 right-6 z-[9999] flex flex-col-reverse gap-3 w-[400px]">
         <AnimatePresence initial={false}>
           {rewards.map((reward, index) => (
             <RewardNotification

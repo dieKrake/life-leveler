@@ -12,7 +12,7 @@ import {
   Gift,
 } from "lucide-react";
 import useSWR, { useSWRConfig } from "swr";
-import { useState } from "react";
+import { useState, forwardRef } from "react";
 import { toast } from "sonner";
 import type { Challenge, ChallengesResponse } from "@/types";
 import { useReward } from "@/components/RewardProvider";
@@ -104,22 +104,21 @@ export default function ChallengesPage() {
     }
   };
 
-  const ChallengeCard = ({
-    challenge,
-    type,
-    index,
-  }: {
+  const ChallengeCard = forwardRef<HTMLDivElement, {
     challenge: Challenge;
     type: "daily" | "weekly";
     index: number;
-  }) => {
+  }>(({ challenge, type, index }, ref) => {
     const progressPercentage = (challenge.progress / challenge.target) * 100;
     const canClaim = challenge.completed && !challenge.claimed;
 
     return (
       <motion.div
+        ref={ref}
+        key={`challenge-${challenge.id}`}
         initial={{ opacity: 0, y: 30, scale: 0.9 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
+        exit={{ opacity: 0, y: -30, scale: 0.9 }}
         transition={{ 
           duration: 0.4, 
           delay: index * 0.1,
@@ -259,7 +258,7 @@ export default function ChallengesPage() {
         </div>
       </motion.div>
     );
-  };
+  });
 
   if (isLoading) {
     return (
@@ -350,17 +349,19 @@ export default function ChallengesPage() {
 
           <div className="overflow-x-auto">
             <div className="flex gap-4 pb-4 min-w-max">
-              {dailyChallenges.length > 0 ? (
-                dailyChallenges.map((challenge, index) => (
-                  <div key={challenge.id} className="flex-none w-80 h-52">
-                    <ChallengeCard challenge={challenge} type="daily" index={index} />
+              <AnimatePresence mode="popLayout">
+                {dailyChallenges.length > 0 ? (
+                  dailyChallenges.map((challenge, index) => (
+                    <div key={challenge.id} className="flex-none w-80 h-52">
+                      <ChallengeCard challenge={challenge} type="daily" index={index} />
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-slate-400 text-center w-full py-8">
+                    Keine täglichen Herausforderungen verfügbar
                   </div>
-                ))
-              ) : (
-                <div className="text-slate-400 text-center w-full py-8">
-                  Keine täglichen Herausforderungen verfügbar
-                </div>
-              )}
+                )}
+              </AnimatePresence>
             </div>
           </div>
         </motion.section>
@@ -387,17 +388,19 @@ export default function ChallengesPage() {
 
           <div className="overflow-x-auto">
             <div className="flex gap-4 pb-4 min-w-max">
-              {weeklyChallenges.length > 0 ? (
-                weeklyChallenges.map((challenge, index) => (
-                  <div key={challenge.id} className="flex-none w-80 h-52">
-                    <ChallengeCard challenge={challenge} type="weekly" index={index} />
+              <AnimatePresence mode="popLayout">
+                {weeklyChallenges.length > 0 ? (
+                  weeklyChallenges.map((challenge, index) => (
+                    <div key={challenge.id} className="flex-none w-80 h-52">
+                      <ChallengeCard challenge={challenge} type="weekly" index={index} />
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-slate-400 text-center w-full py-8">
+                    Keine wöchentlichen Herausforderungen verfügbar
                   </div>
-                ))
-              ) : (
-                <div className="text-slate-400 text-center w-full py-8">
-                  Keine wöchentlichen Herausforderungen verfügbar
-                </div>
-              )}
+                )}
+              </AnimatePresence>
             </div>
           </div>
         </motion.section>

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { CheckSquare, Gem, Trophy, User, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useRouter } from "next/navigation";
 
 export interface RewardData {
   xp?: number;
@@ -11,6 +12,8 @@ export interface RewardData {
   type: "todo" | "challenge" | "achievement" | "level_up";
   title?: string;
   description?: string;
+  clickable?: boolean;
+  navigationPath?: string;
 }
 
 interface RewardNotificationProps {
@@ -26,6 +29,7 @@ export default function RewardNotification({
 }: RewardNotificationProps) {
   const [isVisible, setIsVisible] = useState(false);
   const [hasShown, setHasShown] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     if (reward && !hasShown) {
@@ -70,6 +74,7 @@ export default function RewardNotification({
           borderColor: "border-blue-500/30",
           title: reward.title || "Todo erledigt!",
           description: reward.description || "Großartige Arbeit!",
+          clickable: false,
         };
       case "challenge":
         return {
@@ -80,6 +85,8 @@ export default function RewardNotification({
           title: reward.title || "Challenge gemeistert!",
           description:
             reward.description || "Herausforderung erfolgreich abgeschlossen!",
+          clickable: true,
+          navigationPath: "/challenges",
         };
       case "achievement":
         return {
@@ -90,6 +97,8 @@ export default function RewardNotification({
           title: reward.title || "Erfolg freigeschaltet!",
           description:
             reward.description || "Du hast einen neuen Meilenstein erreicht!",
+          clickable: true,
+          navigationPath: "/profile",
         };
       case "level_up":
         return {
@@ -99,6 +108,7 @@ export default function RewardNotification({
           borderColor: "border-emerald-500/30",
           title: reward.title || "Level Up!",
           description: reward.description || "Du bist aufgestiegen!",
+          clickable: false,
         };
       default:
         return {
@@ -108,12 +118,20 @@ export default function RewardNotification({
           borderColor: "border-blue-500/30",
           title: "Belohnung erhalten!",
           description: "Gut gemacht!",
+          clickable: false,
         };
     }
   };
 
   const config = getTypeConfig();
   const IconComponent = config.icon;
+
+  const handleClick = () => {
+    if (config.clickable && config.navigationPath) {
+      router.push(config.navigationPath);
+      setIsVisible(false); // Hide notification immediately
+    }
+  };
 
   if (!reward) return null;
 
@@ -135,15 +153,17 @@ export default function RewardNotification({
             scale: { duration: 0.3, ease: "easeOut" },
             x: { type: "spring", stiffness: 280, damping: 28 },
           }}
-          className="w-full"
+          className="w-full pointer-events-auto"
         >
           <div
             className={cn(
               "relative overflow-hidden rounded-2xl border backdrop-blur-xl shadow-2xl",
               `bg-gradient-to-br ${config.bgColor}`,
               config.borderColor,
-              "w-full"
+              "w-full",
+              config.clickable && "cursor-pointer hover:scale-105 transition-transform duration-200"
             )}
+            onClick={handleClick}
           >
             {/* Removed sparkles animation */}
 
@@ -186,6 +206,11 @@ export default function RewardNotification({
                     className="text-sm text-slate-300 mb-3"
                   >
                     {config.description}
+                    {config.clickable && (
+                      <span className="block text-xs text-slate-400 mt-1">
+                        Klicken zum Öffnen
+                      </span>
+                    )}
                   </motion.p>
 
                   {/* Rewards display */}

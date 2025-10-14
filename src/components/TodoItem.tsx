@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, forwardRef } from "react";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import type { Todo } from "@/types";
 import useSWR, { KeyedMutator, useSWRConfig } from "swr";
@@ -23,7 +23,7 @@ type TodoItemProps = {
   mutate: KeyedMutator<Todo[]>;
 };
 
-export default function TodoItem({ todo, todos, mutate }: TodoItemProps) {
+const TodoItem = forwardRef<HTMLDivElement, TodoItemProps>(function TodoItem({ todo, todos, mutate }, ref) {
   const supabase = createClientComponentClient();
   const [isChecked, setIsChecked] = useState(todo.is_completed);
   const { mutate: globalMutate } = useSWRConfig();
@@ -153,6 +153,7 @@ export default function TodoItem({ todo, todos, mutate }: TodoItemProps) {
 
   return (
     <motion.div
+      ref={ref}
       layout
       layoutId={`todo-${todo.id}`}
       initial={{ opacity: 0, y: 20, scale: 0.95 }}
@@ -250,4 +251,6 @@ export default function TodoItem({ todo, todos, mutate }: TodoItemProps) {
       </div>
     </motion.div>
   );
-}
+});
+
+export default TodoItem;

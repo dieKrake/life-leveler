@@ -14,6 +14,7 @@ export type Todo = {
 
 export type PlayerStats = {
   xp: number;
+  total_xp: number;
   level: number;
   xp_for_current_level: number;
   xp_for_next_level: number | null;

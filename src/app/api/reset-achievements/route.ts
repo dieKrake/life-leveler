@@ -48,8 +48,8 @@ export async function POST() {
       const { error: gemsError } = await supabase.rpc(
         "update_player_xp_and_gems",
         {
-          p_xp_to_add: 0,
-          p_gems_to_add: -totalGemsFromAchievements,
+          p_xp_change: 0,
+          p_gems_change: -totalGemsFromAchievements,
         }
       );
 

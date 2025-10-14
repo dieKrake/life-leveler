@@ -13,6 +13,7 @@ interface ProfilePictureProps {
   };
   level: number;
   xp: number;
+  totalXp?: number;
   xpForNextLevel: number;
   xpForCurrentLevel: number;
   gems: number;
@@ -25,6 +26,7 @@ export default function ProfilePicture({
   user,
   level,
   xp,
+  totalXp,
   xpForNextLevel,
   xpForCurrentLevel,
   gems,
@@ -232,9 +234,16 @@ export default function ProfilePicture({
           whileHover={{ scale: 1.05 }}
         >
           <Zap className="w-4 h-4 text-yellow-400" />
-          <span className="text-sm font-medium text-yellow-100">
-            {xp.toLocaleString()}
-          </span>
+          <div className="flex flex-col items-center">
+            <span className="text-sm font-medium text-yellow-100">
+              {totalXp ? totalXp.toLocaleString() : xp.toLocaleString()}
+            </span>
+            {totalXp && totalXp !== xp && (
+              <span className="text-xs text-yellow-300/70">
+                Total XP
+              </span>
+            )}
+          </div>
         </motion.div>
         <motion.div
           className="flex items-center gap-1 px-3 py-2 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-full border border-blue-500/30"

@@ -61,6 +61,7 @@ export default function ProfilePage() {
             user={userData}
             level={stats.level}
             xp={stats.xp}
+            totalXp={stats.total_xp}
             xpForCurrentLevel={stats.xp_for_current_level}
             xpForNextLevel={
               stats.xp_for_next_level || stats.xp_for_current_level

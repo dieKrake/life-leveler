@@ -9,6 +9,7 @@ import {
   DifficultyDistributionSection,
   HourlyActivitySection,
 } from "@/components/StatsSections";
+import { motion } from "framer-motion";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -71,23 +72,63 @@ export default function StatsPage() {
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-6">
       <div className="container mx-auto max-w-6xl space-y-8">
         {/* Header */}
-        <div className="text-center space-y-2">
+        <motion.div 
+          className="text-center space-y-2"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
           <h1 className="text-4xl font-bold text-white">Statistiken</h1>
           <p className="text-slate-300 text-lg">
             Verfolge deinen Fortschritt und deine Produktivität
           </p>
-        </div>
+        </motion.div>
 
         {/* Key Metrics */}
-        <StatsKeyMetrics stats={stats} />
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+        >
+          <StatsKeyMetrics stats={stats} />
+        </motion.div>
 
         {/* Charts Section */}
-        <div className="grid gap-6 md:grid-cols-2">
-          <DailyCompletionsSection stats={stats} />
-          <WeeklyTrendSection stats={stats} />
-          <DifficultyDistributionSection stats={stats} />
-          <HourlyActivitySection stats={stats} />
-        </div>
+        <motion.div 
+          className="grid gap-6 md:grid-cols-2"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.4 }}
+        >
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5, delay: 0.6 }}
+          >
+            <DailyCompletionsSection stats={stats} />
+          </motion.div>
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5, delay: 0.7 }}
+          >
+            <WeeklyTrendSection stats={stats} />
+          </motion.div>
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5, delay: 0.8 }}
+          >
+            <DifficultyDistributionSection stats={stats} />
+          </motion.div>
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5, delay: 0.9 }}
+          >
+            <HourlyActivitySection stats={stats} />
+          </motion.div>
+        </motion.div>
       </div>
     </div>
   );

@@ -45,6 +45,7 @@ export function useRewardNotification() {
           : "Challenge gemeistert!",
         description:
           "Herausforderung erfolgreich abgeschlossen! Du bist unstoppbar!",
+        clickable: false, // This is a claim notification - don't make it clickable
       });
     },
     [showReward]
@@ -59,6 +60,7 @@ export function useRewardNotification() {
           ? `"${achievementTitle}" freigeschaltet!`
           : "Erfolg freigeschaltet!",
         description: "Du hast einen neuen Meilenstein erreicht! Fantastisch!",
+        clickable: false, // This is a claim notification - don't make it clickable
       });
     },
     [showReward]
@@ -111,6 +113,7 @@ export function useRewardNotification() {
           ? `"${achievementTitle}" kann freigeschaltet werden!`
           : "Erfolg kann freigeschaltet werden!",
         description: "Gehe zur Erfolge-Seite, um deine Belohnung abzuholen!",
+        clickable: true, // This is an "unlockable" notification - make it clickable
       });
     },
     [showReward]
@@ -127,6 +130,7 @@ export function useRewardNotification() {
           ? `"${challengeTitle}" abgeschlossen!`
           : "Challenge abgeschlossen!",
         description: "Gehe zur Herausforderungen-Seite, um deine Belohnung einzufordern!",
+        clickable: true, // This is a "completable" notification - make it clickable
       });
     },
     [showReward]

@@ -59,14 +59,17 @@ export async function POST(request: Request) {
       });
       if (error) {
         console.error("Error completing todo:", error);
-        throw error;
+        throw new Error(`Database error: ${error.message}`);
       }
       levelUpInfo = data?.[0]; // Get the first (and only) result
     } else {
       const { error } = await supabase.rpc("uncomplete_todo", {
         todo_id: parseInt(todoId),
       });
-      if (error) throw error;
+      if (error) {
+        console.error("Error uncompleting todo:", error);
+        throw new Error(`Database error: ${error.message}`);
+      }
     }
 
     // 3. Sync with Google if todo has google_event_id

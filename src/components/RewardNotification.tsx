@@ -85,7 +85,7 @@ export default function RewardNotification({
           title: reward.title || "Challenge gemeistert!",
           description:
             reward.description || "Herausforderung erfolgreich abgeschlossen!",
-          clickable: true,
+          clickable: reward.clickable ?? true, // Use reward's clickable property, default to true
           navigationPath: "/challenges",
         };
       case "achievement":
@@ -97,7 +97,7 @@ export default function RewardNotification({
           title: reward.title || "Erfolg freigeschaltet!",
           description:
             reward.description || "Du hast einen neuen Meilenstein erreicht!",
-          clickable: true,
+          clickable: reward.clickable ?? true, // Use reward's clickable property, default to true
           navigationPath: "/profile",
         };
       case "level_up":

@@ -75,11 +75,20 @@ export async function GET() {
   const { data: multiplierData } = await supabase
     .rpc("get_streak_multiplier", { streak_days: playerData.current_streak });
 
+  // Calculate correct XP values for display
+  const currentLevelXpRequired = currentLevelData?.xp_required || 0;
+  const nextLevelXpRequired = nextLevelData?.xp_required || null;
+  
+  // For level display: XP needed WITHIN the current level
+  // Example: Level 2 (100 total) to Level 3 (250 total) = 150 XP needed within level 2
+  const xpNeededForNextLevel = nextLevelXpRequired ? (nextLevelXpRequired - currentLevelXpRequired) : null;
+
   const stats = {
     xp: playerData.xp || 0,
     level: playerData.level || 1,
-    xp_for_current_level: currentLevelData?.xp_required || 0,
-    xp_for_next_level: nextLevelData?.xp_required || null,
+    total_xp: playerData.total_xp || 0,
+    xp_for_current_level: 0, // Always 0 (start of current level)
+    xp_for_next_level: xpNeededForNextLevel, // XP needed within current level to reach next
     current_streak: playerData.current_streak || 0,
     highest_streak: playerData.highest_streak || 0,
     streak_multiplier: multiplierData || 1.0,

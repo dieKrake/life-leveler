@@ -26,6 +26,7 @@ export default function PlayerStatsBar() {
   const {
     level,
     xp,
+    total_xp,
     xp_for_current_level,
     xp_for_next_level,
     current_streak,
@@ -33,7 +34,6 @@ export default function PlayerStatsBar() {
     prestige = 0,
     can_prestige = false,
   } = stats;
-
 
   const isMaxLevel = xp_for_next_level === null;
 
@@ -95,16 +95,20 @@ export default function PlayerStatsBar() {
         <div className="flex items-center gap-4">
           {/* XP Display */}
           <AnimatedCounter
-            value={xp}
+            value={total_xp}
             type="xp"
             className="text-sm font-medium text-yellow-100"
             renderWrapper={(children, isAnimating, scaleIntensity) => (
-              <div 
+              <div
                 className="flex items-center gap-1 px-3 py-1 bg-gradient-to-r from-yellow-500/20 to-orange-500/20 rounded-full border border-yellow-500/30 transition-all duration-300"
                 style={{
-                  transform: isAnimating ? `scale(${scaleIntensity})` : 'scale(1)',
-                  boxShadow: isAnimating ? '0 0 20px rgba(251, 191, 36, 0.6), 0 0 40px rgba(251, 191, 36, 0.3)' : 'none',
-                  borderColor: isAnimating ? 'rgba(251, 191, 36, 0.8)' : '',
+                  transform: isAnimating
+                    ? `scale(${scaleIntensity})`
+                    : "scale(1)",
+                  boxShadow: isAnimating
+                    ? "0 0 20px rgba(251, 191, 36, 0.6), 0 0 40px rgba(251, 191, 36, 0.3)"
+                    : "none",
+                  borderColor: isAnimating ? "rgba(251, 191, 36, 0.8)" : "",
                 }}
               >
                 <Zap className="w-4 h-4 text-yellow-400" />
@@ -119,12 +123,16 @@ export default function PlayerStatsBar() {
             type="gems"
             className="text-sm font-medium text-blue-100"
             renderWrapper={(children, isAnimating, scaleIntensity) => (
-              <div 
+              <div
                 className="flex items-center gap-1 px-3 py-1 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-full border border-blue-500/30 transition-all duration-300"
                 style={{
-                  transform: isAnimating ? `scale(${scaleIntensity})` : 'scale(1)',
-                  boxShadow: isAnimating ? '0 0 20px rgba(96, 165, 250, 0.6), 0 0 40px rgba(96, 165, 250, 0.3)' : 'none',
-                  borderColor: isAnimating ? 'rgba(96, 165, 250, 0.8)' : '',
+                  transform: isAnimating
+                    ? `scale(${scaleIntensity})`
+                    : "scale(1)",
+                  boxShadow: isAnimating
+                    ? "0 0 20px rgba(96, 165, 250, 0.6), 0 0 40px rgba(96, 165, 250, 0.3)"
+                    : "none",
+                  borderColor: isAnimating ? "rgba(96, 165, 250, 0.8)" : "",
                 }}
               >
                 <Gem className="w-4 h-4 text-blue-400" />
@@ -139,12 +147,16 @@ export default function PlayerStatsBar() {
             type="streak"
             className="text-sm font-medium text-orange-100"
             renderWrapper={(children, isAnimating, scaleIntensity) => (
-              <div 
+              <div
                 className="flex items-center gap-1 px-3 py-1 bg-gradient-to-r from-orange-500/20 to-red-500/20 rounded-full border border-orange-500/30 transition-all duration-300"
                 style={{
-                  transform: isAnimating ? `scale(${scaleIntensity})` : 'scale(1)',
-                  boxShadow: isAnimating ? '0 0 20px rgba(251, 146, 60, 0.6), 0 0 40px rgba(251, 146, 60, 0.3)' : 'none',
-                  borderColor: isAnimating ? 'rgba(251, 146, 60, 0.8)' : '',
+                  transform: isAnimating
+                    ? `scale(${scaleIntensity})`
+                    : "scale(1)",
+                  boxShadow: isAnimating
+                    ? "0 0 20px rgba(251, 146, 60, 0.6), 0 0 40px rgba(251, 146, 60, 0.3)"
+                    : "none",
+                  borderColor: isAnimating ? "rgba(251, 146, 60, 0.8)" : "",
                 }}
               >
                 <Flame className="w-4 h-4 text-orange-400" />
@@ -159,7 +171,6 @@ export default function PlayerStatsBar() {
             currentLevel={level}
             currentPrestige={prestige}
           />
-
         </div>
       </div>
     </div>

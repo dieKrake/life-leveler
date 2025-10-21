@@ -65,7 +65,7 @@ const formSchema = z
     startDateTime: z.date(),
     endDateTime: z.date(),
     type: z.enum(["event", "task"]),
-    xp_value: z.transform(Number),
+    xp_value: z.number(),
   })
   .refine((data) => data.endDateTime >= data.startDateTime, {
     message: "Die Endzeit muss nach der Startzeit liegen.",
@@ -97,7 +97,7 @@ export default function AddTodoForm({ onSuccess }: AddTodoFormProps) {
     const now = new Date();
     const minutes = now.getMinutes();
     const roundedMinutes = Math.ceil(minutes / 15) * 15;
-    
+
     // If rounding goes to 60, add an hour and set minutes to 0
     if (roundedMinutes === 60) {
       now.setHours(now.getHours() + 1);
@@ -105,7 +105,7 @@ export default function AddTodoForm({ onSuccess }: AddTodoFormProps) {
     } else {
       now.setMinutes(roundedMinutes);
     }
-    
+
     now.setSeconds(0);
     now.setMilliseconds(0);
     return now;
@@ -504,54 +504,60 @@ export default function AddTodoForm({ onSuccess }: AddTodoFormProps) {
         <FormField
           control={form.control}
           name="xp_value"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="text-slate-200 font-semibold flex items-center gap-2">
-                <Gem className="w-4 h-4 text-purple-400" />
-                Schwierigkeit
-              </FormLabel>
-              <FormControl className="flex justify-start gap-2">
-                <ToggleGroup
-                  type="single"
-                  variant="outline"
-                  onValueChange={field.onChange}
-                  className="justify-start"
-                >
-                  <ToggleGroupItem
-                    value="10"
-                    aria-label="Leicht"
-                    className="bg-slate-800/50 border-slate-600 text-slate-300 hover:bg-green-500/20 hover:border-green-500 data-[state=on]:bg-green-500/30 data-[state=on]:border-green-400 data-[state=on]:text-green-300 hover:text-white px-4 py-2 h-auto min-w-[100px]"
+          render={({ field }) => {
+            console.log("xp_value field:", field.value, typeof field.value);
+            return (
+              <FormItem>
+                <FormLabel className="text-slate-200 font-semibold flex items-center gap-2">
+                  <Gem className="w-4 h-4 text-purple-400" />
+                  Schwierigkeit
+                </FormLabel>
+                <FormControl className="flex justify-start gap-2">
+                  <ToggleGroup
+                    type="single"
+                    variant="outline"
+                    value={field.value ? field.value.toString() : "20"}
+                    onValueChange={(value) =>
+                      field.onChange(value ? parseInt(value) : 20)
+                    }
+                    className="justify-start"
                   >
-                    <div className="flex flex-col items-center justify-center w-full">
-                      <p>Easy</p>
-                      <p className="text-xs opacity-80">(10 XP)</p>
-                    </div>
-                  </ToggleGroupItem>
-                  <ToggleGroupItem
-                    value="20"
-                    aria-label="Mittel"
-                    className="bg-slate-800/50 border-slate-600 text-slate-300 hover:bg-yellow-500/20 hover:border-yellow-500 data-[state=on]:bg-yellow-500/30 data-[state=on]:border-yellow-400 data-[state=on]:text-yellow-300 hover:text-white px-4 py-2 h-auto min-w-[100px]"
-                  >
-                    <div className="flex flex-col items-center justify-center w-full">
-                      <p>Medium</p>
-                      <p className="text-xs opacity-80">(20 XP)</p>
-                    </div>
-                  </ToggleGroupItem>
-                  <ToggleGroupItem
-                    value="30"
-                    aria-label="Schwer"
-                    className="bg-slate-800/50 border-slate-600 text-slate-300 hover:bg-red-500/20 hover:border-red-500 data-[state=on]:bg-red-500/30 data-[state=on]:border-red-400 data-[state=on]:text-red-300 hover:text-white px-4 py-2 h-auto min-w-[100px]"
-                  >
-                    <div className="flex flex-col items-center justify-center w-full">
-                      <p>Hard</p>
-                      <p className="text-xs opacity-80">(30 XP)</p>
-                    </div>
-                  </ToggleGroupItem>
-                </ToggleGroup>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+                    <ToggleGroupItem
+                      value="10"
+                      aria-label="Leicht"
+                      className="bg-slate-800/50 border-slate-600 text-slate-300 hover:bg-green-500/20 hover:border-green-500 data-[state=on]:bg-green-500/30 data-[state=on]:border-green-400 data-[state=on]:text-green-300 hover:text-white px-4 py-2 h-auto min-w-[100px]"
+                    >
+                      <div className="flex flex-col items-center justify-center w-full">
+                        <p>Easy</p>
+                        <p className="text-xs opacity-80">(10 XP)</p>
+                      </div>
+                    </ToggleGroupItem>
+                    <ToggleGroupItem
+                      value="20"
+                      aria-label="Mittel"
+                      className="bg-slate-800/50 border-slate-600 text-slate-300 hover:bg-yellow-500/20 hover:border-yellow-500 data-[state=on]:bg-yellow-500/30 data-[state=on]:border-yellow-400 data-[state=on]:text-yellow-300 hover:text-white px-4 py-2 h-auto min-w-[100px]"
+                    >
+                      <div className="flex flex-col items-center justify-center w-full">
+                        <p>Medium</p>
+                        <p className="text-xs opacity-80">(20 XP)</p>
+                      </div>
+                    </ToggleGroupItem>
+                    <ToggleGroupItem
+                      value="30"
+                      aria-label="Schwer"
+                      className="bg-slate-800/50 border-slate-600 text-slate-300 hover:bg-red-500/20 hover:border-red-500 data-[state=on]:bg-red-500/30 data-[state=on]:border-red-400 data-[state=on]:text-red-300 hover:text-white px-4 py-2 h-auto min-w-[100px]"
+                    >
+                      <div className="flex flex-col items-center justify-center w-full">
+                        <p>Hard</p>
+                        <p className="text-xs opacity-80">(30 XP)</p>
+                      </div>
+                    </ToggleGroupItem>
+                  </ToggleGroup>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            );
+          }}
         />
 
         <Button

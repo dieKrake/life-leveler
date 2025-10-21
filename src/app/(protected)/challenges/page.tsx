@@ -109,8 +109,6 @@ export default function ChallengesPage() {
 
   const dailyChallenges = challenges?.daily || [];
   const weeklyChallenges = challenges?.weekly || [];
-  console.log("dailyChallenges challenges", dailyChallenges);
-  console.log("weeklyChallenges challenges", weeklyChallenges);
 
   // Get reset time from the first challenge's expires_at
   const getResetTime = (challengeList: Challenge[]) => {

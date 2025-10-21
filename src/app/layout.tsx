@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import SWRProvider from "@/components/SWRProvider";
 import RewardProvider from "@/components/RewardProvider";
+import { UnifiedDataProvider } from "@/components/UnifiedDataProvider";
 import Navbar from "@/components/Navbar";
 import { cookies } from "next/headers";
 import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
@@ -34,8 +35,17 @@ export default async function RootLayout({
       <body className={`${inter.className} antialiased`}>
         <SWRProvider>
           <RewardProvider>
-            <Navbar />
-            {children}
+            {session ? (
+              <UnifiedDataProvider>
+                <Navbar />
+                {children}
+              </UnifiedDataProvider>
+            ) : (
+              <>
+                <Navbar />
+                {children}
+              </>
+            )}
             <Toaster 
               position="bottom-center" 
               theme="dark"

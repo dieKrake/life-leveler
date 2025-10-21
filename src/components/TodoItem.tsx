@@ -3,8 +3,9 @@
 import { useState, useEffect, forwardRef } from "react";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import type { Todo } from "@/types";
-import useSWR, { KeyedMutator, useSWRConfig } from "swr";
+import { KeyedMutator, useSWRConfig } from "swr";
 import { PlayerStats } from "@/types";
+import { useUnifiedData } from "./UnifiedDataProvider";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
@@ -26,8 +27,7 @@ type TodoItemProps = {
 const TodoItem = forwardRef<HTMLDivElement, TodoItemProps>(function TodoItem({ todo, todos, mutate }, ref) {
   const supabase = createClientComponentClient();
   const [isChecked, setIsChecked] = useState(todo.is_completed);
-  const { mutate: globalMutate } = useSWRConfig();
-  const { data: stats, isLoading } = useSWR<PlayerStats>("/api/player-stats");
+  const { mutateAll, playerStats: stats } = useUnifiedData();
   const { showTodoReward, showXpLoss, showLevelUpReward, showAchievementUnlockable, showChallengeCompletable } = useReward();
 
   useEffect(() => {
@@ -80,9 +80,7 @@ const TodoItem = forwardRef<HTMLDivElement, TodoItemProps>(function TodoItem({ t
 
       // Success - refresh data
       mutate();
-      globalMutate("/api/player-stats");
-      globalMutate("/api/achievements");
-      globalMutate("/api/challenges");
+      mutateAll(); // This will update all data including challenges
 
       // Calculate XP and gems for reward notification
       const baseXp = todo.xp_value || 10;

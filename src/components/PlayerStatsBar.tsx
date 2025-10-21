@@ -1,17 +1,14 @@
 "use client";
 
-import useSWR from "swr";
 import { PlayerStats } from "@/types";
+import { usePlayerStats } from "./UnifiedDataProvider";
 import { Badge } from "@/components/ui/badge";
 import { Zap, Gem, Flame, Star } from "lucide-react";
 import PrestigeButton from "./PrestigeButton";
 import AnimatedCounter from "./AnimatedCounter";
 
 export default function PlayerStatsBar() {
-  const { data: stats, isLoading } = useSWR<PlayerStats>("/api/player-stats", {
-    refreshInterval: 30000, // Refresh every 30 seconds
-    revalidateOnFocus: true, // Refresh when user returns to tab
-  });
+  const { data: stats, isLoading } = usePlayerStats();
 
   if (isLoading || !stats) {
     return (

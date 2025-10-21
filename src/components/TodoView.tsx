@@ -1,7 +1,7 @@
 "use client";
 
-import useSWR from "swr";
 import type { Todo } from "@/types";
+import { useTodos } from "./UnifiedDataProvider";
 import { useMemo, useState } from "react";
 import { CheckSquare, Clock } from "lucide-react";
 import AddTodoSheet from "./AddTodoSheet";
@@ -19,7 +19,7 @@ export default function TodoView() {
     error,
     isLoading,
     mutate,
-  } = useSWR<Todo[]>("/api/get-todos");
+  } = useTodos();
 
   const { isSyncing, isArchiving, handleSync, handleArchiveAllCompleted } =
     useTodoOperations(mutate);

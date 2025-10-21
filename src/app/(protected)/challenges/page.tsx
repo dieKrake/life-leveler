@@ -1,15 +1,14 @@
 "use client";
 
-import useSWR, { useSWRConfig } from "swr";
+import { useSWRConfig } from "swr";
 import { useState } from "react";
 import { toast } from "sonner";
 import type { Challenge, ChallengesResponse } from "@/types";
+import { useChallenges } from "@/components/UnifiedDataProvider";
 import { useReward } from "@/components/RewardProvider";
 import { motion } from "framer-motion";
 import ChallengeSection from "@/components/ChallengeSection";
 import { Trophy } from "lucide-react";
-
-const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 export default function ChallengesPage() {
   const {
@@ -17,7 +16,7 @@ export default function ChallengesPage() {
     error,
     isLoading,
     mutate,
-  } = useSWR<ChallengesResponse>("/api/challenges", fetcher);
+  } = useChallenges();
 
   const { mutate: globalMutate } = useSWRConfig();
   const [claimingId, setClaimingId] = useState<string | null>(null);

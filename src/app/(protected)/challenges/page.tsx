@@ -15,7 +15,7 @@ export default function ChallengesPage() {
 
   const { mutate: globalMutate } = useSWRConfig();
   const [claimingId, setClaimingId] = useState<string | null>(null);
-  const { showChallengeReward } = useReward();
+  const { showChallengeReward, showLevelUpReward } = useReward();
 
   const handleClaim = async (challengeId: string) => {
     setClaimingId(challengeId);
@@ -65,6 +65,10 @@ export default function ChallengesPage() {
       // Show reward notification
       showChallengeReward(data.xp_earned, data.gems_earned, challenge?.title);
 
+      if (data.level_up) {
+        showLevelUpReward(data.new_level);
+      }
+
       // Success - refresh data (same pattern as TodoItem)
       mutate();
       globalMutate("/api/player-stats");
@@ -105,6 +109,8 @@ export default function ChallengesPage() {
 
   const dailyChallenges = challenges?.daily || [];
   const weeklyChallenges = challenges?.weekly || [];
+  console.log("dailyChallenges challenges", dailyChallenges);
+  console.log("weeklyChallenges challenges", weeklyChallenges);
 
   // Get reset time from the first challenge's expires_at
   const getResetTime = (challengeList: Challenge[]) => {

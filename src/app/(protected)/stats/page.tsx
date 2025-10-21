@@ -10,6 +10,7 @@ import {
   HourlyActivitySection,
 } from "@/components/StatsSections";
 import { motion } from "framer-motion";
+import { BarChart3 } from "lucide-react";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -72,13 +73,16 @@ export default function StatsPage() {
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-6">
       <div className="container mx-auto max-w-6xl space-y-8">
         {/* Header */}
-        <motion.div 
+        <motion.div
           className="text-center space-y-2"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <h1 className="text-4xl font-bold text-white">Statistiken</h1>
+          <div className="flex items-center justify-center gap-3 mb-4">
+            <BarChart3 className="w-8 h-8 text-purple-400" />
+            <h1 className="text-4xl font-bold text-white">Statistiken</h1>
+          </div>
           <p className="text-slate-300 text-lg">
             Verfolge deinen Fortschritt und deine Produktivität
           </p>
@@ -94,7 +98,7 @@ export default function StatsPage() {
         </motion.div>
 
         {/* Charts Section */}
-        <motion.div 
+        <motion.div
           className="grid gap-6 md:grid-cols-2"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}

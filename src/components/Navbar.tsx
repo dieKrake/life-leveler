@@ -53,9 +53,9 @@ export default async function Navbar() {
                   asChild
                   className="group relative overflow-hidden rounded-lg px-4 py-2 text-sm font-medium text-slate-300 transition-all duration-300 hover:text-white hover:bg-white/10 hover:shadow-lg hover:scale-105"
                 >
-                  <Link href="/" className="flex items-center gap-2">
+                  <Link href="/dashboard" className="flex items-center gap-2">
                     <Home className="w-4 h-4" />
-                    <span>Startseite</span>
+                    <span>Dashboard</span>
                     <div className="absolute inset-0 bg-gradient-to-r from-purple-500/20 to-pink-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                   </Link>
                 </NavigationMenuLink>

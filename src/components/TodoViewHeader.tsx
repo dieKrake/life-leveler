@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Plus, RefreshCw } from "lucide-react";
+import { Plus, RefreshCw, CheckSquare } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { checkSession } from "@/lib/authUtils";
 import { toast } from "sonner";
@@ -39,22 +39,22 @@ export default function TodoViewHeader({
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.5, delay: 0.1 }}
       >
-        <h1 className="text-3xl font-bold text-white">Meine Aufgaben</h1>
+        <div className="flex items-center justify-left gap-3 mb-4">
+          <CheckSquare className="w-8 h-8 text-purple-400" />
+          <h1 className="text-3xl font-bold text-white">Meine Aufgaben</h1>
+        </div>
         <p className="text-slate-400 mt-1">
           Verwalte deine Todos und sammle XP durch das Erledigen von Aufgaben
         </p>
       </motion.div>
 
-      <motion.div 
+      <motion.div
         className="flex flex-col sm:flex-row gap-2"
         initial={{ opacity: 0, x: 30 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.5, delay: 0.2 }}
       >
-        <motion.div
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-        >
+        <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
           <Button
             onClick={handleAddTodo}
             className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white"
@@ -63,10 +63,7 @@ export default function TodoViewHeader({
             Todo hinzufügen
           </Button>
         </motion.div>
-        <motion.div
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-        >
+        <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
           <Button
             onClick={onSync}
             disabled={isSyncing}

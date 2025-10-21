@@ -60,8 +60,6 @@ export async function GET() {
     const weeklyChallenges =
       data?.filter((c: any) => c.type === "weekly") || [];
 
-    console.log("Daily Challenges:", dailyChallenges);
-    console.log("Weekly Challenges:", weeklyChallenges);
     return NextResponse.json({
       daily: dailyChallenges,
       weekly: weeklyChallenges,

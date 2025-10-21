@@ -7,6 +7,7 @@ import type { Challenge, ChallengesResponse } from "@/types";
 import { useReward } from "@/components/RewardProvider";
 import { motion } from "framer-motion";
 import ChallengeSection from "@/components/ChallengeSection";
+import { Trophy } from "lucide-react";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -91,7 +92,6 @@ export default function ChallengesPage() {
     }
   };
 
-
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-6">
@@ -146,20 +146,23 @@ export default function ChallengesPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-6">
       <div className="container mx-auto max-w-6xl space-y-8">
-        <motion.div 
+        <motion.div
           className="text-center space-y-2"
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <h1 className="text-4xl font-bold text-white">Herausforderungen</h1>
+          <div className="flex items-center justify-center gap-3 mb-4">
+            <Trophy className="w-8 h-8 text-purple-400" />
+            <h1 className="text-4xl font-bold text-white">Herausforderungen</h1>
+          </div>
           <p className="text-slate-300 text-lg">
             Stelle dich täglichen und wöchentlichen Herausforderungen und
             verdiene zusätzliche Belohnungen!
           </p>
         </motion.div>
 
-        <motion.div 
+        <motion.div
           className="space-y-8"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}

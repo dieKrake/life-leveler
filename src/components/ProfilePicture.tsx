@@ -238,11 +238,6 @@ export default function ProfilePicture({
             <span className="text-sm font-medium text-yellow-100">
               {totalXp ? totalXp.toLocaleString() : xp.toLocaleString()}
             </span>
-            {totalXp && totalXp !== xp && (
-              <span className="text-xs text-yellow-300/70">
-                Total XP
-              </span>
-            )}
           </div>
         </motion.div>
         <motion.div

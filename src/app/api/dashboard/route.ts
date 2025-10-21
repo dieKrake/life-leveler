@@ -18,6 +18,7 @@ export async function GET() {
   }
 
   try {
+
     // Parallel fetch all data for better performance
     const [
       playerStatsResult,
@@ -25,10 +26,65 @@ export async function GET() {
       achievementsResult,
       todosResult
     ] = await Promise.allSettled([
-      // Player Stats
-      supabase.rpc("get_player_stats_with_level_info", {
-        p_user_id: session.user.id,
-      }),
+      // Player Stats (using same logic as /api/player-stats)
+      (async () => {
+        
+        // Get basic player data
+        const { data: playerData, error: playerError } = await supabase
+          .from("player_stats")
+          .select("*")
+          .eq("user_id", session.user.id)
+          .single();
+
+        if (playerError) {
+          return { data: null, error: playerError };
+        }
+
+        // Get level info
+        const { data: levelData, error: levelError } = await supabase
+          .from("levels")
+          .select("*")
+          .eq("level", playerData.level)
+          .single();
+
+        if (levelError) {
+          return { data: null, error: levelError };
+        }
+
+        // Calculate streak multiplier
+        const { data: multiplierData, error: multiplierError } = await supabase
+          .from("streak_multipliers")
+          .select("*")
+          .lte("min_streak_days", playerData.current_streak)
+          .order("min_streak_days", { ascending: false })
+          .limit(1)
+          .single();
+
+        const streak_multiplier = multiplierError ? 1.0 : multiplierData.multiplier;
+
+        // Get next level data for correct calculation
+        const { data: nextLevelData } = await supabase
+          .from("levels")
+          .select("*")
+          .eq("level", playerData.level + 1)
+          .single();
+
+        // Use same logic as /api/player-stats for consistency
+        const currentLevelXpRequired = levelData?.xp_required || 0;
+        const nextLevelXpRequired = nextLevelData?.xp_required || null;
+        
+        // XP needed WITHIN the current level (not total XP)
+        const xpNeededForNextLevel = nextLevelXpRequired ? (nextLevelXpRequired - currentLevelXpRequired) : null;
+
+        const result = {
+          ...playerData,
+          xp_for_current_level: 0, // Always 0 (start of current level) - consistent with /api/player-stats
+          xp_for_next_level: xpNeededForNextLevel, // XP needed within current level
+          streak_multiplier,
+        };
+
+        return { data: [result], error: null };
+      })(),
       
       // Challenges (with reset and initialization)
       (async () => {

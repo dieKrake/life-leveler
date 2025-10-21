@@ -33,7 +33,7 @@ export function getTodoTimingColor(todo: Todo): string {
 
   // Due tomorrow - Subtle yellow tint
   if (daysDiff === 1) {
-    return "bg-gradient-to-br from-slate-800/70 to-yellow-900/40 border-yellow-800/30 border";
+    return "bg-gradient-to-br from-slate-800/70 to-blue-800/40 border-blue-800/30 border";
   }
 
   // Future (more than a week) - Subtle purple tint

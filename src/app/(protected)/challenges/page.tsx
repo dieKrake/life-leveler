@@ -11,12 +11,7 @@ import ChallengeSection from "@/components/ChallengeSection";
 import { Trophy } from "lucide-react";
 
 export default function ChallengesPage() {
-  const {
-    data: challenges,
-    error,
-    isLoading,
-    mutate,
-  } = useChallenges();
+  const { data: challenges, error, isLoading, mutate } = useChallenges();
 
   const { mutate: globalMutate } = useSWRConfig();
   const [claimingId, setClaimingId] = useState<string | null>(null);
@@ -69,13 +64,6 @@ export default function ChallengesPage() {
 
       // Show reward notification
       showChallengeReward(data.xp_earned, data.gems_earned, challenge?.title);
-
-      toast.success(
-        `Belohnung eingefordert! +${data.xp_earned} XP, +${data.gems_earned} Gems`,
-        {
-          duration: 3000,
-        }
-      );
 
       // Success - refresh data (same pattern as TodoItem)
       mutate();

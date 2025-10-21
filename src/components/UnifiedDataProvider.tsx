@@ -50,7 +50,6 @@ const fetcher = async (url: string) => {
   }
 
   const data = await res.json();
-  console.log("UnifiedDataProvider: Data received", data);
   return data;
 };
 

@@ -1,6 +1,5 @@
 "use client";
 
-import type { Todo } from "@/types";
 import { useTodos } from "./UnifiedDataProvider";
 import { useMemo, useState } from "react";
 import { CheckSquare, Clock } from "lucide-react";
@@ -14,12 +13,7 @@ import { motion } from "framer-motion";
 export default function TodoView() {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
 
-  const {
-    data: todos,
-    error,
-    isLoading,
-    mutate,
-  } = useTodos();
+  const { data: todos, error, isLoading, mutate } = useTodos();
 
   const { isSyncing, isArchiving, handleSync, handleArchiveAllCompleted } =
     useTodoOperations(mutate);
@@ -78,7 +72,7 @@ export default function TodoView() {
           mutate={mutate}
         />
 
-        <motion.div 
+        <motion.div
           className="grid grid-cols-1 lg:grid-cols-2 gap-8"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}

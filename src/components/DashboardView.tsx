@@ -22,6 +22,12 @@ import {
   Crown,
   Gift,
 } from "lucide-react";
+import {
+  useAchievements,
+  useChallenges,
+  usePlayerStats,
+  useTodos,
+} from "./UnifiedDataProvider";
 
 // Mock data für die erste Version
 const mockStats = {
@@ -36,41 +42,144 @@ const mockStats = {
 };
 
 const mockTodos = [
-  { id: 1, title: "Morgenroutine abschließen", xp_value: 20, completed: false, difficulty: "medium" },
-  { id: 2, title: "30 Min Sport", xp_value: 30, completed: true, difficulty: "hard" },
-  { id: 3, title: "Buch lesen", xp_value: 10, completed: false, difficulty: "easy" },
-  { id: 4, title: "Projekt weiterarbeiten", xp_value: 30, completed: false, difficulty: "hard" },
+  {
+    id: 1,
+    title: "Morgenroutine abschließen",
+    xp_value: 20,
+    completed: false,
+    difficulty: "medium",
+  },
+  {
+    id: 2,
+    title: "30 Min Sport",
+    xp_value: 30,
+    completed: true,
+    difficulty: "hard",
+  },
+  {
+    id: 3,
+    title: "Buch lesen",
+    xp_value: 10,
+    completed: false,
+    difficulty: "easy",
+  },
+  {
+    id: 4,
+    title: "Projekt weiterarbeiten",
+    xp_value: 30,
+    completed: false,
+    difficulty: "hard",
+  },
 ];
 
 const mockChallenges = [
-  { id: 1, title: "5 Todos heute", progress: 2, target: 5, type: "daily", reward: "50 XP + 5 Gems" },
-  { id: 2, title: "Schwere Aufgaben meistern", progress: 1, target: 3, type: "daily", reward: "75 XP + 8 Gems" },
-  { id: 3, title: "Wöchentliche Ziele", progress: 12, target: 25, type: "weekly", reward: "200 XP + 25 Gems" },
+  {
+    id: 1,
+    title: "5 Todos heute",
+    progress: 2,
+    target: 5,
+    type: "daily",
+    reward: "50 XP + 5 Gems",
+  },
+  {
+    id: 2,
+    title: "Schwere Aufgaben meistern",
+    progress: 1,
+    target: 3,
+    type: "daily",
+    reward: "75 XP + 8 Gems",
+  },
+  {
+    id: 3,
+    title: "Wöchentliche Ziele",
+    progress: 12,
+    target: 25,
+    type: "weekly",
+    reward: "200 XP + 25 Gems",
+  },
 ];
 
 const mockAchievements = [
-  { id: 1, name: "Erste Schritte", description: "Erste Todo abgeschlossen", unlocked: true, icon: "🎯" },
-  { id: 2, name: "Streak Master", description: "5 Tage Streak erreicht", unlocked: true, icon: "🔥" },
-  { id: 3, name: "Level Up", description: "Level 2 erreicht", unlocked: true, icon: "⭐" },
-  { id: 4, name: "Gem Sammler", description: "50 Gems sammeln", unlocked: false, progress: 28, target: 50, icon: "💎" },
+  {
+    id: 1,
+    name: "Erste Schritte",
+    description: "Erste Todo abgeschlossen",
+    unlocked: true,
+    icon: "🎯",
+  },
+  {
+    id: 2,
+    name: "Streak Master",
+    description: "5 Tage Streak erreicht",
+    unlocked: true,
+    icon: "🔥",
+  },
+  {
+    id: 3,
+    name: "Level Up",
+    description: "Level 2 erreicht",
+    unlocked: true,
+    icon: "⭐",
+  },
+  {
+    id: 4,
+    name: "Gem Sammler",
+    description: "50 Gems sammeln",
+    unlocked: false,
+    progress: 28,
+    target: 50,
+    icon: "💎",
+  },
 ];
 
 const quickActions = [
-  { title: "Todo hinzufügen", icon: Plus, href: "/todos", color: "from-blue-500 to-blue-600" },
-  { title: "Challenges", icon: Target, href: "/challenges", color: "from-purple-500 to-purple-600" },
-  { title: "Shop besuchen", icon: ShoppingBag, href: "/shop", color: "from-green-500 to-green-600" },
-  { title: "Statistiken", icon: BarChart3, href: "/stats", color: "from-orange-500 to-orange-600" },
+  {
+    title: "Todo hinzufügen",
+    icon: Plus,
+    href: "/todos",
+    color: "from-blue-500 to-blue-600",
+  },
+  {
+    title: "Challenges",
+    icon: Target,
+    href: "/challenges",
+    color: "from-purple-500 to-purple-600",
+  },
+  {
+    title: "Shop besuchen",
+    icon: ShoppingBag,
+    href: "/shop",
+    color: "from-green-500 to-green-600",
+  },
+  {
+    title: "Statistiken",
+    icon: BarChart3,
+    href: "/stats",
+    color: "from-orange-500 to-orange-600",
+  },
 ];
 
 export default function DashboardView() {
-  const completedTodos = mockTodos.filter(todo => todo.completed).length;
-  const totalTodos = mockTodos.length;
-  const todayXP = mockTodos.filter(todo => todo.completed).reduce((sum, todo) => sum + todo.xp_value, 0);
+  const { data: todos } = useTodos();
+  console.log("todos", todos);
+  const { data: challenges } = useChallenges();
+  console.log("challenges", challenges);
+  const { data: achievements } = useAchievements();
+  console.log("achievements", achievements);
+  const { data: playerStats } = usePlayerStats();
+  console.log("playerStats", playerStats);
+
+  const completedTodos = todos?.filter((todo) => todo.is_completed).length;
+  const totalTodos = todos?.length;
+
+  console.log("completedTodos", completedTodos);
+  console.log("totalTodos", totalTodos);
+
+  const todayXP = 50;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-4 md:p-6">
       <div className="max-w-7xl mx-auto space-y-6">
-        
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -93,20 +202,28 @@ export default function DashboardView() {
           className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8"
         >
           {/* Level Card */}
-          <div className="bg-gradient-to-br from-blue-500/20 to-purple-500/20 backdrop-blur-sm border border-blue-500/30 rounded-xl p-4">
+          <div className="bg-gradient-to-br from-purple-500/20 to-purple-500/20 backdrop-blur-sm border border-purple-500/30 rounded-xl p-4">
             <div className="flex items-center gap-3 mb-2">
-              <Crown className="w-6 h-6 text-blue-400" />
-              <span className="text-blue-100 font-medium">Level</span>
+              <Crown className="w-6 h-6 text-purple-400" />
+              <span className="text-purple-100 font-medium">Level</span>
             </div>
-            <div className="text-2xl font-bold text-white">{mockStats.level}</div>
+            <div className="text-2xl font-bold text-white">
+              {playerStats?.level}
+            </div>
             <div className="text-xs text-blue-200">
-              {mockStats.xp}/{mockStats.xp_for_next_level} XP
+              {playerStats?.xp}/{playerStats?.xp_for_next_level} XP
             </div>
             <div className="w-full bg-blue-900/30 rounded-full h-2 mt-2">
-              <div 
-                className="bg-gradient-to-r from-blue-400 to-purple-400 h-2 rounded-full transition-all duration-500"
-                style={{ width: `${(mockStats.xp / mockStats.xp_for_next_level) * 100}%` }}
-              />
+              {playerStats && playerStats?.xp_for_next_level && (
+                <div
+                  className="bg-gradient-to-r from-blue-400 to-purple-400 h-2 rounded-full transition-all duration-500"
+                  style={{
+                    width: `${
+                      (playerStats?.xp / playerStats?.xp_for_next_level) * 100
+                    }%`,
+                  }}
+                />
+              )}
             </div>
           </div>
 
@@ -116,22 +233,27 @@ export default function DashboardView() {
               <Zap className="w-6 h-6 text-yellow-400" />
               <span className="text-yellow-100 font-medium">Total XP</span>
             </div>
-            <div className="text-2xl font-bold text-white">{mockStats.total_xp}</div>
-            <div className="text-xs text-yellow-200">
-              +{todayXP} heute
+            <div className="text-2xl font-bold text-white">
+              {playerStats?.total_xp}
             </div>
+            {playerStats?.xp_for_next_level && playerStats?.xp && (
+              <div className="text-xs text-yellow-200">
+                {playerStats?.xp_for_next_level - playerStats?.xp} XP bis zum
+                nächsten Level
+              </div>
+            )}
           </div>
 
           {/* Gems Card */}
           <div className="bg-gradient-to-br from-emerald-500/20 to-teal-500/20 backdrop-blur-sm border border-emerald-500/30 rounded-xl p-4">
             <div className="flex items-center gap-3 mb-2">
-              <Gem className="w-6 h-6 text-emerald-400" />
-              <span className="text-emerald-100 font-medium">Gems</span>
+              <Gem className="w-6 h-6 text-blue-400" />
+              <span className="text-blue-100 font-medium">Gems</span>
             </div>
-            <div className="text-2xl font-bold text-white">{mockStats.gems}</div>
-            <div className="text-xs text-emerald-200">
-              Sammle mehr im Shop!
+            <div className="text-2xl font-bold text-white">
+              {playerStats?.gems}
             </div>
+            <div className="text-xs text-emerald-200">Sammle mehr im Shop!</div>
           </div>
 
           {/* Streak Card */}
@@ -140,9 +262,11 @@ export default function DashboardView() {
               <Flame className="w-6 h-6 text-red-400" />
               <span className="text-red-100 font-medium">Streak</span>
             </div>
-            <div className="text-2xl font-bold text-white">{mockStats.current_streak}</div>
+            <div className="text-2xl font-bold text-white">
+              {playerStats?.current_streak}
+            </div>
             <div className="text-xs text-red-200">
-              {mockStats.streak_multiplier}x Multiplier
+              {playerStats?.streak_multiplier}x Multiplier
             </div>
           </div>
         </motion.div>
@@ -175,7 +299,6 @@ export default function DashboardView() {
         </motion.div>
 
         <div className="grid lg:grid-cols-2 gap-6">
-          
           {/* Today's Todos */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
@@ -197,17 +320,21 @@ export default function DashboardView() {
                 </motion.button>
               </Link>
             </div>
-            
+
             <div className="mb-4">
               <div className="flex justify-between text-sm text-slate-400 mb-2">
                 <span>Fortschritt</span>
-                <span>{completedTodos}/{totalTodos} abgeschlossen</span>
+                <span>
+                  {completedTodos}/{totalTodos} abgeschlossen
+                </span>
               </div>
               <div className="w-full bg-slate-700 rounded-full h-2">
-                <div 
-                  className="bg-gradient-to-r from-green-400 to-blue-400 h-2 rounded-full transition-all duration-500"
-                  style={{ width: `${(completedTodos / totalTodos) * 100}%` }}
-                />
+                {completedTodos && totalTodos && (
+                  <div
+                    className="bg-gradient-to-r from-green-400 to-blue-400 h-2 rounded-full transition-all duration-500"
+                    style={{ width: `${(completedTodos / totalTodos) * 100}%` }}
+                  />
+                )}
               </div>
             </div>
 
@@ -219,31 +346,43 @@ export default function DashboardView() {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.4 + index * 0.1 }}
                   className={`flex items-center gap-3 p-3 rounded-lg border transition-all duration-200 ${
-                    todo.completed 
-                      ? 'bg-green-500/10 border-green-500/30 text-green-100' 
-                      : 'bg-slate-700/50 border-slate-600 text-slate-200 hover:bg-slate-700'
+                    todo.completed
+                      ? "bg-green-500/10 border-green-500/30 text-green-100"
+                      : "bg-slate-700/50 border-slate-600 text-slate-200 hover:bg-slate-700"
                   }`}
                 >
-                  <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                    todo.completed 
-                      ? 'bg-green-500 border-green-500' 
-                      : 'border-slate-400'
-                  }`}>
-                    {todo.completed && <CheckCircle2 className="w-3 h-3 text-white" />}
+                  <div
+                    className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                      todo.completed
+                        ? "bg-green-500 border-green-500"
+                        : "border-slate-400"
+                    }`}
+                  >
+                    {todo.completed && (
+                      <CheckCircle2 className="w-3 h-3 text-white" />
+                    )}
                   </div>
                   <div className="flex-1">
-                    <div className={`font-medium ${todo.completed ? 'line-through' : ''}`}>
+                    <div
+                      className={`font-medium ${
+                        todo.completed ? "line-through" : ""
+                      }`}
+                    >
                       {todo.title}
                     </div>
                     <div className="text-xs text-slate-400">
                       {todo.xp_value} XP • {todo.difficulty}
                     </div>
                   </div>
-                  <div className={`px-2 py-1 rounded text-xs font-medium ${
-                    todo.difficulty === 'easy' ? 'bg-green-500/20 text-green-300' :
-                    todo.difficulty === 'medium' ? 'bg-yellow-500/20 text-yellow-300' :
-                    'bg-red-500/20 text-red-300'
-                  }`}>
+                  <div
+                    className={`px-2 py-1 rounded text-xs font-medium ${
+                      todo.difficulty === "easy"
+                        ? "bg-green-500/20 text-green-300"
+                        : todo.difficulty === "medium"
+                        ? "bg-yellow-500/20 text-yellow-300"
+                        : "bg-red-500/20 text-red-300"
+                    }`}
+                  >
                     {todo.difficulty}
                   </div>
                 </motion.div>
@@ -283,32 +422,42 @@ export default function DashboardView() {
                   className="bg-slate-700/50 border border-slate-600 rounded-lg p-4 hover:bg-slate-700 transition-all duration-200"
                 >
                   <div className="flex items-center justify-between mb-2">
-                    <h3 className="font-medium text-white">{challenge.title}</h3>
-                    <span className={`px-2 py-1 rounded text-xs font-medium ${
-                      challenge.type === 'daily' 
-                        ? 'bg-blue-500/20 text-blue-300' 
-                        : 'bg-purple-500/20 text-purple-300'
-                    }`}>
+                    <h3 className="font-medium text-white">
+                      {challenge.title}
+                    </h3>
+                    <span
+                      className={`px-2 py-1 rounded text-xs font-medium ${
+                        challenge.type === "daily"
+                          ? "bg-blue-500/20 text-blue-300"
+                          : "bg-purple-500/20 text-purple-300"
+                      }`}
+                    >
                       {challenge.type}
                     </span>
                   </div>
-                  
+
                   <div className="flex justify-between text-sm text-slate-400 mb-2">
                     <span>Fortschritt</span>
-                    <span>{challenge.progress}/{challenge.target}</span>
+                    <span>
+                      {challenge.progress}/{challenge.target}
+                    </span>
                   </div>
-                  
+
                   <div className="w-full bg-slate-600 rounded-full h-2 mb-2">
-                    <div 
+                    <div
                       className={`h-2 rounded-full transition-all duration-500 ${
-                        challenge.type === 'daily' 
-                          ? 'bg-gradient-to-r from-blue-400 to-cyan-400' 
-                          : 'bg-gradient-to-r from-purple-400 to-pink-400'
+                        challenge.type === "daily"
+                          ? "bg-gradient-to-r from-blue-400 to-cyan-400"
+                          : "bg-gradient-to-r from-purple-400 to-pink-400"
                       }`}
-                      style={{ width: `${(challenge.progress / challenge.target) * 100}%` }}
+                      style={{
+                        width: `${
+                          (challenge.progress / challenge.target) * 100
+                        }%`,
+                      }}
                     />
                   </div>
-                  
+
                   <div className="text-xs text-slate-400">
                     Belohnung: {challenge.reward}
                   </div>
@@ -349,29 +498,37 @@ export default function DashboardView() {
                 transition={{ delay: 0.7 + index * 0.1 }}
                 className={`p-4 rounded-lg border transition-all duration-200 ${
                   achievement.unlocked
-                    ? 'bg-yellow-500/10 border-yellow-500/30 text-yellow-100'
-                    : 'bg-slate-700/50 border-slate-600 text-slate-400'
+                    ? "bg-yellow-500/10 border-yellow-500/30 text-yellow-100"
+                    : "bg-slate-700/50 border-slate-600 text-slate-400"
                 }`}
               >
                 <div className="text-2xl mb-2">{achievement.icon}</div>
                 <h3 className="font-medium mb-1">{achievement.name}</h3>
-                <p className="text-xs text-slate-400 mb-2">{achievement.description}</p>
-                
+                <p className="text-xs text-slate-400 mb-2">
+                  {achievement.description}
+                </p>
+
                 {!achievement.unlocked && achievement.progress && (
                   <div className="mt-2">
                     <div className="flex justify-between text-xs mb-1">
                       <span>Fortschritt</span>
-                      <span>{achievement.progress}/{achievement.target}</span>
+                      <span>
+                        {achievement.progress}/{achievement.target}
+                      </span>
                     </div>
                     <div className="w-full bg-slate-600 rounded-full h-1">
-                      <div 
+                      <div
                         className="bg-gradient-to-r from-yellow-400 to-orange-400 h-1 rounded-full transition-all duration-500"
-                        style={{ width: `${(achievement.progress! / achievement.target!) * 100}%` }}
+                        style={{
+                          width: `${
+                            (achievement.progress! / achievement.target!) * 100
+                          }%`,
+                        }}
                       />
                     </div>
                   </div>
                 )}
-                
+
                 {achievement.unlocked && (
                   <div className="flex items-center gap-1 text-xs text-yellow-300">
                     <Award className="w-3 h-3" />
@@ -397,7 +554,9 @@ export default function DashboardView() {
             >
               <Calendar className="w-8 h-8 text-blue-400 mx-auto mb-2" />
               <h3 className="font-bold text-white mb-1">Todos verwalten</h3>
-              <p className="text-sm text-slate-400">Aufgaben erstellen und abschließen</p>
+              <p className="text-sm text-slate-400">
+                Aufgaben erstellen und abschließen
+              </p>
             </motion.div>
           </Link>
 
@@ -408,7 +567,9 @@ export default function DashboardView() {
             >
               <ShoppingBag className="w-8 h-8 text-green-400 mx-auto mb-2" />
               <h3 className="font-bold text-white mb-1">Shop besuchen</h3>
-              <p className="text-sm text-slate-400">Gems für Upgrades ausgeben</p>
+              <p className="text-sm text-slate-400">
+                Gems für Upgrades ausgeben
+              </p>
             </motion.div>
           </Link>
 
@@ -419,7 +580,9 @@ export default function DashboardView() {
             >
               <BarChart3 className="w-8 h-8 text-orange-400 mx-auto mb-2" />
               <h3 className="font-bold text-white mb-1">Statistiken</h3>
-              <p className="text-sm text-slate-400">Fortschritt und Trends anzeigen</p>
+              <p className="text-sm text-slate-400">
+                Fortschritt und Trends anzeigen
+              </p>
             </motion.div>
           </Link>
         </motion.div>

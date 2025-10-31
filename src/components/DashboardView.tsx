@@ -29,49 +29,6 @@ import {
   useTodos,
 } from "./UnifiedDataProvider";
 
-// Mock data für die erste Version
-const mockStats = {
-  level: 2,
-  xp: 142,
-  total_xp: 242,
-  xp_for_next_level: 150,
-  gems: 28,
-  current_streak: 5,
-  streak_multiplier: 1.2,
-  prestige: 0,
-};
-
-const mockTodos = [
-  {
-    id: 1,
-    title: "Morgenroutine abschließen",
-    xp_value: 20,
-    completed: false,
-    difficulty: "medium",
-  },
-  {
-    id: 2,
-    title: "30 Min Sport",
-    xp_value: 30,
-    completed: true,
-    difficulty: "hard",
-  },
-  {
-    id: 3,
-    title: "Buch lesen",
-    xp_value: 10,
-    completed: false,
-    difficulty: "easy",
-  },
-  {
-    id: 4,
-    title: "Projekt weiterarbeiten",
-    xp_value: 30,
-    completed: false,
-    difficulty: "hard",
-  },
-];
-
 const mockChallenges = [
   {
     id: 1,
@@ -172,10 +129,10 @@ export default function DashboardView() {
   const completedTodos = todos?.filter((todo) => todo.is_completed).length;
   const totalTodos = todos?.length;
 
-  console.log("completedTodos", completedTodos);
-  console.log("totalTodos", totalTodos);
-
-  const todayXP = 50;
+  const allChallenges = [
+    ...(challenges?.daily || []),
+    ...(challenges?.weekly || []),
+  ];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-4 md:p-6">
@@ -339,51 +296,55 @@ export default function DashboardView() {
             </div>
 
             <div className="space-y-3">
-              {mockTodos.slice(0, 4).map((todo, index) => (
+              {todos?.slice(0, 4).map((todo, index) => (
                 <motion.div
                   key={todo.id}
                   initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.4 + index * 0.1 }}
                   className={`flex items-center gap-3 p-3 rounded-lg border transition-all duration-200 ${
-                    todo.completed
+                    todo.is_completed
                       ? "bg-green-500/10 border-green-500/30 text-green-100"
                       : "bg-slate-700/50 border-slate-600 text-slate-200 hover:bg-slate-700"
                   }`}
                 >
                   <div
                     className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                      todo.completed
+                      todo.is_completed
                         ? "bg-green-500 border-green-500"
                         : "border-slate-400"
                     }`}
                   >
-                    {todo.completed && (
+                    {todo.is_completed && (
                       <CheckCircle2 className="w-3 h-3 text-white" />
                     )}
                   </div>
                   <div className="flex-1">
                     <div
                       className={`font-medium ${
-                        todo.completed ? "line-through" : ""
+                        todo.is_completed ? "line-through" : ""
                       }`}
                     >
                       {todo.title}
                     </div>
                     <div className="text-xs text-slate-400">
-                      {todo.xp_value} XP • {todo.difficulty}
+                      {todo.xp_value} XP
                     </div>
                   </div>
                   <div
                     className={`px-2 py-1 rounded text-xs font-medium ${
-                      todo.difficulty === "easy"
+                      todo.xp_value === 10
                         ? "bg-green-500/20 text-green-300"
-                        : todo.difficulty === "medium"
+                        : todo.xp_value === 20
                         ? "bg-yellow-500/20 text-yellow-300"
                         : "bg-red-500/20 text-red-300"
                     }`}
                   >
-                    {todo.difficulty}
+                    {todo.xp_value === 10
+                      ? "Einfach"
+                      : todo.xp_value === 20
+                      ? "Mittel"
+                      : "Schwer"}
                   </div>
                 </motion.div>
               ))}
@@ -413,9 +374,9 @@ export default function DashboardView() {
             </div>
 
             <div className="space-y-4">
-              {mockChallenges.map((challenge, index) => (
+              {allChallenges.map((challenge, index) => (
                 <motion.div
-                  key={challenge.id}
+                  key={challenge.challenge_id}
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.5 + index * 0.1 }}
@@ -459,7 +420,8 @@ export default function DashboardView() {
                   </div>
 
                   <div className="text-xs text-slate-400">
-                    Belohnung: {challenge.reward}
+                    Belohnung: {challenge.xp_reward} XP, {challenge.gem_reward}{" "}
+                    Gems
                   </div>
                 </motion.div>
               ))}

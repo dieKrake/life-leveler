@@ -4,8 +4,10 @@ import { PlayerStats, StreakMultiplier } from "@/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Flame, Trophy, ChevronDown, ChevronUp } from "lucide-react";
+import { Flame, ChevronDown, ChevronUp } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { GRADIENTS } from "@/lib/constants";
+import StreakTierCard from "@/components/streak/StreakTierCard";
 
 interface StreakSectionProps {
   stats: PlayerStats;
@@ -19,25 +21,13 @@ export default function StreakSection({ stats }: StreakSectionProps) {
 
   const { current_streak, streak_multiplier } = stats;
 
-  const getStreakTierInfo = (minDays: number, multiplier: number) => {
-    const isActive = current_streak >= minDays;
-    const isNext =
-      !isActive && current_streak >= (minDays - 7 > 0 ? minDays - 7 : 0);
-
-    return {
-      isActive,
-      isNext,
-      daysNeeded: isActive ? 0 : minDays - current_streak,
-    };
-  };
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
     >
-      <Card className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 border-slate-700/50 backdrop-blur-sm">
+      <Card className={`${GRADIENTS.cardBg} ${GRADIENTS.cardBorder} border backdrop-blur-sm`}>
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle className="flex items-center gap-2 text-white">
@@ -109,82 +99,20 @@ export default function StreakSection({ stats }: StreakSectionProps) {
               transition={{ duration: 0.3, ease: "easeInOut" }}
             >
               <h4 className="text-lg font-semibold mb-4 flex items-center gap-2 text-white">
-                <Trophy className="h-5 w-5 text-orange-500" />
+                <Flame className="h-5 w-5 text-orange-500" />
                 Streak Multiplikator Stufen
               </h4>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {streakMultipliers
                   .sort((a, b) => a.min_streak_days - b.min_streak_days)
-                  .map((tier, index) => {
-                    const tierInfo = getStreakTierInfo(
-                      tier.min_streak_days,
-                      tier.multiplier
-                    );
-
-                    return (
-                      <motion.div
-                        key={tier.id}
-                        initial={{ opacity: 0, y: 20, scale: 0.9 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        transition={{ 
-                          duration: 0.3, 
-                          delay: index * 0.1,
-                          type: "spring",
-                          stiffness: 100
-                        }}
-                        whileHover={{ scale: 1.02, y: -2 }}
-                        className={`p-4 rounded-lg border-2 transition-all ${
-                          tierInfo.isActive
-                            ? "border-yellow-100 border-opacity-20 bg-amber-950/20"
-                            : "border-slate-700 bg-slate-800/50"
-                        } ${!tierInfo.isActive ? "opacity-75" : ""}`}
-                      >
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="flex items-center gap-2">
-                          <Flame
-                            className={`h-5 w-5 ${
-                              tierInfo.isActive
-                                ? "text-orange-500"
-                                : "text-slate-500"
-                            }`}
-                          />
-                          <span className="font-semibold text-white">
-                            x{tier.multiplier.toFixed(1)}
-                          </span>
-                        </div>
-                        {tierInfo.isActive && (
-                          <Badge
-                            variant="secondary"
-                            className="bg-orange-500 text-white text-xs"
-                          >
-                            Erreicht
-                          </Badge>
-                        )}
-                      </div>
-
-                      <div className="space-y-1">
-                        <p className="text-sm font-medium text-white">
-                          {tier.min_streak_days === 0
-                            ? "Standard"
-                            : `${tier.min_streak_days}+ Tage`}
-                        </p>
-
-                        {!tierInfo.isActive && tierInfo.daysNeeded > 0 && (
-                          <p className="text-xs text-slate-400">
-                            Noch {tierInfo.daysNeeded} Tage
-                          </p>
-                        )}
-
-                        {tierInfo.isActive && tier.min_streak_days > 0 && (
-                          <p className="text-xs text-orange-400">
-                            Seit {current_streak - tier.min_streak_days + 1}{" "}
-                            Tagen aktiv
-                          </p>
-                        )}
-                      </div>
-                      </motion.div>
-                    );
-                  })}
+                  .map((tier, index) => (
+                    <StreakTierCard
+                      key={tier.id}
+                      tier={tier}
+                      currentStreak={current_streak}
+                      index={index}
+                    />
+                  ))}
               </div>
 
               <motion.div 

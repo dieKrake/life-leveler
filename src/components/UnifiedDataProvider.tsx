@@ -36,16 +36,9 @@ const UnifiedDataContext = createContext<UnifiedDataContextType | undefined>(
 );
 
 const fetcher = async (url: string) => {
-  console.log("UnifiedDataProvider: Fetching", url);
   const res = await fetch(url);
-  console.log("UnifiedDataProvider: Response status", res.status);
 
   if (!res.ok) {
-    console.error(
-      "UnifiedDataProvider: Fetch error",
-      res.status,
-      res.statusText
-    );
     throw new Error(`HTTP ${res.status}: ${res.statusText}`);
   }
 
@@ -68,10 +61,6 @@ export function UnifiedDataProvider({ children }: { children: ReactNode }) {
     revalidateOnReconnect: true,
   });
 
-  // Debug log (remove in production)
-  if (error) {
-    console.error("UnifiedDataProvider: Error", error);
-  }
 
   // Individual mutate functions for specific data updates
   const mutateAll = () => {
@@ -129,7 +118,6 @@ export function useUnifiedData() {
   if (context === undefined) {
     throw new Error("useUnifiedData must be used within a UnifiedDataProvider");
   }
-  console.log("useUnifiedData context:", context);
   return context;
 }
 

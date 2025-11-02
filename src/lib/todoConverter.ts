@@ -1,6 +1,2 @@
-import { Todo } from "@/types";
-
-export function convertTodoData(todos: Todo[]): void {
-  console.log("Converting todo data:", todos);
-  return;
-}
+// This file is deprecated and can be removed
+// The conversion logic is no longer needed

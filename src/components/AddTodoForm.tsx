@@ -505,7 +505,6 @@ export default function AddTodoForm({ onSuccess }: AddTodoFormProps) {
           control={form.control}
           name="xp_value"
           render={({ field }) => {
-            console.log("xp_value field:", field.value, typeof field.value);
             return (
               <FormItem>
                 <FormLabel className="text-slate-200 font-semibold flex items-center gap-2">

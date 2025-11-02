@@ -38,7 +38,6 @@ export default function DeleteTodoButton({
   const router = useRouter();
 
   const handleTokenExpiration = async () => {
-    console.log("Token expired, logging out user...");
     await supabase.auth.signOut();
     router.push("/auth");
   };

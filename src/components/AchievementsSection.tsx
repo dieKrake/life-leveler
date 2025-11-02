@@ -1,21 +1,12 @@
 import { mutate as globalMutate } from "swr";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Target, Trophy, Flame, Gem, TrendingUp, Unlock } from "lucide-react";
-import { UserAchievement } from "@/types";
-import { useState, useEffect } from "react";
+import { Target } from "lucide-react";
+import { useState } from "react";
 import { useReward } from "@/components/RewardProvider";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { useAchievements } from "@/components/UnifiedDataProvider";
-
-const iconMap = {
-  Trophy,
-  Flame,
-  Gem,
-  TrendingUp,
-  Target,
-};
+import AchievementCard from "@/components/achievements/AchievementCard";
+import { GRADIENTS } from "@/lib/constants";
 
 export default function AchievementsSection() {
   const {
@@ -72,7 +63,7 @@ export default function AchievementsSection() {
 
   if (isLoading) {
     return (
-      <Card className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 border-slate-700/50 backdrop-blur-sm">
+      <Card className={`${GRADIENTS.cardBg} ${GRADIENTS.cardBorder} border backdrop-blur-sm`}>
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-white">
             <Target className="h-5 w-5 text-purple-400" />
@@ -88,7 +79,7 @@ export default function AchievementsSection() {
 
   if (!achievements || achievements.length === 0) {
     return (
-      <Card className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 border-slate-700/50 backdrop-blur-sm">
+      <Card className={`${GRADIENTS.cardBg} ${GRADIENTS.cardBorder} border backdrop-blur-sm`}>
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-white">
             <Target className="h-5 w-5 text-purple-400" />
@@ -110,7 +101,7 @@ export default function AchievementsSection() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
     >
-      <Card className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 border-slate-700/50 backdrop-blur-sm">
+      <Card className={`${GRADIENTS.cardBg} ${GRADIENTS.cardBorder} border backdrop-blur-sm`}>
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-white">
             <Target className="h-5 w-5 text-purple-400" />
@@ -119,157 +110,15 @@ export default function AchievementsSection() {
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {achievements.map((achievement, index) => {
-              const IconComponent =
-                iconMap[achievement.icon as keyof typeof iconMap] || Target;
-              const isUnlocked = achievement.is_unlocked;
-              const progressPercentage = Math.min(
-                achievement.progress_percentage,
-                100
-              );
-
-              return (
-                <motion.div
-                  key={achievement.achievement_id}
-                  initial={{ opacity: 0, y: 30, scale: 0.9 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  transition={{
-                    duration: 0.4,
-                    delay: index * 0.1,
-                    type: "spring",
-                    stiffness: 100,
-                  }}
-                  whileHover={{ scale: 1.02, y: -2 }}
-                  className={`relative p-4 border rounded-lg transition-all ${
-                    isUnlocked
-                      ? "border-purple-400 bg-amber-950/20"
-                      : "border-slate-700 bg-slate-800/50"
-                  } ${!isUnlocked ? "opacity-75" : ""}`}
-                >
-                  {/* Achievement Icon and Status */}
-                  <div className="flex items-center justify-between mb-3">
-                    <IconComponent
-                      className={`h-8 w-8 ${
-                        isUnlocked ? "text-purple-400" : "text-slate-500"
-                      }`}
-                    />
-                    {isUnlocked && (
-                      <Badge
-                        variant="secondary"
-                        className="bg-purple-600 text-white text-xs"
-                      >
-                        Erreicht
-                      </Badge>
-                    )}
-                    {achievement.reward_gems > 0 && !isUnlocked && (
-                      <Badge
-                        variant="outline"
-                        className="text-xs border-slate-600 text-slate-300"
-                      >
-                        <div className="flex items-center gap-1">
-                          +{achievement.reward_gems} <Gem className="h-3 w-3" />
-                        </div>
-                      </Badge>
-                    )}
-                  </div>
-
-                  {/* Achievement Info */}
-                  <div className="space-y-2">
-                    <h4 className="font-medium text-sm text-white">
-                      {achievement.name}
-                    </h4>
-                    <p className="text-xs text-slate-400">
-                      {achievement.description}
-                    </p>
-
-                    {/* Progress Bar for non-unlocked achievements */}
-                    {!isUnlocked && (
-                      <div className="space-y-1">
-                        <div className="flex justify-between text-xs text-slate-400">
-                          <span>Fortschritt</span>
-                          <span>
-                            {achievement.current_progress} /{" "}
-                            {achievement.condition_value}
-                          </span>
-                        </div>
-                        <div className="relative w-full h-1.5 bg-slate-700 rounded-full overflow-hidden">
-                          <motion.div
-                            className="h-full bg-gradient-to-r from-purple-400 to-pink-400 rounded-full"
-                            initial={{ width: 0 }}
-                            animate={{ width: `${progressPercentage}%` }}
-                            transition={{
-                              duration: 1.2,
-                              delay: index * 0.1 + 0.5,
-                              ease: "easeOut",
-                            }}
-                          />
-                        </div>
-                        <p className="text-xs text-slate-400">
-                          {progressPercentage.toFixed(0)}% erreicht
-                        </p>
-
-                        {/* Unlock button if achievement is completed but not unlocked */}
-                        {achievement.current_progress >=
-                          achievement.condition_value && (
-                          <motion.div
-                            initial={{ opacity: 0, scale: 0.8 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            transition={{
-                              duration: 0.6,
-                              delay: index * 0.1 + 0.8,
-                              type: "spring",
-                              stiffness: 200,
-                            }}
-                          >
-                            <motion.div
-                              animate={{
-                                scale: [1, 1.05, 1],
-                                boxShadow: [
-                                  "0 0 0px rgba(168, 85, 247, 0)",
-                                  "0 0 20px rgba(168, 85, 247, 0.4)",
-                                  "0 0 0px rgba(168, 85, 247, 0)",
-                                ],
-                              }}
-                              transition={{
-                                duration: 2,
-                                repeat: Infinity,
-                                repeatType: "loop",
-                              }}
-                            >
-                              <Button
-                                size="sm"
-                                onClick={() =>
-                                  unlockAchievement(achievement.achievement_id)
-                                }
-                                disabled={unlockingIds.has(
-                                  achievement.achievement_id
-                                )}
-                                className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
-                              >
-                                <Unlock className="h-3 w-3 mr-1" />
-                                {unlockingIds.has(achievement.achievement_id)
-                                  ? "Schalte frei..."
-                                  : "Freischalten"}
-                              </Button>
-                            </motion.div>
-                          </motion.div>
-                        )}
-                      </div>
-                    )}
-
-                    {/* Unlock date for completed achievements */}
-                    {isUnlocked && achievement.unlocked_at && (
-                      <p className="text-xs text-purple-400">
-                        Erreicht am{" "}
-                        {new Date(achievement.unlocked_at).toLocaleDateString(
-                          "de-DE"
-                        )}
-                      </p>
-                    )}
-                  </div>
-                </motion.div>
-              );
-            })}
+            {achievements.map((achievement, index) => (
+              <AchievementCard
+                key={achievement.achievement_id}
+                achievement={achievement}
+                index={index}
+                onUnlock={unlockAchievement}
+                isUnlocking={unlockingIds.has(achievement.achievement_id)}
+              />
+            ))}
           </div>
 
           {/* Summary Stats */}

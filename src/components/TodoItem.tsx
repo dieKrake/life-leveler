@@ -3,20 +3,20 @@
 import { useState, useEffect, forwardRef } from "react";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import type { Todo } from "@/types";
-import { KeyedMutator, useSWRConfig } from "swr";
-import { PlayerStats } from "@/types";
+import { KeyedMutator } from "swr";
 import { useUnifiedData } from "./UnifiedDataProvider";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { formatTodoDate } from "@/lib/dateUtils";
 import { getTodoTimingColor } from "@/lib/todoUtils";
+import { getGemReward } from "@/lib/difficultyUtils";
 import { DifficultySelector } from "./DifficultySelector";
 import { Flame, Gem } from "lucide-react";
 import ArchiveTodoDialog from "./ArchiveTodoDialog";
 import { toast } from "sonner";
 import { useReward } from "@/components/RewardProvider";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 
 type TodoItemProps = {
   todo: Todo;
@@ -84,7 +84,7 @@ const TodoItem = forwardRef<HTMLDivElement, TodoItemProps>(function TodoItem({ t
 
       // Calculate XP and gems for reward notification
       const baseXp = todo.xp_value || 10;
-      const baseGems = baseXp === 10 ? 1 : baseXp === 20 ? 2 : 4;
+      const baseGems = getGemReward(baseXp);
       const finalXp = Math.round(baseXp * streak_multiplier);
       
       // Show reward notification

@@ -9,18 +9,11 @@ import {
   Zap,
   Gem,
   Flame,
-  ShoppingBag,
-  User,
-  BarChart3,
-  CheckCircle2,
-  Clock,
-  Star,
-  TrendingUp,
-  Award,
-  Plus,
-  ArrowRight,
   Crown,
-  Gift,
+  ArrowRight,
+  Plus,
+  ShoppingBag,
+  BarChart3,
 } from "lucide-react";
 import {
   useAchievements,
@@ -28,6 +21,11 @@ import {
   usePlayerStats,
   useTodos,
 } from "./UnifiedDataProvider";
+import { GRADIENTS, ICON_MAP } from "@/lib/constants";
+import DashboardStatsCard from "./dashboard/DashboardStatsCard";
+import DashboardTodoItem from "./dashboard/DashboardTodoItem";
+import DashboardChallengeItem from "./dashboard/DashboardChallengeItem";
+import AchievementCard from "./achievements/AchievementCard";
 
 const quickActions = [
   {
@@ -56,14 +54,6 @@ const quickActions = [
   },
 ];
 
-const iconMap = {
-  Trophy,
-  Flame,
-  Gem,
-  TrendingUp,
-  Target,
-};
-
 export default function DashboardView() {
   const { data: todos } = useTodos();
   const { data: challenges } = useChallenges();
@@ -79,7 +69,7 @@ export default function DashboardView() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-4 md:p-6">
+    <div className={`min-h-screen ${GRADIENTS.pageBg} p-4 md:p-6`}>
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Header */}
         <motion.div
@@ -102,74 +92,50 @@ export default function DashboardView() {
           transition={{ delay: 0.1 }}
           className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8"
         >
-          {/* Level Card */}
-          <div className="bg-gradient-to-br from-purple-500/20 to-purple-500/20 backdrop-blur-sm border border-purple-500/30 rounded-xl p-4">
-            <div className="flex items-center gap-3 mb-2">
-              <Crown className="w-6 h-6 text-purple-400" />
-              <span className="text-purple-100 font-medium">Level</span>
-            </div>
-            <div className="text-2xl font-bold text-white">
-              {playerStats?.level}
-            </div>
-            <div className="text-xs text-blue-200">
-              {playerStats?.xp}/{playerStats?.xp_for_next_level} XP
-            </div>
-            <div className="w-full bg-blue-900/30 rounded-full h-2 mt-2">
-              {playerStats && playerStats?.xp_for_next_level && (
-                <div
-                  className="bg-gradient-to-r from-blue-400 to-purple-400 h-2 rounded-full transition-all duration-500"
-                  style={{
-                    width: `${
-                      (playerStats?.xp / playerStats?.xp_for_next_level) * 100
-                    }%`,
-                  }}
-                />
-              )}
-            </div>
-          </div>
+          <DashboardStatsCard
+            title="Level"
+            value={playerStats?.level || 0}
+            subtitle={`${playerStats?.xp}/${playerStats?.xp_for_next_level} XP`}
+            Icon={Crown}
+            iconColor="text-purple-400"
+            gradient={`${GRADIENTS.level} border`}
+            progress={
+              playerStats?.xp && playerStats?.xp_for_next_level
+                ? { current: playerStats.xp, total: playerStats.xp_for_next_level }
+                : undefined
+            }
+          />
 
-          {/* XP Card */}
-          <div className="bg-gradient-to-br from-yellow-500/20 to-orange-500/20 backdrop-blur-sm border border-yellow-500/30 rounded-xl p-4">
-            <div className="flex items-center gap-3 mb-2">
-              <Zap className="w-6 h-6 text-yellow-400" />
-              <span className="text-yellow-100 font-medium">Total XP</span>
-            </div>
-            <div className="text-2xl font-bold text-white">
-              {playerStats?.total_xp}
-            </div>
-            {playerStats?.xp_for_next_level && playerStats?.xp && (
-              <div className="text-xs text-yellow-200">
-                {playerStats?.xp_for_next_level - playerStats?.xp} XP bis zum
-                nächsten Level
-              </div>
-            )}
-          </div>
+          <DashboardStatsCard
+            title="Total XP"
+            value={playerStats?.total_xp || 0}
+            subtitle={
+              playerStats?.xp_for_next_level && playerStats?.xp
+                ? `${playerStats.xp_for_next_level - playerStats.xp} XP bis zum nächsten Level`
+                : undefined
+            }
+            Icon={Zap}
+            iconColor="text-yellow-400"
+            gradient={`${GRADIENTS.xp} border`}
+          />
 
-          {/* Gems Card */}
-          <div className="bg-gradient-to-br from-emerald-500/20 to-teal-500/20 backdrop-blur-sm border border-emerald-500/30 rounded-xl p-4">
-            <div className="flex items-center gap-3 mb-2">
-              <Gem className="w-6 h-6 text-blue-400" />
-              <span className="text-blue-100 font-medium">Gems</span>
-            </div>
-            <div className="text-2xl font-bold text-white">
-              {playerStats?.gems}
-            </div>
-            <div className="text-xs text-emerald-200">Sammle mehr im Shop!</div>
-          </div>
+          <DashboardStatsCard
+            title="Gems"
+            value={playerStats?.gems || 0}
+            subtitle="Sammle mehr im Shop!"
+            Icon={Gem}
+            iconColor="text-blue-400"
+            gradient="from-emerald-500/20 to-teal-500/20 border-emerald-500/30 border"
+          />
 
-          {/* Streak Card */}
-          <div className="bg-gradient-to-br from-red-500/20 to-pink-500/20 backdrop-blur-sm border border-red-500/30 rounded-xl p-4">
-            <div className="flex items-center gap-3 mb-2">
-              <Flame className="w-6 h-6 text-red-400" />
-              <span className="text-red-100 font-medium">Streak</span>
-            </div>
-            <div className="text-2xl font-bold text-white">
-              {playerStats?.current_streak}
-            </div>
-            <div className="text-xs text-red-200">
-              {playerStats?.streak_multiplier}x Multiplier
-            </div>
-          </div>
+          <DashboardStatsCard
+            title="Streak"
+            value={playerStats?.current_streak || 0}
+            subtitle={`${playerStats?.streak_multiplier}x Multiplier`}
+            Icon={Flame}
+            iconColor="text-red-400"
+            gradient="from-red-500/20 to-pink-500/20 border-red-500/30 border"
+          />
         </motion.div>
 
         {/* Quick Actions */}
@@ -251,56 +217,7 @@ export default function DashboardView() {
               }}
             >
               {todos?.map((todo, index) => (
-                <motion.div
-                  key={todo.id}
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.4 + index * 0.1 }}
-                  className={`flex items-center gap-3 p-3 rounded-lg border transition-all duration-200 ${
-                    todo.is_completed
-                      ? "bg-green-500/10 border-green-500/30 text-green-100"
-                      : "bg-slate-700/50 border-slate-600 text-slate-200 hover:bg-slate-700"
-                  }`}
-                >
-                  <div
-                    className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                      todo.is_completed
-                        ? "bg-green-500 border-green-500"
-                        : "border-slate-400"
-                    }`}
-                  >
-                    {todo.is_completed && (
-                      <CheckCircle2 className="w-3 h-3 text-white" />
-                    )}
-                  </div>
-                  <div className="flex-1">
-                    <div
-                      className={`font-medium ${
-                        todo.is_completed ? "line-through" : ""
-                      }`}
-                    >
-                      {todo.title}
-                    </div>
-                    <div className="text-xs text-slate-400">
-                      {todo.xp_value} XP
-                    </div>
-                  </div>
-                  <div
-                    className={`px-2 py-1 rounded text-xs font-medium ${
-                      todo.xp_value === 10
-                        ? "bg-green-500/20 text-green-300"
-                        : todo.xp_value === 20
-                        ? "bg-yellow-500/20 text-yellow-300"
-                        : "bg-red-500/20 text-red-300"
-                    }`}
-                  >
-                    {todo.xp_value === 10
-                      ? "Einfach"
-                      : todo.xp_value === 20
-                      ? "Mittel"
-                      : "Schwer"}
-                  </div>
-                </motion.div>
+                <DashboardTodoItem key={todo.id} todo={todo} index={index} />
               ))}
             </div>
           </motion.div>
@@ -335,55 +252,11 @@ export default function DashboardView() {
               }}
             >
               {allChallenges.map((challenge, index) => (
-                <motion.div
+                <DashboardChallengeItem
                   key={challenge.challenge_id}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.5 + index * 0.1 }}
-                  className="bg-slate-700/50 border border-slate-600 rounded-lg p-4 hover:bg-slate-700 transition-all duration-200"
-                >
-                  <div className="flex items-center justify-between mb-2">
-                    <h3 className="font-medium text-white">
-                      {challenge.title}
-                    </h3>
-                    <span
-                      className={`px-2 py-1 rounded text-xs font-medium ${
-                        challenge.type === "daily"
-                          ? "bg-blue-500/20 text-blue-300"
-                          : "bg-purple-500/20 text-purple-300"
-                      }`}
-                    >
-                      {challenge.type}
-                    </span>
-                  </div>
-
-                  <div className="flex justify-between text-sm text-slate-400 mb-2">
-                    <span>Fortschritt</span>
-                    <span>
-                      {challenge.progress}/{challenge.target}
-                    </span>
-                  </div>
-
-                  <div className="w-full bg-slate-600 rounded-full h-2 mb-2">
-                    <div
-                      className={`h-2 rounded-full transition-all duration-500 ${
-                        challenge.type === "daily"
-                          ? "bg-gradient-to-r from-blue-400 to-cyan-400"
-                          : "bg-gradient-to-r from-purple-400 to-pink-400"
-                      }`}
-                      style={{
-                        width: `${
-                          (challenge.progress / challenge.target) * 100
-                        }%`,
-                      }}
-                    />
-                  </div>
-
-                  <div className="text-xs text-slate-400">
-                    Belohnung: {challenge.xp_reward} XP, {challenge.gem_reward}{" "}
-                    Gems
-                  </div>
-                </motion.div>
+                  challenge={challenge}
+                  index={index}
+                />
               ))}
             </div>
           </motion.div>
@@ -412,9 +285,9 @@ export default function DashboardView() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {achievements?.map((achievement, index) => {
+            {achievements?.slice(0, 8).map((achievement, index) => {
               const IconComponent =
-                iconMap[achievement.icon as keyof typeof iconMap] || Target;
+                ICON_MAP[achievement.icon as keyof typeof ICON_MAP] || Target;
 
               return (
                 <motion.div
@@ -428,13 +301,13 @@ export default function DashboardView() {
                       : "bg-slate-700/50 border-slate-600 text-slate-400"
                   }`}
                 >
-                  <IconComponent className="text-2xl mb-2" />
-                  <h3 className="font-medium mb-1">{achievement.name}</h3>
+                  <IconComponent className="w-6 h-6 mb-2" />
+                  <h3 className="font-medium mb-1 text-sm">{achievement.name}</h3>
                   <p className="text-xs text-slate-400 mb-2">
                     {achievement.description}
                   </p>
 
-                  {!achievement.is_unlocked && achievement.current_progress && (
+                  {!achievement.is_unlocked && achievement.current_progress !== undefined && (
                     <div className="mt-2">
                       <div className="flex justify-between text-xs mb-1">
                         <span>Fortschritt</span>
@@ -448,8 +321,8 @@ export default function DashboardView() {
                           className="bg-gradient-to-r from-yellow-400 to-orange-400 h-1 rounded-full transition-all duration-500"
                           style={{
                             width: `${
-                              (achievement.current_progress! /
-                                achievement.condition_value!) *
+                              (achievement.current_progress /
+                                achievement.condition_value) *
                               100
                             }%`,
                           }}
@@ -460,7 +333,7 @@ export default function DashboardView() {
 
                   {achievement.is_unlocked && (
                     <div className="flex items-center gap-1 text-xs text-yellow-300">
-                      <Award className="w-3 h-3" />
+                      <Trophy className="w-3 h-3" />
                       Freigeschaltet
                     </div>
                   )}

@@ -117,7 +117,7 @@ export async function GET() {
 
       // Achievements
       supabase.rpc("get_user_achievements_with_progress", {
-        p_user_id: session.user.id,
+        user_id_param: session.user.id,
       }),
 
       // Todos

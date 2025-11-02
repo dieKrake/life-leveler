@@ -1,4 +1,4 @@
-import useSWR, { mutate as globalMutate } from "swr";
+import { mutate as globalMutate } from "swr";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -7,6 +7,7 @@ import { UserAchievement } from "@/types";
 import { useState, useEffect } from "react";
 import { useReward } from "@/components/RewardProvider";
 import { motion, AnimatePresence } from "framer-motion";
+import { useAchievements } from "@/components/UnifiedDataProvider";
 
 const iconMap = {
   Trophy,
@@ -21,7 +22,7 @@ export default function AchievementsSection() {
     data: achievements,
     isLoading,
     mutate,
-  } = useSWR<UserAchievement[]>("/api/achievements");
+  } = useAchievements();
   const [unlockingIds, setUnlockingIds] = useState<Set<number>>(new Set());
   const { showAchievementReward } = useReward();
 

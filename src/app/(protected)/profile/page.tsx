@@ -57,7 +57,7 @@ export default function ProfilePage() {
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-6">
       <div className="container mx-auto max-w-6xl space-y-8">
         {/* Profile Header with ProfilePicture */}
-        <motion.div 
+        <motion.div
           className="text-center space-y-6"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -77,9 +77,9 @@ export default function ProfilePage() {
             prestige={stats.prestige || 0}
           />
         </motion.div>
-        
+
         {/* TEMPORARY: Reset button for testing */}
-        <motion.div 
+        <motion.div
           className="flex justify-center"
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -87,7 +87,7 @@ export default function ProfilePage() {
         >
           <ResetAchievementsButton />
         </motion.div>
-        
+
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -95,7 +95,7 @@ export default function ProfilePage() {
         >
           <StreakSection stats={stats} />
         </motion.div>
-        
+
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}

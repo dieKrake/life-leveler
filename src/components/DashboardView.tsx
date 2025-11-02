@@ -29,66 +29,6 @@ import {
   useTodos,
 } from "./UnifiedDataProvider";
 
-const mockChallenges = [
-  {
-    id: 1,
-    title: "5 Todos heute",
-    progress: 2,
-    target: 5,
-    type: "daily",
-    reward: "50 XP + 5 Gems",
-  },
-  {
-    id: 2,
-    title: "Schwere Aufgaben meistern",
-    progress: 1,
-    target: 3,
-    type: "daily",
-    reward: "75 XP + 8 Gems",
-  },
-  {
-    id: 3,
-    title: "Wöchentliche Ziele",
-    progress: 12,
-    target: 25,
-    type: "weekly",
-    reward: "200 XP + 25 Gems",
-  },
-];
-
-const mockAchievements = [
-  {
-    id: 1,
-    name: "Erste Schritte",
-    description: "Erste Todo abgeschlossen",
-    unlocked: true,
-    icon: "🎯",
-  },
-  {
-    id: 2,
-    name: "Streak Master",
-    description: "5 Tage Streak erreicht",
-    unlocked: true,
-    icon: "🔥",
-  },
-  {
-    id: 3,
-    name: "Level Up",
-    description: "Level 2 erreicht",
-    unlocked: true,
-    icon: "⭐",
-  },
-  {
-    id: 4,
-    name: "Gem Sammler",
-    description: "50 Gems sammeln",
-    unlocked: false,
-    progress: 28,
-    target: 50,
-    icon: "💎",
-  },
-];
-
 const quickActions = [
   {
     title: "Todo hinzufügen",
@@ -118,13 +58,9 @@ const quickActions = [
 
 export default function DashboardView() {
   const { data: todos } = useTodos();
-  console.log("todos", todos);
   const { data: challenges } = useChallenges();
-  console.log("challenges", challenges);
   const { data: achievements } = useAchievements();
-  console.log("achievements", achievements);
   const { data: playerStats } = usePlayerStats();
-  console.log("playerStats", playerStats);
 
   const completedTodos = todos?.filter((todo) => todo.is_completed).length;
   const totalTodos = todos?.length;
@@ -286,7 +222,7 @@ export default function DashboardView() {
                 </span>
               </div>
               <div className="w-full bg-slate-700 rounded-full h-2">
-                {completedTodos && totalTodos && (
+                {typeof totalTodos === 'number' && typeof completedTodos === 'number' && totalTodos > 0 && (
                   <div
                     className="bg-gradient-to-r from-green-400 to-blue-400 h-2 rounded-full transition-all duration-500"
                     style={{ width: `${(completedTodos / totalTodos) * 100}%` }}
@@ -295,8 +231,14 @@ export default function DashboardView() {
               </div>
             </div>
 
-            <div className="space-y-3">
-              {todos?.slice(0, 4).map((todo, index) => (
+            <div
+              className="space-y-3 h-[500px] overflow-y-auto pr-2"
+              style={{
+                scrollbarWidth: "thin",
+                scrollbarColor: "#475569 #1e293b",
+              }}
+            >
+              {todos?.map((todo, index) => (
                 <motion.div
                   key={todo.id}
                   initial={{ opacity: 0, x: -10 }}
@@ -373,7 +315,13 @@ export default function DashboardView() {
               </Link>
             </div>
 
-            <div className="space-y-4">
+            <div
+              className="space-y-4 h-[550px] overflow-y-auto pr-2"
+              style={{
+                scrollbarWidth: "thin",
+                scrollbarColor: "#475569 #1e293b",
+              }}
+            >
               {allChallenges.map((challenge, index) => (
                 <motion.div
                   key={challenge.challenge_id}
@@ -430,7 +378,7 @@ export default function DashboardView() {
         </div>
 
         {/* Recent Achievements */}
-        <motion.div
+        {/* <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6 }}
@@ -452,7 +400,7 @@ export default function DashboardView() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {mockAchievements.map((achievement, index) => (
+            {achievements?.map((achievement, index) => (
               <motion.div
                 key={achievement.id}
                 initial={{ opacity: 0, scale: 0.9 }}
@@ -500,7 +448,7 @@ export default function DashboardView() {
               </motion.div>
             ))}
           </div>
-        </motion.div>
+        </motion.div> */}
 
         {/* Navigation Links */}
         <motion.div

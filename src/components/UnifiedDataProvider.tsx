@@ -6,13 +6,13 @@ import type {
   PlayerStats,
   Todo,
   ChallengesResponse,
-  Achievement,
+  UserAchievement,
 } from "@/types";
 
 interface DashboardData {
   playerStats: PlayerStats;
   challenges: ChallengesResponse;
-  achievements: Achievement[];
+  achievements: UserAchievement[];
   todos: Todo[];
   timestamp: string;
 }
@@ -20,7 +20,7 @@ interface DashboardData {
 interface UnifiedDataContextType {
   playerStats: PlayerStats | undefined;
   challenges: ChallengesResponse | undefined;
-  achievements: Achievement[] | undefined;
+  achievements: UserAchievement[] | undefined;
   todos: Todo[] | undefined;
   isLoading: boolean;
   error: any;
@@ -129,6 +129,7 @@ export function useUnifiedData() {
   if (context === undefined) {
     throw new Error("useUnifiedData must be used within a UnifiedDataProvider");
   }
+  console.log("useUnifiedData context:", context);
   return context;
 }
 
@@ -184,15 +185,33 @@ export function useAchievements() {
   const { achievements, isLoading, error, mutateAchievements } =
     useUnifiedData();
 
-  const mutate: KeyedMutator<Achievement[]> = async (
+  // Fallback to individual API if unified data is not working
+  const fallback = useSWR<UserAchievement[]>("/api/achievements", fetcher, {
+    refreshInterval: 30000,
+    revalidateOnFocus: true,
+  });
+
+  // Use fallback if unified data is not working
+  const shouldUseFallback =
+    error || (isLoading && !achievements && fallback.data);
+
+  const mutate: KeyedMutator<UserAchievement[]> = async (
     data?,
     shouldRevalidate?
   ) => {
+    if (shouldUseFallback) {
+      return fallback.mutate(data, shouldRevalidate);
+    }
     mutateAchievements();
     return achievements;
   };
 
-  return { data: achievements, isLoading, error, mutate };
+  return {
+    data: shouldUseFallback ? fallback.data : achievements,
+    isLoading: shouldUseFallback ? fallback.isLoading : isLoading,
+    error: shouldUseFallback ? fallback.error : error,
+    mutate,
+  };
 }
 
 export function useTodos() {

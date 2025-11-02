@@ -30,6 +30,7 @@ export async function GET() {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
+    console.log("Achievements from route:", achievements);
     return NextResponse.json(achievements);
   } catch (error) {
     console.error("Unerwarteter Fehler:", error);

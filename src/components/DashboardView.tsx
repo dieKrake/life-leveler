@@ -56,6 +56,14 @@ const quickActions = [
   },
 ];
 
+const iconMap = {
+  Trophy,
+  Flame,
+  Gem,
+  TrendingUp,
+  Target,
+};
+
 export default function DashboardView() {
   const { data: todos } = useTodos();
   const { data: challenges } = useChallenges();
@@ -222,12 +230,16 @@ export default function DashboardView() {
                 </span>
               </div>
               <div className="w-full bg-slate-700 rounded-full h-2">
-                {typeof totalTodos === 'number' && typeof completedTodos === 'number' && totalTodos > 0 && (
-                  <div
-                    className="bg-gradient-to-r from-green-400 to-blue-400 h-2 rounded-full transition-all duration-500"
-                    style={{ width: `${(completedTodos / totalTodos) * 100}%` }}
-                  />
-                )}
+                {typeof totalTodos === "number" &&
+                  typeof completedTodos === "number" &&
+                  totalTodos > 0 && (
+                    <div
+                      className="bg-gradient-to-r from-green-400 to-blue-400 h-2 rounded-full transition-all duration-500"
+                      style={{
+                        width: `${(completedTodos / totalTodos) * 100}%`,
+                      }}
+                    />
+                  )}
               </div>
             </div>
 
@@ -378,7 +390,7 @@ export default function DashboardView() {
         </div>
 
         {/* Recent Achievements */}
-        {/* <motion.div
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6 }}
@@ -400,101 +412,62 @@ export default function DashboardView() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {achievements?.map((achievement, index) => (
-              <motion.div
-                key={achievement.id}
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.7 + index * 0.1 }}
-                className={`p-4 rounded-lg border transition-all duration-200 ${
-                  achievement.unlocked
-                    ? "bg-yellow-500/10 border-yellow-500/30 text-yellow-100"
-                    : "bg-slate-700/50 border-slate-600 text-slate-400"
-                }`}
-              >
-                <div className="text-2xl mb-2">{achievement.icon}</div>
-                <h3 className="font-medium mb-1">{achievement.name}</h3>
-                <p className="text-xs text-slate-400 mb-2">
-                  {achievement.description}
-                </p>
+            {achievements?.map((achievement, index) => {
+              const IconComponent =
+                iconMap[achievement.icon as keyof typeof iconMap] || Target;
 
-                {!achievement.unlocked && achievement.progress && (
-                  <div className="mt-2">
-                    <div className="flex justify-between text-xs mb-1">
-                      <span>Fortschritt</span>
-                      <span>
-                        {achievement.progress}/{achievement.target}
-                      </span>
-                    </div>
-                    <div className="w-full bg-slate-600 rounded-full h-1">
-                      <div
-                        className="bg-gradient-to-r from-yellow-400 to-orange-400 h-1 rounded-full transition-all duration-500"
-                        style={{
-                          width: `${
-                            (achievement.progress! / achievement.target!) * 100
-                          }%`,
-                        }}
-                      />
-                    </div>
-                  </div>
-                )}
+              return (
+                <motion.div
+                  key={achievement.achievement_id}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.7 + index * 0.1 }}
+                  className={`p-4 rounded-lg border transition-all duration-200 ${
+                    achievement.is_unlocked
+                      ? "bg-yellow-500/10 border-yellow-500/30 text-yellow-100"
+                      : "bg-slate-700/50 border-slate-600 text-slate-400"
+                  }`}
+                >
+                  <IconComponent className="text-2xl mb-2" />
+                  <h3 className="font-medium mb-1">{achievement.name}</h3>
+                  <p className="text-xs text-slate-400 mb-2">
+                    {achievement.description}
+                  </p>
 
-                {achievement.unlocked && (
-                  <div className="flex items-center gap-1 text-xs text-yellow-300">
-                    <Award className="w-3 h-3" />
-                    Freigeschaltet
-                  </div>
-                )}
-              </motion.div>
-            ))}
+                  {!achievement.is_unlocked && achievement.current_progress && (
+                    <div className="mt-2">
+                      <div className="flex justify-between text-xs mb-1">
+                        <span>Fortschritt</span>
+                        <span>
+                          {achievement.current_progress}/
+                          {achievement.condition_value}
+                        </span>
+                      </div>
+                      <div className="w-full bg-slate-600 rounded-full h-1">
+                        <div
+                          className="bg-gradient-to-r from-yellow-400 to-orange-400 h-1 rounded-full transition-all duration-500"
+                          style={{
+                            width: `${
+                              (achievement.current_progress! /
+                                achievement.condition_value!) *
+                              100
+                            }%`,
+                          }}
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {achievement.is_unlocked && (
+                    <div className="flex items-center gap-1 text-xs text-yellow-300">
+                      <Award className="w-3 h-3" />
+                      Freigeschaltet
+                    </div>
+                  )}
+                </motion.div>
+              );
+            })}
           </div>
-        </motion.div> */}
-
-        {/* Navigation Links */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.8 }}
-          className="grid grid-cols-2 md:grid-cols-3 gap-4"
-        >
-          <Link href="/todos">
-            <motion.div
-              whileHover={{ scale: 1.02 }}
-              className="bg-gradient-to-r from-blue-500/20 to-cyan-500/20 border border-blue-500/30 rounded-xl p-6 text-center hover:shadow-lg transition-all duration-200"
-            >
-              <Calendar className="w-8 h-8 text-blue-400 mx-auto mb-2" />
-              <h3 className="font-bold text-white mb-1">Todos verwalten</h3>
-              <p className="text-sm text-slate-400">
-                Aufgaben erstellen und abschließen
-              </p>
-            </motion.div>
-          </Link>
-
-          <Link href="/shop">
-            <motion.div
-              whileHover={{ scale: 1.02 }}
-              className="bg-gradient-to-r from-green-500/20 to-emerald-500/20 border border-green-500/30 rounded-xl p-6 text-center hover:shadow-lg transition-all duration-200"
-            >
-              <ShoppingBag className="w-8 h-8 text-green-400 mx-auto mb-2" />
-              <h3 className="font-bold text-white mb-1">Shop besuchen</h3>
-              <p className="text-sm text-slate-400">
-                Gems für Upgrades ausgeben
-              </p>
-            </motion.div>
-          </Link>
-
-          <Link href="/stats">
-            <motion.div
-              whileHover={{ scale: 1.02 }}
-              className="bg-gradient-to-r from-orange-500/20 to-red-500/20 border border-orange-500/30 rounded-xl p-6 text-center hover:shadow-lg transition-all duration-200"
-            >
-              <BarChart3 className="w-8 h-8 text-orange-400 mx-auto mb-2" />
-              <h3 className="font-bold text-white mb-1">Statistiken</h3>
-              <p className="text-sm text-slate-400">
-                Fortschritt und Trends anzeigen
-              </p>
-            </motion.div>
-          </Link>
         </motion.div>
       </div>
     </div>

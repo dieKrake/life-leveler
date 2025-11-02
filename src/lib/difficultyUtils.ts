@@ -44,7 +44,9 @@ const DIFFICULTY_CONFIGS: Record<10 | 20 | 30, DifficultyConfig> = {
  * Get difficulty configuration for a given XP value
  */
 export function getDifficultyConfig(xpValue: number): DifficultyConfig {
-  const validXp = [10, 20, 30].includes(xpValue) ? (xpValue as 10 | 20 | 30) : 10;
+  const validXp = [10, 20, 30].includes(xpValue)
+    ? (xpValue as 10 | 20 | 30)
+    : 10;
   return DIFFICULTY_CONFIGS[validXp];
 }
 

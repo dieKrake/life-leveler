@@ -4,7 +4,7 @@ import { Target } from "lucide-react";
 import { useState } from "react";
 import { useReward } from "@/components/RewardProvider";
 import { motion } from "framer-motion";
-import { useAchievements } from "@/components/UnifiedDataProvider";
+import { useAchievements, useUnifiedData } from "@/components/UnifiedDataProvider";
 import AchievementCard from "@/components/achievements/AchievementCard";
 import { GRADIENTS } from "@/lib/constants";
 
@@ -14,6 +14,7 @@ export default function AchievementsSection() {
     isLoading,
     mutate,
   } = useAchievements();
+  const { mutateAll } = useUnifiedData();
   const [unlockingIds, setUnlockingIds] = useState<Set<number>>(new Set());
   const { showAchievementReward } = useReward();
 
@@ -40,10 +41,9 @@ export default function AchievementsSection() {
           );
         }
 
-        // Refresh achievements data
+        // Refresh all data to update gems in UI
         mutate();
-        // Also refresh player stats to update gems in UI
-        globalMutate("/api/player-stats");
+        mutateAll();
       } else {
         const error = await response.json();
         console.error("Fehler beim Freischalten:", error);

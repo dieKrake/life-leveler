@@ -9,6 +9,9 @@ const config: Config = {
   ],
   safelist: [
     // Todo timing colors - subtle dark theme variants
+    "bg-red-500/20",
+    "bg-yellow-500/20",
+    "text-red-300",
     "bg-gradient-to-br",
     "from-slate-800/60",
     "from-slate-800/70",

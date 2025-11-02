@@ -34,3 +34,15 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# temporary SQL files (keep backups)
+/FINAL_FIX.sql
+/fix_streak_stats.sql
+/debug_prestige.sql
+/reset_achievements_for_testing.sql
+/FIX_*.sql
+/APPLY_*.sql
+
+# database backups
+/backups/
+backup_*.sql

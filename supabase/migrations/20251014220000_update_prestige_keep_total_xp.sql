@@ -206,18 +206,16 @@ CREATE OR REPLACE FUNCTION get_player_stats_with_level_info()
 RETURNS TABLE(
   user_id UUID,
   level INTEGER,
-  xp INTEGER,
-  total_xp INTEGER,
+  xp BIGINT,
+  total_xp BIGINT,
   gems INTEGER,
   current_streak INTEGER,
   highest_streak INTEGER,
-  streak_multiplier DECIMAL(3,2),
+  streak_multiplier DECIMAL,
   prestige INTEGER,
   max_level_reached INTEGER,
-  xp_for_current_level INTEGER,
-  xp_for_next_level INTEGER,
-  created_at TIMESTAMPTZ,
-  updated_at TIMESTAMPTZ
+  xp_for_current_level BIGINT,
+  xp_for_next_level BIGINT
 )
 LANGUAGE plpgsql
 SECURITY DEFINER
@@ -243,17 +241,14 @@ BEGIN
     COALESCE(sm.multiplier, 1.0) as streak_multiplier,
     ps.prestige,
     ps.max_level_reached,
-    COALESCE(l_current.xp_required, 0) as xp_for_current_level,
-    COALESCE(l_next.xp_required, 0) as xp_for_next_level,
-    ps.created_at,
-    ps.updated_at
+    COALESCE(l_current.xp_required, 0::BIGINT) as xp_for_current_level,
+    COALESCE(l_next.xp_required, 0::BIGINT) as xp_for_next_level
   FROM player_stats ps
   LEFT JOIN levels l_current ON l_current.level = ps.level
   LEFT JOIN levels l_next ON l_next.level = ps.level + 1
   LEFT JOIN streak_multipliers sm ON ps.current_streak >= sm.min_streak_days
-    AND (sm.max_streak_days IS NULL OR ps.current_streak <= sm.max_streak_days)
   WHERE ps.user_id = v_user_id
-  ORDER BY sm.multiplier DESC
+  ORDER BY sm.multiplier DESC NULLS LAST
   LIMIT 1;
 END;
 $$;

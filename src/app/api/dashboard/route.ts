@@ -13,22 +13,20 @@ export async function GET() {
   if (!session) {
     return NextResponse.json(
       { error: "Nicht authentifiziert" },
-      { status: 401 }
+      { status: 401 },
     );
   }
 
   try {
-
     // Parallel fetch all data for better performance
     const [
       playerStatsResult,
       challengesResult,
       achievementsResult,
-      todosResult
+      todosResult,
     ] = await Promise.allSettled([
       // Player Stats (using same logic as /api/player-stats)
       (async () => {
-        
         // Get basic player data
         const { data: playerData, error: playerError } = await supabase
           .from("player_stats")
@@ -60,7 +58,9 @@ export async function GET() {
           .limit(1)
           .single();
 
-        const streak_multiplier = multiplierError ? 1.0 : multiplierData.multiplier;
+        const streak_multiplier = multiplierError
+          ? 1.0
+          : multiplierData.multiplier;
 
         // Get next level data for correct calculation
         const { data: nextLevelData } = await supabase
@@ -72,20 +72,23 @@ export async function GET() {
         // Use same logic as /api/player-stats for consistency
         const currentLevelXpRequired = levelData?.xp_required || 0;
         const nextLevelXpRequired = nextLevelData?.xp_required || null;
-        
+
         // XP needed WITHIN the current level (not total XP)
-        const xpNeededForNextLevel = nextLevelXpRequired ? (nextLevelXpRequired - currentLevelXpRequired) : null;
+        const xpNeededForNextLevel = nextLevelXpRequired
+          ? nextLevelXpRequired - currentLevelXpRequired
+          : null;
 
         const result = {
           ...playerData,
           xp_for_current_level: 0, // Always 0 (start of current level) - consistent with /api/player-stats
           xp_for_next_level: xpNeededForNextLevel, // XP needed within current level
           streak_multiplier,
+          can_prestige: (playerData.level || 1) >= 10,
         };
 
         return { data: [result], error: null };
       })(),
-      
+
       // Challenges (with reset and initialization)
       (async () => {
         // Reset expired challenges and create new ones
@@ -106,8 +109,10 @@ export async function GET() {
         if (error) throw error;
 
         // Group challenges by type
-        const dailyChallenges = data?.filter((c: any) => c.type === "daily") || [];
-        const weeklyChallenges = data?.filter((c: any) => c.type === "weekly") || [];
+        const dailyChallenges =
+          data?.filter((c: any) => c.type === "daily") || [];
+        const weeklyChallenges =
+          data?.filter((c: any) => c.type === "weekly") || [];
 
         return {
           daily: dailyChallenges,
@@ -126,25 +131,30 @@ export async function GET() {
         .select("*")
         .eq("user_id", session.user.id)
         .is("archived_at", null)
-        .order("start_time", { ascending: true })
+        .order("start_time", { ascending: true }),
     ]);
 
     // Process results and handle errors
-    const playerStats = playerStatsResult.status === "fulfilled" && !playerStatsResult.value.error
-      ? playerStatsResult.value.data?.[0]
-      : null;
+    const playerStats =
+      playerStatsResult.status === "fulfilled" && !playerStatsResult.value.error
+        ? playerStatsResult.value.data?.[0]
+        : null;
 
-    const challenges = challengesResult.status === "fulfilled"
-      ? challengesResult.value
-      : { daily: [], weekly: [] };
+    const challenges =
+      challengesResult.status === "fulfilled"
+        ? challengesResult.value
+        : { daily: [], weekly: [] };
 
-    const achievements = achievementsResult.status === "fulfilled" && !achievementsResult.value.error
-      ? achievementsResult.value.data
-      : [];
+    const achievements =
+      achievementsResult.status === "fulfilled" &&
+      !achievementsResult.value.error
+        ? achievementsResult.value.data
+        : [];
 
-    const todos = todosResult.status === "fulfilled" && !todosResult.value.error
-      ? todosResult.value.data
-      : [];
+    const todos =
+      todosResult.status === "fulfilled" && !todosResult.value.error
+        ? todosResult.value.data
+        : [];
 
     // Log any errors for debugging
     if (playerStatsResult.status === "rejected") {
@@ -171,7 +181,7 @@ export async function GET() {
     console.error("Unexpected error in dashboard API:", error);
     return NextResponse.json(
       { error: "Ein unerwarteter Fehler ist aufgetreten" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

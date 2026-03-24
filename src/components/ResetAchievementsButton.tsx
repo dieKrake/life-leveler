@@ -9,13 +9,17 @@ export default function ResetAchievementsButton() {
   const [isResetting, setIsResetting] = useState(false);
 
   const handleReset = async () => {
-    if (!confirm("WARNUNG: Dies wird alle deine Achievements löschen! Fortfahren?")) {
+    if (
+      !confirm(
+        "WARNUNG: Dies setzt ALLE Spielerdaten zurück (Stats, Achievements, Challenges, Todos)! Fortfahren?",
+      )
+    ) {
       return;
     }
 
     setIsResetting(true);
     try {
-      const response = await fetch("/api/reset-achievements", {
+      const response = await fetch("/api/reset-all", {
         method: "POST",
         credentials: "include",
       });
@@ -27,8 +31,8 @@ export default function ResetAchievementsButton() {
       }
 
       toast.success(
-        `Achievements zurückgesetzt! ${data.achievementsReset} Achievements entfernt, ${data.gemsSubtracted} Gems abgezogen`,
-        { duration: 5000 }
+        `Alles zurückgesetzt! ${data.achievements_deleted} Achievements, ${data.challenges_deleted} Challenges, ${data.todos_reset} Todos`,
+        { duration: 5000 },
       );
 
       // Refresh page to see changes
@@ -50,7 +54,7 @@ export default function ResetAchievementsButton() {
       className="gap-2"
     >
       <Trash2 className="w-4 h-4" />
-      {isResetting ? "Resetting..." : "Reset Achievements (TEST)"}
+      {isResetting ? "Resetting..." : "Alles zurücksetzen (TEST)"}
     </Button>
   );
 }

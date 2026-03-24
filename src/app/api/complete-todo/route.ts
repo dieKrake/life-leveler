@@ -59,7 +59,10 @@ export async function POST(request: Request) {
       });
       if (error) {
         console.error("Error completing todo:", error);
-        throw new Error(`Database error: ${error.message}`);
+        console.error("Error details:", JSON.stringify(error, null, 2));
+        throw new Error(
+          `Database error: ${error.message} | Details: ${error.details} | Hint: ${error.hint}`,
+        );
       }
       levelUpInfo = data?.[0]; // Get the first (and only) result
     } else {

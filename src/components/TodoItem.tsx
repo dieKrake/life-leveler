@@ -87,6 +87,9 @@ const TodoItem = forwardRef<HTMLDivElement, TodoItemProps>(function TodoItem(
 
       const responseData = await response.json();
 
+      // DEBUG: Log the complete response to see achievements
+      console.log("🔍 Complete-Todo Response:", responseData);
+
       // Success - refresh data
       mutate();
       mutateAll(); // This will update all data including challenges

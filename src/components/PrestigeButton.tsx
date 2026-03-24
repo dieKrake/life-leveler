@@ -17,7 +17,7 @@ import { Badge } from "@/components/ui/badge";
 import { Star, Gem, RotateCcw, Trophy, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 import { useReward } from "@/components/RewardProvider";
-import { mutate } from "swr";
+import { useUnifiedData } from "@/components/UnifiedDataProvider";
 
 interface PrestigeButtonProps {
   canPrestige: boolean;
@@ -33,6 +33,7 @@ export default function PrestigeButton({
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { showPrestigeReward } = useReward();
+  const { mutateAll } = useUnifiedData();
 
   const handlePrestige = async () => {
     setIsLoading(true);
@@ -54,21 +55,20 @@ export default function PrestigeButton({
       showPrestigeReward(data.new_prestige, data.gems_earned);
 
       // Refresh all relevant data
-      mutate("/api/player-stats");
-      mutate("/api/achievements");
+      mutateAll();
 
       toast.success(
         `Prestige ${data.new_prestige} erreicht! +${data.gems_earned} Gems erhalten!`,
         {
           description: `${data.achievements_reset} Erfolge wurden zurückgesetzt.`,
-        }
+        },
       );
 
       setIsOpen(false);
     } catch (error) {
       console.error("Prestige error:", error);
       toast.error(
-        error instanceof Error ? error.message : "Prestige fehlgeschlagen"
+        error instanceof Error ? error.message : "Prestige fehlgeschlagen",
       );
     } finally {
       setIsLoading(false);

@@ -19,7 +19,7 @@ export async function POST(request: Request) {
   if (!session || !session.provider_token) {
     return NextResponse.json(
       { error: "Nicht authentifiziert oder Provider-Token fehlt" },
-      { status: 401 }
+      { status: 401 },
     );
   }
 
@@ -30,7 +30,7 @@ export async function POST(request: Request) {
     if (!validation.success) {
       return NextResponse.json(
         { error: validation.error.format() },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -47,7 +47,7 @@ export async function POST(request: Request) {
     if (todoError || !todo) {
       return NextResponse.json(
         { error: "Todo nicht gefunden" },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -93,7 +93,7 @@ export async function POST(request: Request) {
           if (!taskResponse.ok) {
             console.error(
               "Fehler beim Aktualisieren der Google Task:",
-              await taskResponse.text()
+              await taskResponse.text(),
             );
           }
         } else if (todo.google_event_id.startsWith("evt-")) {
@@ -114,7 +114,7 @@ export async function POST(request: Request) {
           if (!eventResponse.ok) {
             console.error(
               "Fehler beim Aktualisieren des Google Events:",
-              await eventResponse.text()
+              await eventResponse.text(),
             );
           }
         }
@@ -132,12 +132,16 @@ export async function POST(request: Request) {
       challengesUpdated: completed,
       // Include level-up information if available
       levelUp: levelUpInfo,
+      // Include auto-claimed challenges
+      challengesClaimed: levelUpInfo?.claimed_challenges || [],
+      // Include auto-unlocked achievements
+      achievementsUnlocked: levelUpInfo?.unlocked_achievements || [],
     });
   } catch (error) {
     console.error("Fehler beim Aktualisieren des Todos:", error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "Unbekannter Fehler" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

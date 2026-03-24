@@ -8,8 +8,6 @@ interface ChallengeSectionProps {
   title: string;
   type: "daily" | "weekly";
   challenges: Challenge[];
-  onClaim: (challengeId: string) => Promise<void>;
-  claimingId: string | null;
   resetTime: string;
 }
 
@@ -17,8 +15,6 @@ export default function ChallengeSection({
   title,
   type,
   challenges,
-  onClaim,
-  claimingId,
   resetTime,
 }: ChallengeSectionProps) {
   const IconComponent = type === "daily" ? Clock : Calendar;
@@ -74,8 +70,6 @@ export default function ChallengeSection({
                     challenge={challenge}
                     type={type}
                     index={index}
-                    onClaim={onClaim}
-                    isClaimingThis={claimingId === challenge.id}
                   />
                 </motion.div>
               ))}

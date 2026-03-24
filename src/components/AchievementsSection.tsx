@@ -1,69 +1,18 @@
-import { mutate as globalMutate } from "swr";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Target } from "lucide-react";
-import { useState } from "react";
-import { useReward } from "@/components/RewardProvider";
 import { motion } from "framer-motion";
-import { useAchievements, useUnifiedData } from "@/components/UnifiedDataProvider";
+import { useAchievements } from "@/components/UnifiedDataProvider";
 import AchievementCard from "@/components/achievements/AchievementCard";
 import { GRADIENTS } from "@/lib/constants";
 
 export default function AchievementsSection() {
-  const {
-    data: achievements,
-    isLoading,
-    mutate,
-  } = useAchievements();
-  const { mutateAll } = useUnifiedData();
-  const [unlockingIds, setUnlockingIds] = useState<Set<number>>(new Set());
-  const { showAchievementReward } = useReward();
-
-  const unlockAchievement = async (achievementId: number) => {
-    setUnlockingIds((prev) => new Set(prev).add(achievementId));
-
-    try {
-      const response = await fetch("/api/achievements/unlock", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ achievementId }),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-
-        // Show achievement reward notification
-        if (data.achievement) {
-          showAchievementReward(
-            data.achievement.reward_gems,
-            data.achievement.title
-          );
-        }
-
-        // Refresh all data to update gems in UI
-        mutate();
-        mutateAll();
-      } else {
-        const error = await response.json();
-        console.error("Fehler beim Freischalten:", error);
-        console.error("Response status:", response.status);
-        console.error("Full response:", response);
-      }
-    } catch (error) {
-      console.error("Fehler beim Freischalten:", error);
-    } finally {
-      setUnlockingIds((prev) => {
-        const newSet = new Set(prev);
-        newSet.delete(achievementId);
-        return newSet;
-      });
-    }
-  };
+  const { data: achievements, isLoading } = useAchievements();
 
   if (isLoading) {
     return (
-      <Card className={`${GRADIENTS.cardBg} ${GRADIENTS.cardBorder} border backdrop-blur-sm`}>
+      <Card
+        className={`${GRADIENTS.cardBg} ${GRADIENTS.cardBorder} border backdrop-blur-sm`}
+      >
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-white">
             <Target className="h-5 w-5 text-purple-400" />
@@ -79,7 +28,9 @@ export default function AchievementsSection() {
 
   if (!achievements || achievements.length === 0) {
     return (
-      <Card className={`${GRADIENTS.cardBg} ${GRADIENTS.cardBorder} border backdrop-blur-sm`}>
+      <Card
+        className={`${GRADIENTS.cardBg} ${GRADIENTS.cardBorder} border backdrop-blur-sm`}
+      >
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-white">
             <Target className="h-5 w-5 text-purple-400" />
@@ -101,7 +52,9 @@ export default function AchievementsSection() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
     >
-      <Card className={`${GRADIENTS.cardBg} ${GRADIENTS.cardBorder} border backdrop-blur-sm`}>
+      <Card
+        className={`${GRADIENTS.cardBg} ${GRADIENTS.cardBorder} border backdrop-blur-sm`}
+      >
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-white">
             <Target className="h-5 w-5 text-purple-400" />
@@ -115,8 +68,6 @@ export default function AchievementsSection() {
                 key={achievement.achievement_id}
                 achievement={achievement}
                 index={index}
-                onUnlock={unlockAchievement}
-                isUnlocking={unlockingIds.has(achievement.achievement_id)}
               />
             ))}
           </div>
@@ -185,7 +136,7 @@ export default function AchievementsSection() {
                   {Math.round(
                     (achievements.filter((a) => a.is_unlocked).length /
                       achievements.length) *
-                      100
+                      100,
                   )}
                   %
                 </div>

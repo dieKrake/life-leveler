@@ -24,11 +24,20 @@ type TodoItemProps = {
   mutate: KeyedMutator<Todo[]>;
 };
 
-const TodoItem = forwardRef<HTMLDivElement, TodoItemProps>(function TodoItem({ todo, todos, mutate }, ref) {
+const TodoItem = forwardRef<HTMLDivElement, TodoItemProps>(function TodoItem(
+  { todo, todos, mutate },
+  ref,
+) {
   const supabase = createClientComponentClient();
   const [isChecked, setIsChecked] = useState(todo.is_completed);
   const { mutateAll, playerStats: stats } = useUnifiedData();
-  const { showTodoReward, showXpLoss, showLevelUpReward, showAchievementUnlockable, showChallengeCompletable } = useReward();
+  const {
+    showTodoReward,
+    showXpLoss,
+    showLevelUpReward,
+    showAchievementReward,
+    showChallengeReward,
+  } = useReward();
 
   useEffect(() => {
     setIsChecked(todo.is_completed);
@@ -66,7 +75,7 @@ const TodoItem = forwardRef<HTMLDivElement, TodoItemProps>(function TodoItem({ t
 
       if (response.status === 401) {
         toast.error(
-          "Deine Sitzung ist abgelaufen. Bitte melde dich erneut an."
+          "Deine Sitzung ist abgelaufen. Bitte melde dich erneut an.",
         );
         // Handle session expiration
         return;
@@ -86,32 +95,62 @@ const TodoItem = forwardRef<HTMLDivElement, TodoItemProps>(function TodoItem({ t
       const baseXp = todo.xp_value || 10;
       const baseGems = getGemReward(baseXp);
       const finalXp = Math.round(baseXp * streak_multiplier);
-      
+
       // Show reward notification
       if (checked) {
+        // 1. Todo-Reward
         showTodoReward(finalXp, baseGems, todo.title || undefined);
-        
-        // Check for level-up and show notification
+
+        // 2. Auto-claimed Challenges (separate toasts with 500ms delay)
+        if (responseData.challengesClaimed?.length > 0) {
+          responseData.challengesClaimed.forEach(
+            (challenge: any, index: number) => {
+              setTimeout(() => {
+                showChallengeReward(
+                  challenge.xp_earned,
+                  challenge.gems_earned,
+                  challenge.title,
+                );
+              }, index * 500);
+            },
+          );
+        }
+
+        // 3. Auto-unlocked Achievements (separate toasts with 500ms delay)
+        if (responseData.achievementsUnlocked?.length > 0) {
+          const challengeDelay =
+            (responseData.challengesClaimed?.length || 0) * 500;
+          responseData.achievementsUnlocked.forEach(
+            (achievement: any, index: number) => {
+              setTimeout(
+                () => {
+                  showAchievementReward(
+                    achievement.reward_gems,
+                    achievement.name,
+                  );
+                },
+                challengeDelay + index * 500,
+              );
+            },
+          );
+        }
+
+        // 4. Level-Up (if occurred)
         if (responseData.levelUp?.level_up) {
-          showLevelUpReward(responseData.levelUp.new_level);
-        }
-        
-        // Show notifications for unlockable achievements
-        if (responseData.levelUp?.unlockable_achievements?.length > 0) {
-          responseData.levelUp.unlockable_achievements.forEach((achievement: any) => {
-            showAchievementUnlockable(achievement.reward_gems, achievement.name);
-          });
-        }
-        
-        // Show notifications for completed challenges (not yet claimed)
-        if (responseData.levelUp?.completed_challenges?.length > 0) {
-          responseData.levelUp.completed_challenges.forEach((challenge: any) => {
-            showChallengeCompletable(challenge.xp_reward, challenge.gem_reward, challenge.title);
-          });
+          const totalDelay =
+            (responseData.challengesClaimed?.length || 0) * 500 +
+            (responseData.achievementsUnlocked?.length || 0) * 500;
+          setTimeout(() => {
+            showLevelUpReward(responseData.levelUp.new_level);
+          }, totalDelay);
         }
       } else {
         // Show XP loss when unchecking
-        showXpLoss(finalXp, baseGems, `"${todo.title || 'Todo'}" rückgängig gemacht`);
+        showXpLoss(
+          finalXp,
+          baseGems,
+          `"${todo.title || "Todo"}" rückgängig gemacht`,
+        );
       }
 
       // Success - removed toast notification, using reward notification instead
@@ -119,7 +158,7 @@ const TodoItem = forwardRef<HTMLDivElement, TodoItemProps>(function TodoItem({ t
       console.error("Fehler beim Aktualisieren des Todos:", error);
       setIsChecked(!checked); // Revert checkbox state
       toast.error(
-        "Fehler beim Aktualisieren des Todos. Bitte versuche es erneut."
+        "Fehler beim Aktualisieren des Todos. Bitte versuche es erneut.",
       );
     }
   };
@@ -135,7 +174,7 @@ const TodoItem = forwardRef<HTMLDivElement, TodoItemProps>(function TodoItem({ t
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(
-          errorData.error || "Fehler beim Aktualisieren der Schwierigkeit"
+          errorData.error || "Fehler beim Aktualisieren der Schwierigkeit",
         );
       }
 
@@ -155,30 +194,30 @@ const TodoItem = forwardRef<HTMLDivElement, TodoItemProps>(function TodoItem({ t
       layout
       layoutId={`todo-${todo.id}`}
       initial={{ opacity: 0, y: 20, scale: 0.95 }}
-      animate={{ 
-        opacity: 1, 
-        y: 0, 
+      animate={{
+        opacity: 1,
+        y: 0,
         scale: isChecked ? 0.98 : 1,
       }}
-      exit={{ 
-        opacity: 0, 
-        y: -20, 
+      exit={{
+        opacity: 0,
+        y: -20,
         scale: 0.95,
-        transition: { duration: 0.3 }
+        transition: { duration: 0.3 },
       }}
-      transition={{ 
-        duration: 0.4, 
+      transition={{
+        duration: 0.4,
         ease: "easeInOut",
-        layout: { duration: 0.3, ease: "easeInOut" }
+        layout: { duration: 0.3, ease: "easeInOut" },
       }}
-      whileHover={{ 
+      whileHover={{
         scale: isChecked ? 0.99 : 1.01,
-        transition: { duration: 0.2 }
+        transition: { duration: 0.2 },
       }}
       className={`relative p-4 rounded-lg ${timingColor} ${
-        isChecked 
-          ? 'opacity-75 bg-gradient-to-br from-slate-800/30 to-slate-900/30' 
-          : 'opacity-100 hover:shadow-lg hover:shadow-slate-900/20'
+        isChecked
+          ? "opacity-75 bg-gradient-to-br from-slate-800/30 to-slate-900/30"
+          : "opacity-100 hover:shadow-lg hover:shadow-slate-900/20"
       }`}
     >
       <div className="flex items-start space-x-3">
@@ -208,7 +247,7 @@ const TodoItem = forwardRef<HTMLDivElement, TodoItemProps>(function TodoItem({ t
               <Badge
                 variant="outline"
                 className={`text-xs border-purple-500/50 text-purple-300 bg-purple-900/20 transition-all duration-300 ${
-                  isChecked ? 'opacity-60 scale-95' : 'opacity-100 scale-100'
+                  isChecked ? "opacity-60 scale-95" : "opacity-100 scale-100"
                 }`}
               >
                 <Gem className="w-3 h-3 mr-1" />
@@ -218,9 +257,11 @@ const TodoItem = forwardRef<HTMLDivElement, TodoItemProps>(function TodoItem({ t
           </div>
 
           {/* Date and Controls Row */}
-          <div className={`flex items-center justify-between transition-all duration-300 ${
-            isChecked ? 'opacity-60' : 'opacity-100'
-          }`}>
+          <div
+            className={`flex items-center justify-between transition-all duration-300 ${
+              isChecked ? "opacity-60" : "opacity-100"
+            }`}
+          >
             <p className="text-xs text-slate-400 transition-colors duration-300">
               {formatTodoDate(todo.start_time, todo.end_time)}
             </p>

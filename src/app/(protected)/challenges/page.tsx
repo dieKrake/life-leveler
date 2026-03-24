@@ -1,87 +1,13 @@
 "use client";
 
-import { useSWRConfig } from "swr";
-import { useState } from "react";
-import { toast } from "sonner";
-import type { Challenge, ChallengesResponse } from "@/types";
+import type { Challenge } from "@/types";
 import { useChallenges } from "@/components/UnifiedDataProvider";
-import { useReward } from "@/components/RewardProvider";
 import { motion } from "framer-motion";
 import ChallengeSection from "@/components/ChallengeSection";
 import { Trophy } from "lucide-react";
 
 export default function ChallengesPage() {
-  const { data: challenges, error, isLoading, mutate } = useChallenges();
-
-  const { mutate: globalMutate } = useSWRConfig();
-  const [claimingId, setClaimingId] = useState<string | null>(null);
-  const { showChallengeReward, showLevelUpReward } = useReward();
-
-  const handleClaim = async (challengeId: string) => {
-    setClaimingId(challengeId);
-
-    // Optimistic update: immediately mark as claimed in local state
-    const optimisticUpdate = (currentData: ChallengesResponse | undefined) => {
-      if (!currentData) return currentData;
-
-      const updateChallenges = (challenges: Challenge[]) =>
-        challenges.map((challenge) =>
-          challenge.id === challengeId
-            ? { ...challenge, claimed: true }
-            : challenge
-        );
-
-      return {
-        daily: updateChallenges(currentData.daily || []),
-        weekly: updateChallenges(currentData.weekly || []),
-      };
-    };
-
-    // Apply optimistic update
-    mutate(optimisticUpdate(challenges), false);
-
-    try {
-      const response = await fetch("/api/claim-challenge", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userChallengeId: challengeId }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        // Revert optimistic update on error
-        mutate();
-        toast.error(data.error || "Fehler beim Einfordern der Belohnung");
-        return;
-      }
-
-      // Find the challenge for the title
-      const challenge = [
-        ...(challenges?.daily || []),
-        ...(challenges?.weekly || []),
-      ].find((c) => c.id === challengeId);
-
-      // Show reward notification
-      showChallengeReward(data.xp_earned, data.gems_earned, challenge?.title);
-
-      if (data.level_up) {
-        showLevelUpReward(data.new_level);
-      }
-
-      // Success - refresh data (same pattern as TodoItem)
-      mutate();
-      globalMutate("/api/player-stats");
-      globalMutate("/api/achievements");
-    } catch (error) {
-      console.error("Error claiming reward:", error);
-      // Revert optimistic update on error
-      mutate();
-      toast.error("Fehler beim Einfordern der Belohnung");
-    } finally {
-      setClaimingId(null);
-    }
-  };
+  const { data: challenges, error, isLoading } = useChallenges();
 
   if (isLoading) {
     return (
@@ -163,8 +89,6 @@ export default function ChallengesPage() {
             title="Tägliche Herausforderungen"
             type="daily"
             challenges={dailyChallenges}
-            onClaim={handleClaim}
-            claimingId={claimingId}
             resetTime={getResetTime(dailyChallenges)}
           />
 
@@ -172,8 +96,6 @@ export default function ChallengesPage() {
             title="Wöchentliche Herausforderungen"
             type="weekly"
             challenges={weeklyChallenges}
-            onClaim={handleClaim}
-            claimingId={claimingId}
             resetTime={getResetTime(weeklyChallenges)}
           />
         </motion.div>

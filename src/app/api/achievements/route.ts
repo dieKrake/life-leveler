@@ -15,19 +15,23 @@ export async function GET() {
   if (!user) {
     return NextResponse.json(
       { error: "Nicht authentifiziert" },
-      { status: 401 }
+      { status: 401 },
     );
   }
 
   try {
     const { data: achievements, error } = await supabase.rpc(
       "get_user_achievements_with_progress",
-      { user_id_param: user.id }
+      { user_id_param: user.id },
     );
 
     if (error) {
       console.error("Fehler beim Laden der Achievements:", error);
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      console.error("Error details:", JSON.stringify(error, null, 2));
+      return NextResponse.json(
+        { error: error.message, details: error },
+        { status: 500 },
+      );
     }
 
     return NextResponse.json(achievements);
@@ -35,7 +39,7 @@ export async function GET() {
     console.error("Unerwarteter Fehler:", error);
     return NextResponse.json(
       { error: "Interner Serverfehler" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

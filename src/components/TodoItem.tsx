@@ -14,6 +14,7 @@ import { getGemReward } from "@/lib/difficultyUtils";
 import { DifficultySelector } from "./DifficultySelector";
 import { Flame, Gem } from "lucide-react";
 import ArchiveTodoDialog from "./ArchiveTodoDialog";
+import PermanentDeleteDialog from "./PermanentDeleteDialog";
 import { toast } from "sonner";
 import { useReward } from "@/components/RewardProvider";
 import { motion } from "framer-motion";
@@ -285,8 +286,19 @@ const TodoItem = forwardRef<HTMLDivElement, TodoItemProps>(function TodoItem(
                 </div>
               )}
 
-              {/* Archive Button - for all todos */}
-              <ArchiveTodoDialog todo={todo} todos={todos} mutate={mutate} />
+              {/* Delete Button - only for incomplete todos */}
+              {!isChecked && (
+                <PermanentDeleteDialog
+                  todo={todo}
+                  todos={todos}
+                  mutate={mutate}
+                />
+              )}
+
+              {/* Archive Button - only for completed todos */}
+              {isChecked && (
+                <ArchiveTodoDialog todo={todo} todos={todos} mutate={mutate} />
+              )}
             </div>
           </div>
         </div>

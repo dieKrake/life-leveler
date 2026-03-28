@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Archive } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -24,18 +24,18 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 
-interface ArchiveTodoDialogProps {
+interface PermanentDeleteDialogProps {
   todo: Todo;
   todos: Todo[] | undefined;
   mutate: KeyedMutator<Todo[]>;
 }
 
-export default function ArchiveTodoDialog({
+export default function PermanentDeleteDialog({
   todo,
   todos,
   mutate,
-}: ArchiveTodoDialogProps) {
-  const [isArchiving, setIsArchiving] = useState(false);
+}: PermanentDeleteDialogProps) {
+  const [isDeleting, setIsDeleting] = useState(false);
   const supabase = createClientComponentClient();
   const router = useRouter();
 
@@ -44,44 +44,55 @@ export default function ArchiveTodoDialog({
     router.push("/auth");
   };
 
-  const handleArchive = async () => {
+  const handlePermanentDelete = async () => {
     if (!todos) return;
-    setIsArchiving(true);
+    setIsDeleting(true);
 
     // Optimistisches Update: Entferne das Todo sofort aus der UI
     const optimisticData = todos.filter((t) => t.id !== todo.id);
     mutate(optimisticData, false);
 
     try {
-      const response = await fetch(`/api/delete-todo/${todo.google_event_id}`, {
-        method: "DELETE",
-      });
+      // Permanent delete from database
+      const { error: deleteError } = await supabase
+        .from("todos")
+        .delete()
+        .eq("id", todo.id);
 
-      // Check for authentication errors (401 or 403)
-      if (response.status === 401 || response.status === 403) {
-        await handleTokenExpiration();
-        return;
+      if (deleteError) {
+        throw new Error("Fehler beim Löschen des Todos aus der Datenbank.");
       }
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(
-          errorData.error || "Fehler beim Archivieren des Todos.",
+      // Delete from Google if it has a google_event_id
+      if (todo.google_event_id) {
+        const response = await fetch(
+          `/api/delete-todo/${todo.google_event_id}`,
+          {
+            method: "DELETE",
+          },
         );
+
+        // Check for authentication errors (401 or 403)
+        if (response.status === 401 || response.status === 403) {
+          await handleTokenExpiration();
+          return;
+        }
+
+        if (!response.ok) {
+          console.error("Fehler beim Löschen aus Google, aber lokal gelöscht");
+        }
       }
 
-      // Re-validiere die Daten nach erfolgreichem Archivieren
+      // Re-validiere die Daten nach erfolgreichem Löschen
       mutate();
-      toast.success("Todo erfolgreich archiviert.");
+      toast.success("Todo permanent gelöscht.");
     } catch (error) {
       console.error(error);
       // Bei einem Fehler: Setze die UI auf den ursprünglichen Zustand zurück
       mutate(todos, false);
-      toast.error(
-        "Fehler beim Archivieren des Todos. Bitte versuche es erneut.",
-      );
+      toast.error("Fehler beim Löschen des Todos. Bitte versuche es erneut.");
     } finally {
-      setIsArchiving(false);
+      setIsDeleting(false);
     }
   };
 
@@ -94,26 +105,29 @@ export default function ArchiveTodoDialog({
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-8 w-8 p-0 text-slate-400 hover:text-purple-400 hover:bg-purple-500/10 transition-colors"
+                className="h-8 w-8 p-0 text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-colors"
               >
-                <Archive className="w-4 h-4" />
+                <Trash2 className="w-4 h-4" />
               </Button>
             </AlertDialogTrigger>
           </TooltipTrigger>
           <TooltipContent>
-            <p>Archivieren</p>
+            <p>Löschen</p>
           </TooltipContent>
         </Tooltip>
         <AlertDialogContent className="bg-slate-800 border-slate-700">
           <AlertDialogHeader>
             <AlertDialogTitle className="text-white">
-              Todo archivieren?
+              Todo permanent löschen?
             </AlertDialogTitle>
             <AlertDialogDescription className="text-slate-300">
-              Das Todo "{todo.title}" wird aus deiner aktiven Liste entfernt und
-              archiviert. Es bleibt für deine Statistiken und Achievements
-              erhalten, wird aber nicht mehr in der normalen Ansicht angezeigt.
-              Das Todo wird auch aus deinem Google Account gelöscht.
+              Das Todo "{todo.title}" wird{" "}
+              <span className="text-red-400 font-semibold">
+                permanent gelöscht
+              </span>
+              . Diese Aktion kann nicht rückgängig gemacht werden. Das Todo wird
+              auch aus deinen Statistiken und Achievements entfernt und aus
+              deinem Google Account gelöscht.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -121,11 +135,11 @@ export default function ArchiveTodoDialog({
               Abbrechen
             </AlertDialogCancel>
             <AlertDialogAction
-              onClick={handleArchive}
-              disabled={isArchiving}
-              className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
+              onClick={handlePermanentDelete}
+              disabled={isDeleting}
+              className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700"
             >
-              {isArchiving ? "Archiviere..." : "Archivieren"}
+              {isDeleting ? "Lösche..." : "Permanent löschen"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

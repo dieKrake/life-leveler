@@ -118,16 +118,16 @@ export default function AchievementMuseum() {
   if (isLoading) {
     return (
       <Card
-        className={`${GRADIENTS.cardBg} ${GRADIENTS.cardBorder} border backdrop-blur-sm h-full`}
+        className={`${GRADIENTS.cardBg} ${GRADIENTS.cardBorder} border backdrop-blur-sm h-full flex flex-col`}
       >
-        <CardHeader className="pb-3">
+        <CardHeader className="pb-3 flex-shrink-0">
           <CardTitle className="flex items-center gap-2 text-white text-lg">
             <Landmark className="h-5 w-5 text-purple-400" />
             Achievement Museum
           </CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="text-center text-slate-400 py-8">Lade Museum...</div>
+        <CardContent className="flex-1 flex items-center justify-center">
+          <div className="text-center text-slate-400">Lade Museum...</div>
         </CardContent>
       </Card>
     );
@@ -136,16 +136,16 @@ export default function AchievementMuseum() {
   if (!data || data.entries.length === 0) {
     return (
       <Card
-        className={`${GRADIENTS.cardBg} ${GRADIENTS.cardBorder} border backdrop-blur-sm h-full`}
+        className={`${GRADIENTS.cardBg} ${GRADIENTS.cardBorder} border backdrop-blur-sm h-full flex flex-col`}
       >
-        <CardHeader className="pb-3">
+        <CardHeader className="pb-3 flex-shrink-0">
           <CardTitle className="flex items-center gap-2 text-white text-lg">
             <Landmark className="h-5 w-5 text-purple-400" />
             Achievement Museum
           </CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="text-center py-8">
+        <CardContent className="flex-1 flex items-center justify-center">
+          <div className="text-center">
             <Trophy className="w-12 h-12 text-slate-600 mx-auto mb-3" />
             <p className="text-slate-400 text-sm">
               Noch keine Achievements erreicht
@@ -161,9 +161,9 @@ export default function AchievementMuseum() {
 
   return (
     <Card
-      className={`${GRADIENTS.cardBg} ${GRADIENTS.cardBorder} border backdrop-blur-sm h-full`}
+      className={`${GRADIENTS.cardBg} ${GRADIENTS.cardBorder} border backdrop-blur-sm h-full flex flex-col`}
     >
-      <CardHeader className="pb-3">
+      <CardHeader className="pb-3 flex-shrink-0">
         <CardTitle className="flex items-center justify-between text-white">
           <div className="flex items-center gap-2 text-lg">
             <Landmark className="h-5 w-5 text-purple-400" />
@@ -185,20 +185,22 @@ export default function AchievementMuseum() {
           </div>
         </CardTitle>
       </CardHeader>
-      <CardContent>
-        {/* Museum Grid */}
-        <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 max-h-[300px] overflow-y-auto pr-1 custom-scrollbar">
-          {data.entries.map((entry, index) => (
-            <MuseumTile
-              key={`${entry.achievement_id}-${entry.prestige_level}`}
-              entry={entry}
-              index={index}
-            />
-          ))}
+      <CardContent className="flex-1 flex flex-col min-h-0">
+        {/* Museum Grid - scrollable area */}
+        <div className="flex-1 overflow-y-auto pr-1 custom-scrollbar min-h-0">
+          <div className="grid grid-cols-3 gap-2">
+            {data.entries.map((entry, index) => (
+              <MuseumTile
+                key={`${entry.achievement_id}-${entry.prestige_level}`}
+                entry={entry}
+                index={index}
+              />
+            ))}
+          </div>
         </div>
 
-        {/* Legend */}
-        <div className="mt-4 pt-3 border-t border-slate-700/50">
+        {/* Legend - fixed at bottom */}
+        <div className="mt-4 pt-3 border-t border-slate-700/50 flex-shrink-0">
           <p className="text-[10px] text-slate-500 mb-2">Prestige-Stufen:</p>
           <div className="flex flex-wrap gap-2">
             {[0, 1, 2, 3, 4].map((p) => (

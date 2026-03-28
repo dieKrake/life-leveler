@@ -59,13 +59,13 @@ export default function ProfilePage() {
       <div className="container mx-auto max-w-6xl space-y-8">
         {/* Profile Header with ProfilePicture and Achievement Museum */}
         <motion.div
-          className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start"
+          className="grid grid-cols-1 lg:grid-cols-[60%_40%] gap-6 items-stretch min-h-[420px]"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          {/* Left: Profile Picture */}
-          <div className="flex justify-center lg:justify-end">
+          {/* Left: Profile Picture (60%) */}
+          <div className="flex items-center justify-center bg-gradient-to-br from-slate-800/50 to-slate-900/50 border border-slate-700/50 rounded-xl backdrop-blur-sm p-8">
             <ProfilePicture
               user={userData}
               level={stats.level}
@@ -81,8 +81,9 @@ export default function ProfilePage() {
             />
           </div>
 
-          {/* Right: Achievement Museum */}
+          {/* Right: Achievement Museum (40%) */}
           <motion.div
+            className="h-full"
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}

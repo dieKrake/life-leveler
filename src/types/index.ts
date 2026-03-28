@@ -134,3 +134,21 @@ export interface ChallengeCompletion {
     type: ChallengeType;
   };
 }
+
+export type AchievementHistoryEntry = {
+  id: number;
+  achievement_id: number;
+  achievement_name: string;
+  achievement_description: string;
+  achievement_icon: string;
+  achievement_category: string;
+  prestige_level: number;
+  unlocked_at: string;
+};
+
+export type AchievementMuseumData = {
+  entries: AchievementHistoryEntry[];
+  totalAchievements: number;
+  uniqueAchievements: number;
+  highestPrestige: number;
+};

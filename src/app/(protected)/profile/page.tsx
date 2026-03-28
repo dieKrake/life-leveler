@@ -3,6 +3,7 @@
 import useSWR from "swr";
 import { PlayerStats } from "@/types";
 import ProfilePicture from "@/components/ProfilePicture";
+import AchievementMuseum from "@/components/AchievementMuseum";
 import StreakSection from "@/components/StreakSection";
 import AchievementsSection from "@/components/AchievementsSection";
 import ResetAchievementsButton from "@/components/ResetAchievementsButton";
@@ -56,26 +57,38 @@ export default function ProfilePage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-6">
       <div className="container mx-auto max-w-6xl space-y-8">
-        {/* Profile Header with ProfilePicture */}
+        {/* Profile Header with ProfilePicture and Achievement Museum */}
         <motion.div
-          className="text-center space-y-6"
+          className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <ProfilePicture
-            user={userData}
-            level={stats.level}
-            xp={stats.xp}
-            totalXp={stats.total_xp}
-            xpForCurrentLevel={stats.xp_for_current_level}
-            xpForNextLevel={
-              stats.xp_for_next_level || stats.xp_for_current_level
-            }
-            gems={stats.gems}
-            streak={stats.current_streak}
-            prestige={stats.prestige || 0}
-          />
+          {/* Left: Profile Picture */}
+          <div className="flex justify-center lg:justify-end">
+            <ProfilePicture
+              user={userData}
+              level={stats.level}
+              xp={stats.xp}
+              totalXp={stats.total_xp}
+              xpForCurrentLevel={stats.xp_for_current_level}
+              xpForNextLevel={
+                stats.xp_for_next_level || stats.xp_for_current_level
+              }
+              gems={stats.gems}
+              streak={stats.current_streak}
+              prestige={stats.prestige || 0}
+            />
+          </div>
+
+          {/* Right: Achievement Museum */}
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+          >
+            <AchievementMuseum />
+          </motion.div>
         </motion.div>
 
         {/* TEMPORARY: Reset button for testing */}

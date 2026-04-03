@@ -3,11 +3,13 @@ import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { KeyedMutator } from "swr";
 import type { Todo } from "@/types";
 import { toast } from "sonner";
+import { useTranslation } from "@/hooks/useTranslation";
 
 export function useTodoOperations(mutate: KeyedMutator<Todo[]>) {
   const [isSyncing, setIsSyncing] = useState(false);
   const [isArchiving, setIsArchiving] = useState(false);
   const supabase = createClientComponentClient();
+  const { t } = useTranslation();
 
   const handleSync = async () => {
     setIsSyncing(true);
@@ -15,26 +17,22 @@ export function useTodoOperations(mutate: KeyedMutator<Todo[]>) {
       const response = await fetch("/api/sync-events", { method: "POST" });
 
       if (response.status === 401) {
-        toast.error(
-          "Deine Sitzung ist abgelaufen. Bitte melde dich erneut an."
-        );
+        toast.error(t("errors.sessionExpired"));
         await supabase.auth.signOut();
         window.location.href = "/login";
         return;
       }
 
       if (!response.ok) {
-        toast.error(
-          "Synchronisierung fehlgeschlagen. Bitte versuche es erneut."
-        );
-        throw new Error("Synchronisierung fehlgeschlagen");
+        toast.error(t("sync.syncFailed"));
+        throw new Error(t("sync.syncFailed"));
       }
 
-      toast.success("Synchronisierung erfolgreich abgeschlossen!");
+      toast.success(t("sync.syncSuccess"));
       mutate();
     } catch (err) {
-      console.error("Fehler bei der Synchronisierung:", err);
-      toast.error("Ein Fehler ist bei der Synchronisierung aufgetreten.");
+      console.error("Error during sync:", err);
+      toast.error(t("sync.syncError"));
     } finally {
       setIsSyncing(false);
     }
@@ -48,27 +46,25 @@ export function useTodoOperations(mutate: KeyedMutator<Todo[]>) {
       });
 
       if (response.status === 401) {
-        toast.error(
-          "Deine Sitzung ist abgelaufen. Bitte melde dich erneut an."
-        );
+        toast.error(t("errors.sessionExpired"));
         await supabase.auth.signOut();
         window.location.href = "/login";
         return;
       }
 
       if (!response.ok) {
-        toast.error("Archivierung fehlgeschlagen. Bitte versuche es erneut.");
-        throw new Error("Archivierung fehlgeschlagen");
+        toast.error(t("archive.archiveFailed"));
+        throw new Error(t("archive.archiveFailed"));
       }
 
       const result = await response.json();
       toast.success(
-        `${result.archivedCount} erledigte Todos erfolgreich archiviert!`
+        t("archive.archiveAllSuccess", { count: result.archivedCount }),
       );
       mutate();
     } catch (err) {
-      console.error("Fehler beim Archivieren der erledigten Todos:", err);
-      toast.error("Ein Fehler ist beim Archivieren aufgetreten.");
+      console.error("Error archiving completed todos:", err);
+      toast.error(t("archive.archiveError"));
     } finally {
       setIsArchiving(false);
     }

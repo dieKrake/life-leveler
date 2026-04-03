@@ -23,6 +23,7 @@ import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface PermanentDeleteDialogProps {
   todo: Todo;
@@ -38,6 +39,7 @@ export default function PermanentDeleteDialog({
   const [isDeleting, setIsDeleting] = useState(false);
   const supabase = createClientComponentClient();
   const router = useRouter();
+  const { t } = useTranslation();
 
   const handleTokenExpiration = async () => {
     await supabase.auth.signOut();
@@ -60,7 +62,7 @@ export default function PermanentDeleteDialog({
         .eq("id", todo.id);
 
       if (deleteError) {
-        throw new Error("Fehler beim Löschen des Todos aus der Datenbank.");
+        throw new Error(t("errors.todoDeleteError"));
       }
 
       // Delete from Google if it has a google_event_id
@@ -79,18 +81,18 @@ export default function PermanentDeleteDialog({
         }
 
         if (!response.ok) {
-          console.error("Fehler beim Löschen aus Google, aber lokal gelöscht");
+          console.error("Error deleting from Google, but deleted locally");
         }
       }
 
       // Re-validiere die Daten nach erfolgreichem Löschen
       mutate();
-      toast.success("Todo permanent gelöscht.");
+      toast.success(t("deleteTodo.deleteSuccess"));
     } catch (error) {
       console.error(error);
       // Bei einem Fehler: Setze die UI auf den ursprünglichen Zustand zurück
       mutate(todos, false);
-      toast.error("Fehler beim Löschen des Todos. Bitte versuche es erneut.");
+      toast.error(t("deleteTodo.deleteError"));
     } finally {
       setIsDeleting(false);
     }
@@ -112,34 +114,32 @@ export default function PermanentDeleteDialog({
             </AlertDialogTrigger>
           </TooltipTrigger>
           <TooltipContent>
-            <p>Löschen</p>
+            <p>{t("deleteTodo.tooltip")}</p>
           </TooltipContent>
         </Tooltip>
         <AlertDialogContent className="bg-slate-800 border-slate-700">
           <AlertDialogHeader>
             <AlertDialogTitle className="text-white">
-              Todo permanent löschen?
+              {t("deleteTodo.permanentDelete")}
             </AlertDialogTitle>
             <AlertDialogDescription className="text-slate-300">
-              Das Todo "{todo.title}" wird{" "}
-              <span className="text-red-400 font-semibold">
-                permanent gelöscht
-              </span>
-              . Diese Aktion kann nicht rückgängig gemacht werden. Das Todo wird
-              auch aus deinen Statistiken und Achievements entfernt und aus
-              deinem Google Account gelöscht.
+              {t("deleteTodo.permanentDeleteDescription", {
+                title: todo.title || "Todo",
+              })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel className="bg-slate-700 text-slate-300 hover:bg-slate-600">
-              Abbrechen
+              {t("common.cancel")}
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={handlePermanentDelete}
               disabled={isDeleting}
               className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700"
             >
-              {isDeleting ? "Lösche..." : "Permanent löschen"}
+              {isDeleting
+                ? t("deleteTodo.deleting")
+                : t("deleteTodo.deleteAction")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

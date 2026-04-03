@@ -4,16 +4,14 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { Trash2 } from "lucide-react";
+import { useTranslation } from "@/hooks/useTranslation";
 
 export default function ResetAchievementsButton() {
   const [isResetting, setIsResetting] = useState(false);
+  const { t } = useTranslation();
 
   const handleReset = async () => {
-    if (
-      !confirm(
-        "WARNUNG: Dies setzt ALLE Spielerdaten zurück (Stats, Achievements, Challenges, Todos)! Fortfahren?",
-      )
-    ) {
+    if (!confirm(t("reset.confirmWarning"))) {
       return;
     }
 
@@ -27,11 +25,15 @@ export default function ResetAchievementsButton() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || "Reset fehlgeschlagen");
+        throw new Error(data.error || t("reset.resetFailed"));
       }
 
       toast.success(
-        `Alles zurückgesetzt! ${data.achievements_deleted} Achievements, ${data.challenges_deleted} Challenges, ${data.todos_reset} Todos`,
+        t("reset.resetSuccess", {
+          achievements: data.achievements_deleted,
+          challenges: data.challenges_deleted,
+          todos: data.todos_reset,
+        }),
         { duration: 5000 },
       );
 
@@ -39,7 +41,7 @@ export default function ResetAchievementsButton() {
       setTimeout(() => window.location.reload(), 2000);
     } catch (error) {
       console.error("Reset error:", error);
-      toast.error(`Fehler beim Reset: ${error}`);
+      toast.error(t("reset.resetError", { error: String(error) }));
     } finally {
       setIsResetting(false);
     }
@@ -54,7 +56,7 @@ export default function ResetAchievementsButton() {
       className="gap-2"
     >
       <Trash2 className="w-4 h-4" />
-      {isResetting ? "Resetting..." : "Alles zurücksetzen (TEST)"}
+      {isResetting ? t("reset.resetting") : t("reset.resetAll")}
     </Button>
   );
 }

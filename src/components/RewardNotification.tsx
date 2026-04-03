@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { CheckSquare, Gem, Trophy, User, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
+import { useTranslation } from "@/hooks/useTranslation";
 
 export interface RewardData {
   xp?: number;
@@ -30,6 +31,7 @@ export default function RewardNotification({
   const [isVisible, setIsVisible] = useState(false);
   const [hasShown, setHasShown] = useState(false);
   const router = useRouter();
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (reward && !hasShown) {
@@ -72,8 +74,9 @@ export default function RewardNotification({
           color: "from-blue-500 to-cyan-500",
           bgColor: "from-blue-500/20 to-cyan-500/20",
           borderColor: "border-blue-500/30",
-          title: reward.title || "Todo erledigt!",
-          description: reward.description || "Großartige Arbeit!",
+          title: reward.title || t("rewards.todoCompletedGeneric"),
+          description:
+            reward.description || t("rewards.todoCompletedDescription"),
           clickable: false,
         };
       case "challenge":
@@ -82,9 +85,9 @@ export default function RewardNotification({
           color: "from-red-500 to-pink-500",
           bgColor: "from-red-500/20 to-pink-500/20",
           borderColor: "border-red-500/30",
-          title: reward.title || "Challenge gemeistert!",
+          title: reward.title || t("rewards.challengeCompletedGeneric"),
           description:
-            reward.description || "Herausforderung erfolgreich abgeschlossen!",
+            reward.description || t("rewards.challengeCompletedDescription"),
           clickable: reward.clickable ?? true, // Use reward's clickable property, default to true
           navigationPath: "/challenges",
         };
@@ -94,9 +97,9 @@ export default function RewardNotification({
           color: "from-green-500 to-emerald-500",
           bgColor: "from-green-500/20 to-emerald-500/20",
           borderColor: "border-green-500/30",
-          title: reward.title || "Erfolg freigeschaltet!",
+          title: reward.title || t("rewards.achievementUnlockedGeneric"),
           description:
-            reward.description || "Du hast einen neuen Meilenstein erreicht!",
+            reward.description || t("rewards.achievementUnlockedDescription"),
           clickable: reward.clickable ?? true, // Use reward's clickable property, default to true
           navigationPath: "/profile",
         };
@@ -106,8 +109,9 @@ export default function RewardNotification({
           color: "from-emerald-500 to-teal-500",
           bgColor: "from-emerald-500/20 to-teal-500/20",
           borderColor: "border-emerald-500/30",
-          title: reward.title || "Level Up!",
-          description: reward.description || "Du bist aufgestiegen!",
+          title: reward.title || t("rewards.levelUp"),
+          description:
+            reward.description || t("rewards.levelReachedDescription"),
           clickable: false,
         };
       default:
@@ -116,8 +120,8 @@ export default function RewardNotification({
           color: "from-blue-500 to-cyan-500",
           bgColor: "from-blue-500/20 to-cyan-500/20",
           borderColor: "border-blue-500/30",
-          title: "Belohnung erhalten!",
-          description: "Gut gemacht!",
+          title: t("rewards.rewardReceived"),
+          description: t("rewards.wellDone"),
           clickable: false,
         };
     }
@@ -161,7 +165,8 @@ export default function RewardNotification({
               `bg-gradient-to-br ${config.bgColor}`,
               config.borderColor,
               "w-full",
-              config.clickable && "cursor-pointer hover:scale-105 transition-transform duration-200"
+              config.clickable &&
+                "cursor-pointer hover:scale-105 transition-transform duration-200",
             )}
             onClick={handleClick}
           >
@@ -183,7 +188,7 @@ export default function RewardNotification({
                   className={cn(
                     "flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center",
                     `bg-gradient-to-br ${config.color}`,
-                    "shadow-lg"
+                    "shadow-lg",
                   )}
                 >
                   <IconComponent className="w-6 h-6 text-white" />
@@ -208,7 +213,7 @@ export default function RewardNotification({
                     {config.description}
                     {config.clickable && (
                       <span className="block text-xs text-slate-400 mt-1">
-                        Klicken zum Öffnen
+                        {t("rewards.clickToOpen")}
                       </span>
                     )}
                   </motion.p>
@@ -266,7 +271,7 @@ export default function RewardNotification({
               transition={{ duration: 4, ease: "linear" }}
               className={cn(
                 "absolute bottom-0 left-0 h-1 origin-left",
-                `bg-gradient-to-r ${config.color}`
+                `bg-gradient-to-r ${config.color}`,
               )}
               style={{ width: "100%" }}
             />

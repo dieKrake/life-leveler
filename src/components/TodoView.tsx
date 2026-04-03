@@ -9,9 +9,11 @@ import TodoSection from "./TodoSection";
 import ArchiveAllDialog from "./ArchiveAllDialog";
 import { useTodoOperations } from "@/hooks/useTodoOperations";
 import { motion } from "framer-motion";
+import { useTranslation } from "@/hooks/useTranslation";
 
 export default function TodoView() {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const { t } = useTranslation();
 
   const { data: todos, error, isLoading, mutate } = useTodos();
 
@@ -20,19 +22,21 @@ export default function TodoView() {
 
   const incompleteTodos = useMemo(
     () => todos?.filter((todo) => !todo.is_completed) || [],
-    [todos]
+    [todos],
   );
 
   const completedTodos = useMemo(
     () => todos?.filter((todo) => todo.is_completed) || [],
-    [todos]
+    [todos],
   );
 
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-6">
         <div className="container mx-auto max-w-6xl">
-          <div className="text-center text-white">Lade Todos...</div>
+          <div className="text-center text-white">
+            {t("todos.loadingTodos")}
+          </div>
         </div>
       </div>
     );
@@ -43,7 +47,7 @@ export default function TodoView() {
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-6">
         <div className="container mx-auto max-w-6xl">
           <div className="text-center text-red-400">
-            Fehler: {error.message}
+            {t("common.errorMessage", { message: error.message })}
           </div>
         </div>
       </div>
@@ -84,13 +88,13 @@ export default function TodoView() {
             transition={{ duration: 0.5, delay: 0.3 }}
           >
             <TodoSection
-              title="Offene Aufgaben"
+              title={t("todos.openTasks")}
               icon="clock"
               iconColor="text-blue-400"
               todos={incompleteTodos}
               allTodos={todos}
               mutate={mutate}
-              emptyMessage="Super! Keine offenen Aufgaben."
+              emptyMessage={t("todos.noOpenTasks")}
               emptyIcon={
                 <CheckSquare className="h-12 w-12 text-slate-600 mx-auto mb-3" />
               }
@@ -103,13 +107,13 @@ export default function TodoView() {
             transition={{ duration: 0.5, delay: 0.4 }}
           >
             <TodoSection
-              title="Erledigte Aufgaben"
+              title={t("todos.completedTasks")}
               icon="checkSquare"
               iconColor="text-green-400"
               todos={completedTodos}
               allTodos={todos}
               mutate={mutate}
-              emptyMessage="Noch keine Aufgaben erledigt."
+              emptyMessage={t("todos.noCompletedTasks")}
               emptyIcon={
                 <Clock className="h-12 w-12 text-slate-600 mx-auto mb-3" />
               }

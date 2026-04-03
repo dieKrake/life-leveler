@@ -11,6 +11,7 @@ import {
 import AddTodoForm from "./AddTodoForm";
 import type { Todo } from "@/types";
 import { KeyedMutator } from "swr";
+import { useTranslation } from "@/hooks/useTranslation";
 
 type AddTodoSheetProps = {
   open: boolean;
@@ -25,6 +26,8 @@ export default function AddTodoSheet({
   todos,
   mutate,
 }: AddTodoSheetProps) {
+  const { t } = useTranslation();
+
   const handleSuccess = (newTodo: Todo) => {
     // Optimistisches Update: Füge das neue Todo sofort zur Liste hinzu
     // und sortiere die Liste nach start_time
@@ -46,11 +49,10 @@ export default function AddTodoSheet({
       <SheetContent className="bg-gradient-to-br from-slate-900 via-purple-900/20 to-slate-900 border-slate-700/50 backdrop-blur-sm">
         <SheetHeader className="space-y-3 pb-6">
           <SheetTitle className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-            Neues Todo erstellen
+            {t("addTodoForm.createNewTodo")}
           </SheetTitle>
           <SheetDescription className="text-slate-300 text-base">
-            Fülle die Details aus. Dein neuer Eintrag wird direkt mit Google
-            synchronisiert und bringt dir XP für dein Level-System.
+            {t("addTodoForm.createDescription")}
           </SheetDescription>
         </SheetHeader>
         <div className="py-4">

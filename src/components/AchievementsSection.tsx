@@ -4,9 +4,11 @@ import { motion } from "framer-motion";
 import { useAchievements } from "@/components/UnifiedDataProvider";
 import AchievementCard from "@/components/achievements/AchievementCard";
 import { GRADIENTS } from "@/lib/constants";
+import { useTranslation } from "@/hooks/useTranslation";
 
 export default function AchievementsSection() {
   const { data: achievements, isLoading } = useAchievements();
+  const { t } = useTranslation();
 
   if (isLoading) {
     return (
@@ -16,11 +18,13 @@ export default function AchievementsSection() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-white">
             <Target className="h-5 w-5 text-purple-400" />
-            Erfolge
+            {t("achievements.achievements")}
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-center text-slate-400">Lade Erfolge...</div>
+          <div className="text-center text-slate-400">
+            {t("achievements.loadingAchievements")}
+          </div>
         </CardContent>
       </Card>
     );
@@ -34,12 +38,12 @@ export default function AchievementsSection() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-white">
             <Target className="h-5 w-5 text-purple-400" />
-            Erfolge
+            {t("achievements.achievements")}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="text-center text-slate-400">
-            Keine Erfolge verfügbar
+            {t("achievements.noAchievements")}
           </div>
         </CardContent>
       </Card>
@@ -58,7 +62,7 @@ export default function AchievementsSection() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-white">
             <Target className="h-5 w-5 text-purple-400" />
-            Erfolge
+            {t("achievements.achievements")}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -94,7 +98,9 @@ export default function AchievementsSection() {
                 <div className="text-2xl font-bold text-purple-400">
                   {achievements.filter((a) => a.is_unlocked).length}
                 </div>
-                <p className="text-xs text-slate-400">Erreicht</p>
+                <p className="text-xs text-slate-400">
+                  {t("achievements.achieved")}
+                </p>
               </motion.div>
               <motion.div
                 initial={{ opacity: 0, scale: 0.8 }}
@@ -107,7 +113,9 @@ export default function AchievementsSection() {
                 <div className="text-2xl font-bold text-white">
                   {achievements.length}
                 </div>
-                <p className="text-xs text-slate-400">Gesamt</p>
+                <p className="text-xs text-slate-400">
+                  {t("achievements.total")}
+                </p>
               </motion.div>
               <motion.div
                 initial={{ opacity: 0, scale: 0.8 }}
@@ -122,7 +130,9 @@ export default function AchievementsSection() {
                     .filter((a) => a.is_unlocked)
                     .reduce((sum, a) => sum + a.reward_gems, 0)}
                 </div>
-                <p className="text-xs text-slate-400">Edelsteine erhalten</p>
+                <p className="text-xs text-slate-400">
+                  {t("achievements.gemsEarned")}
+                </p>
               </motion.div>
               <motion.div
                 initial={{ opacity: 0, scale: 0.8 }}
@@ -140,7 +150,9 @@ export default function AchievementsSection() {
                   )}
                   %
                 </div>
-                <p className="text-xs text-slate-400">Abgeschlossen</p>
+                <p className="text-xs text-slate-400">
+                  {t("achievements.percentCompleted")}
+                </p>
               </motion.div>
             </div>
           </motion.div>

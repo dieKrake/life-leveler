@@ -21,6 +21,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
+import { useTranslation } from "@/hooks/useTranslation";
 
 type DeleteTodoButtonProps = {
   todo: Todo;
@@ -36,6 +37,7 @@ export default function DeleteTodoButton({
   const [isArchiving, setIsArchiving] = useState(false);
   const supabase = createClientComponentClient();
   const router = useRouter();
+  const { t } = useTranslation();
 
   const handleTokenExpiration = async () => {
     await supabase.auth.signOut();
@@ -58,25 +60,21 @@ export default function DeleteTodoButton({
       // Check for authentication errors (401 or 403)
       if (response.status === 401 || response.status === 403) {
         await handleTokenExpiration();
-        toast.error(
-          "Deine Sitzung ist abgelaufen. Bitte melde dich erneut an."
-        );
+        toast.error(t("errors.sessionExpired"));
         return;
       }
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(
-          errorData.error || "Fehler beim Archivieren des Todos."
-        );
+        throw new Error(errorData.error || t("errors.todoArchiveError"));
       }
 
       // Re-validiere die Daten nach erfolgreichem Archivieren
       mutate();
-      toast.success("Todo erfolgreich archiviert!");
+      toast.success(t("archive.archiveSuccess"));
     } catch (error) {
       console.error(error);
-      toast.error("Ein unerwarteter Fehler ist aufgetreten.");
+      toast.error(t("errors.unexpectedError"));
       // Bei einem Fehler: Setze die UI auf den ursprünglichen Zustand zurück
       mutate(todos, false);
     } finally {
@@ -93,18 +91,15 @@ export default function DeleteTodoButton({
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Todo archivieren?</AlertDialogTitle>
+          <AlertDialogTitle>{t("archive.archiveTodo")}</AlertDialogTitle>
           <AlertDialogDescription>
-            Das Todo wird aus deiner aktiven Liste entfernt und archiviert. Es
-            bleibt für deine Statistiken und Achievements erhalten, wird aber
-            nicht mehr in der normalen Ansicht angezeigt. Das Todo wird auch aus
-            deinem Google Account gelöscht.
+            {t("archive.archiveTodoDescription", { title: todo.title || "" })}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Abbrechen</AlertDialogCancel>
+          <AlertDialogCancel>{t("common.cancel")}</AlertDialogCancel>
           <AlertDialogAction onClick={handleArchive} disabled={isArchiving}>
-            {isArchiving ? "Archiviere..." : "Archivieren"}
+            {isArchiving ? t("archive.archiving") : t("archive.archive")}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

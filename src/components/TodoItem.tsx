@@ -18,6 +18,7 @@ import PermanentDeleteDialog from "./PermanentDeleteDialog";
 import { toast } from "sonner";
 import { useReward } from "@/components/RewardProvider";
 import { motion } from "framer-motion";
+import { useTranslation } from "@/hooks/useTranslation";
 
 type TodoItemProps = {
   todo: Todo;
@@ -32,6 +33,7 @@ const TodoItem = forwardRef<HTMLDivElement, TodoItemProps>(function TodoItem(
   const supabase = createClientComponentClient();
   const [isChecked, setIsChecked] = useState(todo.is_completed);
   const { mutateAll, playerStats: stats } = useUnifiedData();
+  const { t } = useTranslation();
   const {
     showTodoReward,
     showXpLoss,
@@ -47,7 +49,7 @@ const TodoItem = forwardRef<HTMLDivElement, TodoItemProps>(function TodoItem(
   if (!stats) {
     return (
       <div className="w-full bg-gradient-to-br from-slate-800/50 to-slate-900/50 border border-slate-700/50 rounded-lg p-3">
-        <div className="text-slate-400">Lade Stats...</div>
+        <div className="text-slate-400">{t("playerStats.loadingStats")}</div>
       </div>
     );
   }
@@ -75,15 +77,13 @@ const TodoItem = forwardRef<HTMLDivElement, TodoItemProps>(function TodoItem(
       });
 
       if (response.status === 401) {
-        toast.error(
-          "Deine Sitzung ist abgelaufen. Bitte melde dich erneut an.",
-        );
+        toast.error(t("errors.sessionExpired"));
         // Handle session expiration
         return;
       }
 
       if (!response.ok) {
-        throw new Error("Fehler beim Aktualisieren des Todos");
+        throw new Error(t("errors.todoUpdateError"));
       }
 
       const responseData = await response.json();
@@ -153,17 +153,15 @@ const TodoItem = forwardRef<HTMLDivElement, TodoItemProps>(function TodoItem(
         showXpLoss(
           finalXp,
           baseGems,
-          `"${todo.title || "Todo"}" rückgängig gemacht`,
+          t("rewards.todoUndoneTitle", { title: todo.title || "Todo" }),
         );
       }
 
       // Success - removed toast notification, using reward notification instead
     } catch (error) {
-      console.error("Fehler beim Aktualisieren des Todos:", error);
+      console.error("Error updating todo:", error);
       setIsChecked(!checked); // Revert checkbox state
-      toast.error(
-        "Fehler beim Aktualisieren des Todos. Bitte versuche es erneut.",
-      );
+      toast.error(t("errors.todoUpdateError"));
     }
   };
 
@@ -177,14 +175,12 @@ const TodoItem = forwardRef<HTMLDivElement, TodoItemProps>(function TodoItem(
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(
-          errorData.error || "Fehler beim Aktualisieren der Schwierigkeit",
-        );
+        throw new Error(errorData.error || t("errors.difficultyUpdateError"));
       }
 
       mutate(); // Aktualisiere die Todo-Liste
     } catch (error) {
-      console.error("Fehler beim Ändern der Schwierigkeit:", error);
+      console.error("Error changing difficulty:", error);
       throw error;
     }
   };

@@ -1,14 +1,18 @@
+"use client";
+
 import { PlayerStats } from "@/types";
 import { Progress } from "@/components/ui/progress";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Gem, Trophy, TrendingUp } from "lucide-react";
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface StatsCardsProps {
   stats: PlayerStats;
 }
 
 export default function StatsCards({ stats }: StatsCardsProps) {
+  const { t } = useTranslation();
   const { level, xp, xp_for_current_level, xp_for_next_level, gems } = stats;
 
   const isMaxLevel = xp_for_next_level === null;
@@ -28,16 +32,20 @@ export default function StatsCards({ stats }: StatsCardsProps) {
       {/* Level Card */}
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Level</CardTitle>
+          <CardTitle className="text-sm font-medium">
+            {t("common.level")}
+          </CardTitle>
           <Trophy className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">Level {level}</div>
+          <div className="text-2xl font-bold">
+            {t("common.level")} {level}
+          </div>
           <div className="space-y-2 mt-4">
             {!isMaxLevel ? (
               <>
                 <div className="flex justify-between text-xs">
-                  <span>Fortschritt</span>
+                  <span>{t("profile.levelProgress")}</span>
                   <span>
                     {xpEarnedInLevel} / {totalXpForLevel} XP
                   </span>
@@ -45,7 +53,7 @@ export default function StatsCards({ stats }: StatsCardsProps) {
                 <Progress value={progressPercentage} className="h-2" />
               </>
             ) : (
-              <Badge variant="secondary">Max Level erreicht!</Badge>
+              <Badge variant="secondary">{t("profile.maxLevelReached")}</Badge>
             )}
           </div>
         </CardContent>
@@ -55,14 +63,14 @@ export default function StatsCards({ stats }: StatsCardsProps) {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">
-            Erfahrungspunkte
+            {t("profile.xpPoints")}
           </CardTitle>
           <TrendingUp className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">{xp.toLocaleString()} XP</div>
           <p className="text-xs text-muted-foreground mt-1">
-            Gesamt gesammelte Erfahrung
+            {t("profile.totalXpCollected")}
           </p>
         </CardContent>
       </Card>
@@ -70,13 +78,15 @@ export default function StatsCards({ stats }: StatsCardsProps) {
       {/* Gems Card */}
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Edelsteine</CardTitle>
+          <CardTitle className="text-sm font-medium">
+            {t("common.gems")}
+          </CardTitle>
           <Gem className="h-4 w-4 text-blue-500" />
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold text-blue-500">{gems}</div>
           <p className="text-xs text-muted-foreground mt-1">
-            Verfügbare Edelsteine
+            {t("profile.availableGems")}
           </p>
         </CardContent>
       </Card>

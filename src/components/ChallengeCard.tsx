@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Calendar, Clock, Zap, CheckCircle2, Gem } from "lucide-react";
 import type { Challenge } from "@/types";
 import { motion } from "framer-motion";
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface ChallengeCardProps {
   challenge: Challenge;
@@ -12,6 +13,7 @@ interface ChallengeCardProps {
 
 const ChallengeCard = forwardRef<HTMLDivElement, ChallengeCardProps>(
   ({ challenge, type, index }, ref) => {
+    const { t } = useTranslation();
     const progressPercentage = (challenge.progress / challenge.target) * 100;
 
     return (
@@ -106,7 +108,7 @@ const ChallengeCard = forwardRef<HTMLDivElement, ChallengeCardProps>(
               animate={{ opacity: 1 }}
               transition={{ duration: 0.3, delay: index * 0.1 + 0.5 }}
             >
-              <span className="text-slate-300">Fortschritt</span>
+              <span className="text-slate-300">{t("challenges.progress")}</span>
               <span className="font-medium text-white">
                 {challenge.progress}/{challenge.target}
               </span>
@@ -162,9 +164,9 @@ const ChallengeCard = forwardRef<HTMLDivElement, ChallengeCardProps>(
                 }`}
               >
                 {challenge.claimed
-                  ? "✓ Eingefordert"
+                  ? `✓ ${t("challenges.claimed")}`
                   : challenge.completed
-                    ? "Abgeschlossen"
+                    ? t("challenges.completed")
                     : challenge.time_left}
               </Badge>
             </motion.div>

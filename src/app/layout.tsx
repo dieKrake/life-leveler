@@ -8,6 +8,7 @@ import Navbar from "@/components/Navbar";
 import { cookies } from "next/headers";
 import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
 import { Toaster } from "sonner";
+import LanguageProvider from "@/lib/LanguageProvider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -33,34 +34,36 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.className} antialiased`}>
-        <SWRProvider>
-          <RewardProvider>
-            {session ? (
-              <UnifiedDataProvider>
-                <Navbar />
-                {children}
-              </UnifiedDataProvider>
-            ) : (
-              <>
-                <Navbar />
-                {children}
-              </>
-            )}
-            <Toaster 
-              position="bottom-center" 
-              theme="dark"
-              toastOptions={{
-                style: {
-                  background: 'rgb(30 41 59)', // slate-800
-                  border: '1px solid rgb(51 65 85)', // slate-700
-                  color: 'rgb(226 232 240)', // slate-200
-                },
-                className: 'font-medium',
-              }}
-              closeButton 
-            />
-          </RewardProvider>
-        </SWRProvider>
+        <LanguageProvider>
+          <SWRProvider>
+            <RewardProvider>
+              {session ? (
+                <UnifiedDataProvider>
+                  <Navbar />
+                  {children}
+                </UnifiedDataProvider>
+              ) : (
+                <>
+                  <Navbar />
+                  {children}
+                </>
+              )}
+              <Toaster
+                position="bottom-center"
+                theme="dark"
+                toastOptions={{
+                  style: {
+                    background: "rgb(30 41 59)", // slate-800
+                    border: "1px solid rgb(51 65 85)", // slate-700
+                    color: "rgb(226 232 240)", // slate-200
+                  },
+                  className: "font-medium",
+                }}
+                closeButton
+              />
+            </RewardProvider>
+          </SWRProvider>
+        </LanguageProvider>
       </body>
     </html>
   );

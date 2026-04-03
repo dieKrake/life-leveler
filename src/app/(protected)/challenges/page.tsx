@@ -5,16 +5,18 @@ import { useChallenges } from "@/components/UnifiedDataProvider";
 import { motion } from "framer-motion";
 import ChallengeSection from "@/components/ChallengeSection";
 import { Trophy } from "lucide-react";
+import { useTranslation } from "@/hooks/useTranslation";
 
 export default function ChallengesPage() {
   const { data: challenges, error, isLoading } = useChallenges();
+  const { t } = useTranslation();
 
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-6">
         <div className="container mx-auto max-w-6xl">
           <div className="text-center text-white">
-            Lade Herausforderungen...
+            {t("challenges.loadingChallenges")}
           </div>
         </div>
       </div>
@@ -26,7 +28,7 @@ export default function ChallengesPage() {
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-6">
         <div className="container mx-auto max-w-6xl">
           <div className="text-center text-red-400">
-            Fehler: {error.message}
+            {t("common.errorMessage", { message: error.message })}
           </div>
         </div>
       </div>
@@ -45,7 +47,7 @@ export default function ChallengesPage() {
     const now = new Date();
     const diff = expiresAt.getTime() - now.getTime();
 
-    if (diff <= 0) return "Abgelaufen";
+    if (diff <= 0) return t("challenges.expired");
 
     const days = Math.floor(diff / (1000 * 60 * 60 * 24));
     const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
@@ -71,11 +73,12 @@ export default function ChallengesPage() {
         >
           <div className="flex items-center justify-center gap-3 mb-4">
             <Trophy className="w-8 h-8 text-purple-400" />
-            <h1 className="text-4xl font-bold text-white">Herausforderungen</h1>
+            <h1 className="text-4xl font-bold text-white">
+              {t("challenges.challenges")}
+            </h1>
           </div>
           <p className="text-slate-300 text-lg">
-            Stelle dich täglichen und wöchentlichen Herausforderungen und
-            verdiene zusätzliche Belohnungen!
+            {t("challenges.challengesDescription")}
           </p>
         </motion.div>
 
@@ -86,14 +89,14 @@ export default function ChallengesPage() {
           transition={{ duration: 0.5, delay: 0.2 }}
         >
           <ChallengeSection
-            title="Tägliche Herausforderungen"
+            title={t("challenges.dailyChallenges")}
             type="daily"
             challenges={dailyChallenges}
             resetTime={getResetTime(dailyChallenges)}
           />
 
           <ChallengeSection
-            title="Wöchentliche Herausforderungen"
+            title={t("challenges.weeklyChallenges")}
             type="weekly"
             challenges={weeklyChallenges}
             resetTime={getResetTime(weeklyChallenges)}

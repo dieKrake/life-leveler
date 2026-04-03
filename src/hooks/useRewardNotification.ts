@@ -1,5 +1,6 @@
 import { useState, useCallback } from "react";
 import { RewardData } from "@/components/RewardNotification";
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface RewardWithId extends RewardData {
   id: string;
@@ -7,6 +8,7 @@ interface RewardWithId extends RewardData {
 
 export function useRewardNotification() {
   const [rewards, setRewards] = useState<RewardWithId[]>([]);
+  const { t } = useTranslation();
 
   const showReward = useCallback((reward: RewardData) => {
     const rewardWithId: RewardWithId = {
@@ -27,11 +29,13 @@ export function useRewardNotification() {
         type: "todo",
         xp,
         gems,
-        title: todoTitle ? `"${todoTitle}" erledigt!` : "Todo erledigt!",
-        description: "Großartige Arbeit! Du kommst deinen Zielen näher.",
+        title: todoTitle
+          ? t("rewards.todoCompleted", { title: todoTitle })
+          : t("rewards.todoCompletedGeneric"),
+        description: t("rewards.todoCompletedDescription"),
       });
     },
-    [showReward]
+    [showReward],
   );
 
   const showChallengeReward = useCallback(
@@ -41,14 +45,13 @@ export function useRewardNotification() {
         xp,
         gems,
         title: challengeTitle
-          ? `"${challengeTitle}" gemeistert!`
-          : "Challenge gemeistert!",
-        description:
-          "Herausforderung erfolgreich abgeschlossen! Du bist unstoppbar!",
+          ? t("rewards.challengeCompleted", { title: challengeTitle })
+          : t("rewards.challengeCompletedGeneric"),
+        description: t("rewards.challengeCompletedDescription"),
         clickable: false, // This is a claim notification - don't make it clickable
       });
     },
-    [showReward]
+    [showReward],
   );
 
   const showAchievementReward = useCallback(
@@ -57,13 +60,13 @@ export function useRewardNotification() {
         type: "achievement",
         gems,
         title: achievementTitle
-          ? `"${achievementTitle}" freigeschaltet!`
-          : "Erfolg freigeschaltet!",
-        description: "Du hast einen neuen Meilenstein erreicht! Fantastisch!",
+          ? t("rewards.achievementUnlocked", { title: achievementTitle })
+          : t("rewards.achievementUnlockedGeneric"),
+        description: t("rewards.achievementUnlockedDescription"),
         clickable: false, // This is a claim notification - don't make it clickable
       });
     },
-    [showReward]
+    [showReward],
   );
 
   const showLevelUpReward = useCallback(
@@ -71,11 +74,11 @@ export function useRewardNotification() {
       showReward({
         type: "level_up",
         gems: bonusGems,
-        title: `Level ${newLevel} erreicht!`,
-        description: "Herzlichen Glückwunsch! Du wirst immer stärker!",
+        title: t("rewards.levelReached", { level: newLevel }),
+        description: t("rewards.levelReachedDescription"),
       });
     },
-    [showReward]
+    [showReward],
   );
 
   const showXpLoss = useCallback(
@@ -84,11 +87,11 @@ export function useRewardNotification() {
         type: "todo",
         xp: -Math.abs(xp), // Ensure negative
         gems: -Math.abs(gems), // Ensure negative
-        title: reason || "Todo rückgängig gemacht",
-        description: "Kein Problem! Du schaffst das beim nächsten Mal!",
+        title: reason || t("rewards.todoUndone"),
+        description: t("rewards.todoUndoneDescription"),
       });
     },
-    [showReward]
+    [showReward],
   );
 
   const showPrestigeReward = useCallback(
@@ -96,11 +99,11 @@ export function useRewardNotification() {
       showReward({
         type: "level_up",
         gems: bonusGems,
-        title: `Prestige ${prestigeLevel} erreicht!`,
-        description: "Unglaublich! Du hast einen neuen Prestige-Level erreicht!",
+        title: t("rewards.prestigeReached", { level: prestigeLevel }),
+        description: t("rewards.prestigeReachedDescription"),
       });
     },
-    [showReward]
+    [showReward],
   );
 
   const showAchievementUnlockable = useCallback(
@@ -110,13 +113,13 @@ export function useRewardNotification() {
         // Don't show gems for "unlockable" notification - only show when actually claimed
         gems: undefined,
         title: achievementTitle
-          ? `"${achievementTitle}" kann freigeschaltet werden!`
-          : "Erfolg kann freigeschaltet werden!",
-        description: "Gehe zur Erfolge-Seite, um deine Belohnung abzuholen!",
+          ? t("rewards.achievementUnlockable", { title: achievementTitle })
+          : t("rewards.achievementUnlockableGeneric"),
+        description: t("rewards.achievementUnlockableDescription"),
         clickable: true, // This is an "unlockable" notification - make it clickable
       });
     },
-    [showReward]
+    [showReward],
   );
 
   const showChallengeCompletable = useCallback(
@@ -127,13 +130,13 @@ export function useRewardNotification() {
         xp: undefined,
         gems: undefined,
         title: challengeTitle
-          ? `"${challengeTitle}" abgeschlossen!`
-          : "Challenge abgeschlossen!",
-        description: "Gehe zur Herausforderungen-Seite, um deine Belohnung einzufordern!",
+          ? t("rewards.challengeCompletable", { title: challengeTitle })
+          : t("rewards.challengeCompletableGeneric"),
+        description: t("rewards.challengeCompletableDescription"),
         clickable: true, // This is a "completable" notification - make it clickable
       });
     },
-    [showReward]
+    [showReward],
   );
 
   return {

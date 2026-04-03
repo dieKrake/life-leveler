@@ -3,6 +3,7 @@ import { Calendar, Clock } from "lucide-react";
 import ChallengeCard from "@/components/ChallengeCard";
 import type { Challenge } from "@/types";
 import { AnimatePresence, motion } from "framer-motion";
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface ChallengeSectionProps {
   title: string;
@@ -17,6 +18,7 @@ export default function ChallengeSection({
   challenges,
   resetTime,
 }: ChallengeSectionProps) {
+  const { t } = useTranslation();
   const IconComponent = type === "daily" ? Clock : Calendar;
   const iconColor = type === "daily" ? "text-blue-400" : "text-purple-400";
   const badgeColor =
@@ -45,7 +47,7 @@ export default function ChallengeSection({
           transition={{ duration: 0.3, delay: type === "daily" ? 0.4 : 0.6 }}
         >
           <Badge variant="outline" className={`ml-2 ${badgeColor}`}>
-            Erneuert in {resetTime}
+            {t("challenges.renewsIn", { time: resetTime })}
           </Badge>
         </motion.div>
       </motion.div>
@@ -84,8 +86,9 @@ export default function ChallengeSection({
                 delay: type === "daily" ? 0.6 : 0.8,
               }}
             >
-              Keine {type === "daily" ? "täglichen" : "wöchentlichen"}{" "}
-              Herausforderungen verfügbar
+              {type === "daily"
+                ? t("challenges.noDailyChallenges")
+                : t("challenges.noWeeklyChallenges")}
             </motion.div>
           )}
         </div>

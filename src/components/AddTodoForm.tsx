@@ -37,6 +37,7 @@ import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { toast } from "sonner";
+import { useTranslation } from "@/hooks/useTranslation";
 
 // Generate 15-minute intervals for time selection
 const generateTimeOptions = () => {
@@ -79,6 +80,7 @@ type AddTodoFormProps = {
 export default function AddTodoForm({ onSuccess }: AddTodoFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const supabase = createClientComponentClient();
+  const { t } = useTranslation();
 
   // Load favorite type from localStorage immediately (not in useEffect)
   const getInitialType = () => {
@@ -112,7 +114,7 @@ export default function AddTodoForm({ onSuccess }: AddTodoFormProps) {
   };
 
   const [favoriteType, setFavoriteType] = useState<"event" | "task">(
-    getInitialType
+    getInitialType,
   );
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -135,7 +137,9 @@ export default function AddTodoForm({ onSuccess }: AddTodoFormProps) {
     setFavoriteType(type);
     localStorage.setItem("todo-favorite-type", type);
     toast.success(
-      `"${type === "event" ? "Termin" : "Aufgabe"}" als Favorit gespeichert!`
+      t("addTodoForm.favoriteSaved", {
+        type: type === "event" ? t("addTodoForm.event") : t("addTodoForm.task"),
+      }),
     );
   };
 
@@ -160,7 +164,7 @@ export default function AddTodoForm({ onSuccess }: AddTodoFormProps) {
 
   const handleTimeChange = (
     timeString: string,
-    currentDate: Date | undefined
+    currentDate: Date | undefined,
   ) => {
     if (!currentDate) return new Date();
 
@@ -186,28 +190,24 @@ export default function AddTodoForm({ onSuccess }: AddTodoFormProps) {
       });
 
       if (response.status === 401) {
-        toast.error(
-          "Deine Sitzung ist abgelaufen. Bitte melde dich erneut an."
-        );
+        toast.error(t("errors.sessionExpired"));
         await supabase.auth.signOut();
         window.location.href = "/login";
         return;
       }
 
       if (!response.ok) {
-        toast.error(
-          "Fehler beim Erstellen des Todos. Bitte versuche es erneut."
-        );
-        throw new Error("Fehler beim Erstellen des Todos");
+        toast.error(t("errors.todoCreateError"));
+        throw new Error(t("errors.todoCreateError"));
       }
 
       const newTodo: Todo = await response.json();
       onSuccess(newTodo);
       form.reset();
-      toast.success("Todo erfolgreich erstellt!");
+      toast.success(t("success.todoCreated"));
     } catch (error) {
-      console.error("Fehler beim Erstellen des Todos:", error);
-      toast.error("Ein unerwarteter Fehler ist aufgetreten.");
+      console.error("Error creating todo:", error);
+      toast.error(t("errors.unexpectedError"));
     } finally {
       setIsSubmitting(false);
     }
@@ -222,7 +222,7 @@ export default function AddTodoForm({ onSuccess }: AddTodoFormProps) {
           render={({ field }) => (
             <FormItem className="space-y-4">
               <FormLabel className="text-slate-200 font-semibold">
-                Typ
+                {t("addTodoForm.type")}
               </FormLabel>
               <FormControl>
                 <RadioGroup
@@ -240,7 +240,7 @@ export default function AddTodoForm({ onSuccess }: AddTodoFormProps) {
                       htmlFor="type-event"
                       className="font-normal text-slate-300 cursor-pointer"
                     >
-                      Termin
+                      {t("addTodoForm.event")}
                     </Label>
                     <button
                       type="button"
@@ -252,16 +252,16 @@ export default function AddTodoForm({ onSuccess }: AddTodoFormProps) {
                         "ml-1 transition-opacity",
                         favoriteType === "event"
                           ? "opacity-100"
-                          : "opacity-0 group-hover:opacity-100"
+                          : "opacity-0 group-hover:opacity-100",
                       )}
-                      title="Als Favorit markieren"
+                      title={t("addTodoForm.markAsFavorite")}
                     >
                       <Bookmark
                         className={cn(
                           "w-4 h-4 transition-all",
                           favoriteType === "event"
                             ? "fill-blue-400 text-blue-400"
-                            : "text-slate-400 hover:text-blue-400"
+                            : "text-slate-400 hover:text-blue-400",
                         )}
                       />
                     </button>
@@ -276,7 +276,7 @@ export default function AddTodoForm({ onSuccess }: AddTodoFormProps) {
                       htmlFor="type-task"
                       className="font-normal text-slate-300 cursor-pointer"
                     >
-                      Aufgabe
+                      {t("addTodoForm.task")}
                     </Label>
                     <button
                       type="button"
@@ -288,16 +288,16 @@ export default function AddTodoForm({ onSuccess }: AddTodoFormProps) {
                         "ml-1 transition-opacity",
                         favoriteType === "task"
                           ? "opacity-100"
-                          : "opacity-0 group-hover:opacity-100"
+                          : "opacity-0 group-hover:opacity-100",
                       )}
-                      title="Als Favorit markieren"
+                      title={t("addTodoForm.markAsFavorite")}
                     >
                       <Bookmark
                         className={cn(
                           "w-4 h-4 transition-all",
                           favoriteType === "task"
                             ? "fill-blue-400 text-blue-400"
-                            : "text-slate-400 hover:text-blue-400"
+                            : "text-slate-400 hover:text-blue-400",
                         )}
                       />
                     </button>
@@ -315,11 +315,11 @@ export default function AddTodoForm({ onSuccess }: AddTodoFormProps) {
           render={({ field }) => (
             <FormItem>
               <FormLabel className="text-slate-200 font-semibold">
-                Titel
+                {t("addTodoForm.title")}
               </FormLabel>
               <FormControl>
                 <Input
-                  placeholder="Neues Todo..."
+                  placeholder={t("addTodoForm.titlePlaceholder")}
                   {...field}
                   autoFocus
                   className="bg-slate-800/50 border-slate-600 text-slate-200 placeholder:text-slate-400 focus:border-purple-500 focus:ring-purple-500/20"
@@ -336,7 +336,7 @@ export default function AddTodoForm({ onSuccess }: AddTodoFormProps) {
           render={({ field }) => (
             <FormItem className="flex flex-col">
               <FormLabel className="text-slate-200 font-semibold">
-                Start
+                {t("addTodoForm.start")}
               </FormLabel>
               <FormControl>
                 <Popover>
@@ -345,13 +345,13 @@ export default function AddTodoForm({ onSuccess }: AddTodoFormProps) {
                       variant={"outline"}
                       className={cn(
                         "pl-3 text-left font-normal bg-slate-800/50 border-slate-600 text-slate-200 hover:bg-slate-700/50 hover:border-purple-500 hover:text-white",
-                        !field.value && "text-slate-400"
+                        !field.value && "text-slate-400",
                       )}
                     >
                       {field.value ? (
                         format(field.value, "PPP HH:mm")
                       ) : (
-                        <span>Wähle ein Datum</span>
+                        <span>{t("addTodoForm.selectDate")}</span>
                       )}
                       <CalendarIcon className="ml-auto h-4 w-4 text-white" />
                     </Button>
@@ -366,7 +366,7 @@ export default function AddTodoForm({ onSuccess }: AddTodoFormProps) {
                       onSelect={(date) => {
                         const newDateTime = handleCalendarSelect(
                           date,
-                          field.value
+                          field.value,
                         );
                         field.onChange(newDateTime);
 
@@ -390,13 +390,15 @@ export default function AddTodoForm({ onSuccess }: AddTodoFormProps) {
                         onValueChange={(timeString) => {
                           const newDateTime = handleTimeChange(
                             timeString,
-                            field.value
+                            field.value,
                           );
                           field.onChange(newDateTime);
                         }}
                       >
                         <SelectTrigger className="bg-slate-700/50 border-slate-600 text-slate-200 hover:bg-slate-700/50 hover:border-purple-500 hover:text-white">
-                          <SelectValue placeholder="Zeit wählen" />
+                          <SelectValue
+                            placeholder={t("addTodoForm.selectTime")}
+                          />
                         </SelectTrigger>
                         <SelectContent className="bg-slate-800 border-slate-600 text-slate-200 max-h-60">
                           {timeOptions.map((option) => (
@@ -426,7 +428,7 @@ export default function AddTodoForm({ onSuccess }: AddTodoFormProps) {
             render={({ field }) => (
               <FormItem className="flex flex-col">
                 <FormLabel className="text-slate-200 font-semibold">
-                  Ende
+                  {t("addTodoForm.end")}
                 </FormLabel>
                 <FormControl>
                   <Popover>
@@ -435,13 +437,13 @@ export default function AddTodoForm({ onSuccess }: AddTodoFormProps) {
                         variant={"outline"}
                         className={cn(
                           "pl-3 text-left font-normal bg-slate-800/50 border-slate-600 text-slate-200 hover:bg-slate-700/50 hover:border-purple-500 hover:text-white",
-                          !field.value && "text-slate-400"
+                          !field.value && "text-slate-400",
                         )}
                       >
                         {field.value ? (
                           format(field.value, "PPP HH:mm")
                         ) : (
-                          <span>Wähle ein Datum</span>
+                          <span>{t("addTodoForm.selectDate")}</span>
                         )}
                         <CalendarIcon className="ml-auto h-4 w-4 text-white" />
                       </Button>
@@ -471,13 +473,15 @@ export default function AddTodoForm({ onSuccess }: AddTodoFormProps) {
                           onValueChange={(timeString) => {
                             const newDateTime = handleTimeChange(
                               timeString,
-                              field.value
+                              field.value,
                             );
                             field.onChange(newDateTime);
                           }}
                         >
                           <SelectTrigger className="bg-slate-700/50 border-slate-600 text-slate-200">
-                            <SelectValue placeholder="Zeit wählen" />
+                            <SelectValue
+                              placeholder={t("addTodoForm.selectTime")}
+                            />
                           </SelectTrigger>
                           <SelectContent className="bg-slate-800 border-slate-600 text-slate-200 max-h-60">
                             {timeOptions.map((option) => (
@@ -509,7 +513,7 @@ export default function AddTodoForm({ onSuccess }: AddTodoFormProps) {
               <FormItem>
                 <FormLabel className="text-slate-200 font-semibold flex items-center gap-2">
                   <Gem className="w-4 h-4 text-purple-400" />
-                  Schwierigkeit
+                  {t("addTodoForm.difficulty")}
                 </FormLabel>
                 <FormControl className="flex justify-start gap-2">
                   <ToggleGroup
@@ -564,7 +568,7 @@ export default function AddTodoForm({ onSuccess }: AddTodoFormProps) {
           disabled={isSubmitting}
           className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold py-3 text-lg shadow-lg hover:shadow-purple-500/25 transition-all duration-200"
         >
-          {isSubmitting ? "Speichere..." : "Todo erstellen"}
+          {isSubmitting ? t("addTodoForm.saving") : t("addTodoForm.createTodo")}
         </Button>
       </form>
     </Form>

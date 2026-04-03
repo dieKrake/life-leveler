@@ -11,6 +11,7 @@ import {
 import { ChevronDown } from "lucide-react";
 import { Todo } from "@/types";
 import { toast } from "sonner";
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface DifficultySelectorProps {
   todo: Todo;
@@ -18,18 +19,19 @@ interface DifficultySelectorProps {
   disabled?: boolean;
 }
 
-const difficultyOptions = [
-  { value: 10, label: "Einfach", color: "text-green-600" },
-  { value: 20, label: "Mittel", color: "text-yellow-600" },
-  { value: 30, label: "Schwer", color: "text-red-600" },
-];
-
 export function DifficultySelector({
   todo,
   onDifficultyChange,
   disabled = false,
 }: DifficultySelectorProps) {
   const [isLoading, setIsLoading] = useState(false);
+  const { t } = useTranslation();
+
+  const difficultyOptions = [
+    { value: 10, label: t("difficulty.easy"), color: "text-green-600" },
+    { value: 20, label: t("difficulty.medium"), color: "text-yellow-600" },
+    { value: 30, label: t("difficulty.hard"), color: "text-red-600" },
+  ];
 
   const currentDifficulty =
     difficultyOptions.find((option) => option.value === todo.xp_value) ||
@@ -42,16 +44,17 @@ export function DifficultySelector({
     try {
       await onDifficultyChange(todo.id, newXpValue);
       const newDifficulty = difficultyOptions.find(
-        (opt) => opt.value === newXpValue
+        (opt) => opt.value === newXpValue,
       );
       toast.success(
-        `Schwierigkeit auf ${newDifficulty?.label} (${newXpValue} XP) geändert!`
+        t("difficulty.difficultyChangedTo", {
+          label: newDifficulty?.label || "",
+          xp: newXpValue,
+        }),
       );
     } catch (error) {
-      console.error("Fehler beim Ändern der Schwierigkeit:", error);
-      toast.error(
-        "Fehler beim Ändern der Schwierigkeit. Bitte versuche es erneut."
-      );
+      console.error("Error changing difficulty:", error);
+      toast.error(t("difficulty.difficultyChangeError"));
     } finally {
       setIsLoading(false);
     }

@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import useSWR from "swr";
 import { AchievementMuseumData, AchievementHistoryEntry } from "@/types";
 import { GRADIENTS } from "@/lib/constants";
+import { useTranslation } from "@/hooks/useTranslation";
 
 const getPrestigeColor = (prestige: number) => {
   switch (prestige) {
@@ -24,21 +25,12 @@ const getPrestigeColor = (prestige: number) => {
   }
 };
 
-const getPrestigeLabel = (prestige: number) => {
-  switch (prestige) {
-    case 0:
-      return "Bronze";
-    case 1:
-      return "Silber";
-    case 2:
-      return "Gold";
-    case 3:
-      return "Diamant";
-    case 4:
-      return "Meister";
-    default:
-      return `Legende ${prestige - 4}`;
-  }
+const prestigeKeyMap: Record<number, string> = {
+  0: "museum.bronze",
+  1: "museum.silver",
+  2: "museum.gold",
+  3: "museum.diamond",
+  4: "museum.master",
 };
 
 interface MuseumTileProps {
@@ -47,8 +39,11 @@ interface MuseumTileProps {
 }
 
 function MuseumTile({ entry, index }: MuseumTileProps) {
+  const { t } = useTranslation();
   const prestigeColor = getPrestigeColor(entry.prestige_level);
-  const prestigeLabel = getPrestigeLabel(entry.prestige_level);
+  const prestigeLabel = prestigeKeyMap[entry.prestige_level]
+    ? t(prestigeKeyMap[entry.prestige_level])
+    : t("museum.legend", { level: entry.prestige_level - 4 });
 
   return (
     <motion.div
@@ -102,7 +97,7 @@ function MuseumTile({ entry, index }: MuseumTileProps) {
             {entry.achievement_description}
           </p>
           <p className="text-[10px] text-purple-400 mt-1">
-            Prestige {entry.prestige_level} • {prestigeLabel}
+            {t("prestige.prestige")} {entry.prestige_level} • {prestigeLabel}
           </p>
         </div>
       </div>
@@ -111,6 +106,7 @@ function MuseumTile({ entry, index }: MuseumTileProps) {
 }
 
 export default function AchievementMuseum() {
+  const { t } = useTranslation();
   const { data, isLoading } = useSWR<AchievementMuseumData>(
     "/api/achievement-history",
   );
@@ -127,7 +123,9 @@ export default function AchievementMuseum() {
           </CardTitle>
         </CardHeader>
         <CardContent className="flex-1 flex items-center justify-center">
-          <div className="text-center text-slate-400">Lade Museum...</div>
+          <div className="text-center text-slate-400">
+            {t("museum.loadingMuseum")}
+          </div>
         </CardContent>
       </Card>
     );
@@ -148,10 +146,10 @@ export default function AchievementMuseum() {
           <div className="text-center">
             <Trophy className="w-12 h-12 text-slate-600 mx-auto mb-3" />
             <p className="text-slate-400 text-sm">
-              Noch keine Achievements erreicht
+              {t("museum.noAchievements")}
             </p>
             <p className="text-slate-500 text-xs mt-1">
-              Erreiche Achievements um sie hier zu sammeln!
+              {t("museum.achieveToCollect")}
             </p>
           </div>
         </CardContent>
@@ -174,7 +172,7 @@ export default function AchievementMuseum() {
               <span className="text-purple-400 font-bold">
                 {data.totalAchievements}
               </span>{" "}
-              Gesamt
+              {t("achievements.total")}
             </span>
             <span className="text-slate-400">
               <span className="text-blue-400 font-bold">
@@ -201,7 +199,9 @@ export default function AchievementMuseum() {
 
         {/* Legend - fixed at bottom */}
         <div className="mt-4 pt-3 border-t border-slate-700/50 flex-shrink-0">
-          <p className="text-[10px] text-slate-500 mb-2">Prestige-Stufen:</p>
+          <p className="text-[10px] text-slate-500 mb-2">
+            {t("museum.prestigeLevels")}
+          </p>
           <div className="flex flex-wrap gap-2">
             {[0, 1, 2, 3, 4].map((p) => (
               <div
@@ -211,7 +211,9 @@ export default function AchievementMuseum() {
                   bg-gradient-to-r ${getPrestigeColor(p)} text-white
                 `}
               >
-                {getPrestigeLabel(p)}
+                {prestigeKeyMap[p]
+                  ? t(prestigeKeyMap[p])
+                  : t("museum.legend", { level: p - 4 })}
               </div>
             ))}
           </div>

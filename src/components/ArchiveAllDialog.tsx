@@ -11,6 +11,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface ArchiveAllDialogProps {
   completedCount: number;
@@ -23,6 +24,8 @@ export default function ArchiveAllDialog({
   onArchiveAll,
   isArchiving,
 }: ArchiveAllDialogProps) {
+  const { t } = useTranslation();
+
   if (completedCount === 0) return null;
 
   return (
@@ -34,32 +37,33 @@ export default function ArchiveAllDialog({
           className="flex items-center gap-2 text-sm bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white border-none hover:text-white"
         >
           <Archive className="w-4 h-4" />
-          Alle archivieren ({completedCount})
+          {t("archive.archiveAllButton", { count: completedCount })}
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent className="bg-slate-800 border-slate-700">
         <AlertDialogHeader>
           <AlertDialogTitle className="text-white">
-            Alle erledigten Todos archivieren?
+            {t("archive.archiveAllCompleted")}
           </AlertDialogTitle>
           <AlertDialogDescription className="text-slate-300">
-            {completedCount} erledigte {completedCount === 1 ? "Todo" : "Todos"}{" "}
-            werden aus deiner aktiven Liste entfernt und archiviert. Sie bleiben
-            für deine Statistiken und Achievements erhalten, werden aber nicht
-            mehr in der normalen Ansicht angezeigt. Die Todos werden auch aus
-            deinem Google Account gelöscht.
+            {t("archive.archiveAllDescription", {
+              count: completedCount,
+              todoWord: completedCount === 1 ? "Todo" : "Todos",
+            })}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel className="bg-slate-700 text-slate-300 hover:bg-slate-600">
-            Abbrechen
+            {t("common.cancel")}
           </AlertDialogCancel>
           <AlertDialogAction
             onClick={onArchiveAll}
             disabled={isArchiving}
             className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
           >
-            {isArchiving ? "Archiviere..." : "Alle archivieren"}
+            {isArchiving
+              ? t("archive.archiving")
+              : t("archive.archiveAllAction")}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

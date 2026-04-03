@@ -18,7 +18,7 @@ export default function SWRProvider({
           const res = await fetch(url);
           if (!res.ok) {
             const error: any = new Error(
-              "Ein Fehler ist beim Laden der Daten aufgetreten."
+              "An error occurred while loading data.",
             );
             error.info = await res.json();
             error.status = res.status;

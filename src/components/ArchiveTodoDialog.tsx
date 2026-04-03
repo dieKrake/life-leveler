@@ -23,6 +23,7 @@ import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface ArchiveTodoDialogProps {
   todo: Todo;
@@ -38,6 +39,7 @@ export default function ArchiveTodoDialog({
   const [isArchiving, setIsArchiving] = useState(false);
   const supabase = createClientComponentClient();
   const router = useRouter();
+  const { t } = useTranslation();
 
   const handleTokenExpiration = async () => {
     await supabase.auth.signOut();
@@ -65,21 +67,17 @@ export default function ArchiveTodoDialog({
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(
-          errorData.error || "Fehler beim Archivieren des Todos.",
-        );
+        throw new Error(errorData.error || t("errors.todoArchiveError"));
       }
 
       // Re-validiere die Daten nach erfolgreichem Archivieren
       mutate();
-      toast.success("Todo erfolgreich archiviert.");
+      toast.success(t("archive.archiveSuccess"));
     } catch (error) {
       console.error(error);
       // Bei einem Fehler: Setze die UI auf den ursprünglichen Zustand zurück
       mutate(todos, false);
-      toast.error(
-        "Fehler beim Archivieren des Todos. Bitte versuche es erneut.",
-      );
+      toast.error(t("archive.archiveError"));
     } finally {
       setIsArchiving(false);
     }
@@ -101,31 +99,30 @@ export default function ArchiveTodoDialog({
             </AlertDialogTrigger>
           </TooltipTrigger>
           <TooltipContent>
-            <p>Archivieren</p>
+            <p>{t("archive.archive")}</p>
           </TooltipContent>
         </Tooltip>
         <AlertDialogContent className="bg-slate-800 border-slate-700">
           <AlertDialogHeader>
             <AlertDialogTitle className="text-white">
-              Todo archivieren?
+              {t("archive.archiveTodo")}
             </AlertDialogTitle>
             <AlertDialogDescription className="text-slate-300">
-              Das Todo "{todo.title}" wird aus deiner aktiven Liste entfernt und
-              archiviert. Es bleibt für deine Statistiken und Achievements
-              erhalten, wird aber nicht mehr in der normalen Ansicht angezeigt.
-              Das Todo wird auch aus deinem Google Account gelöscht.
+              {t("archive.archiveTodoDescription", {
+                title: todo.title || "Todo",
+              })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel className="bg-slate-700 text-slate-300 hover:bg-slate-600">
-              Abbrechen
+              {t("common.cancel")}
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={handleArchive}
               disabled={isArchiving}
               className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
             >
-              {isArchiving ? "Archiviere..." : "Archivieren"}
+              {isArchiving ? t("archive.archiving") : t("archive.archive")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

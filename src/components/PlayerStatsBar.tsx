@@ -6,15 +6,17 @@ import { Badge } from "@/components/ui/badge";
 import { Zap, Gem, Flame, Star } from "lucide-react";
 import PrestigeButton from "./PrestigeButton";
 import AnimatedCounter from "./AnimatedCounter";
+import { useTranslation } from "@/hooks/useTranslation";
 
 export default function PlayerStatsBar() {
   const { data: stats, isLoading } = usePlayerStats();
+  const { t } = useTranslation();
 
   if (isLoading || !stats) {
     return (
       <div className="flex justify-center w-full bg-gradient-to-r from-slate-900 via-purple-900 to-slate-900 border-b border-slate-700/50 px-4 sticky top-16 z-40">
         <div className="container flex items-center justify-center h-12 text-sm text-slate-300">
-          Lade Stats...
+          {t("playerStats.loadingStats")}
         </div>
       </div>
     );
@@ -72,7 +74,7 @@ export default function PlayerStatsBar() {
               <div className="flex justify-between text-xs mb-1 text-slate-300">
                 <span>XP</span>
                 {isMaxLevel ? (
-                  <span>Max Level</span>
+                  <span>{t("playerStats.maxLevel")}</span>
                 ) : (
                   <span>
                     {xpEarnedInLevel} / {totalXpForLevel}

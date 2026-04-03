@@ -4,20 +4,22 @@ import { motion } from "framer-motion";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { 
-  Trophy, 
-  Target, 
-  Zap, 
-  Gem, 
-  Star, 
+import {
+  Trophy,
+  Target,
+  Zap,
+  Gem,
+  Star,
   Crown,
   Sparkles,
   TrendingUp,
-  CheckSquare
+  CheckSquare,
 } from "lucide-react";
+import { useTranslation } from "@/hooks/useTranslation";
 
 export default function LoginPage() {
   const supabase = createClientComponentClient();
+  const { t } = useTranslation();
 
   const handleGoogleLogin = async () => {
     await supabase.auth.signInWithOAuth({
@@ -33,35 +35,34 @@ export default function LoginPage() {
   const features = [
     {
       icon: CheckSquare,
-      title: "Smart Todo Management",
-      description: "Organisiere deine Aufgaben mit intelligenten Kategorien und Prioritäten",
-      color: "from-blue-500 to-cyan-500"
+      title: t("login.feature1Title"),
+      description: t("login.feature1Desc"),
+      color: "from-blue-500 to-cyan-500",
     },
     {
       icon: Trophy,
-      title: "Gamification System",
-      description: "Sammle XP, steige in Leveln auf und verdiene Edelsteine für deine Erfolge",
-      color: "from-purple-500 to-pink-500"
+      title: t("login.feature2Title"),
+      description: t("login.feature2Desc"),
+      color: "from-purple-500 to-pink-500",
     },
     {
       icon: Target,
-      title: "Achievements & Challenges",
-      description: "Erreiche Meilensteine und meistere tägliche sowie wöchentliche Herausforderungen",
-      color: "from-green-500 to-emerald-500"
+      title: t("login.feature3Title"),
+      description: t("login.feature3Desc"),
+      color: "from-green-500 to-emerald-500",
     },
     {
       icon: Sparkles,
-      title: "Prestige System",
-      description: "Erreiche das Maximum und starte mit Prestige-Boni neu durch",
-      color: "from-yellow-500 to-orange-500"
-    }
+      title: t("login.feature4Title"),
+      description: t("login.feature4Desc"),
+      color: "from-yellow-500 to-orange-500",
+    },
   ];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center p-6">
       <div className="container mx-auto max-w-6xl">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-          
           {/* Left Side - Branding & Features */}
           <motion.div
             initial={{ opacity: 0, x: -50 }}
@@ -85,14 +86,14 @@ export default function LoginPage() {
                   Life Leveler
                 </h1>
               </motion.div>
-              
+
               <motion.p
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.4 }}
                 className="text-xl text-slate-300 mb-8"
               >
-                Verwandle dein Leben in ein Spiel und erreiche deine Ziele mit Spaß und Motivation!
+                {t("login.subtitle")}
               </motion.p>
             </div>
 
@@ -108,7 +109,9 @@ export default function LoginPage() {
                   className="p-4 rounded-xl bg-slate-800/50 border border-slate-700/50 backdrop-blur-sm"
                 >
                   <div className="flex items-start gap-3">
-                    <div className={`p-2 rounded-lg bg-gradient-to-br ${feature.color} shadow-lg`}>
+                    <div
+                      className={`p-2 rounded-lg bg-gradient-to-br ${feature.color} shadow-lg`}
+                    >
                       <feature.icon className="w-5 h-5 text-white" />
                     </div>
                     <div>
@@ -133,15 +136,21 @@ export default function LoginPage() {
             >
               <div className="flex items-center gap-2">
                 <Zap className="w-5 h-5 text-yellow-400" />
-                <span className="text-sm text-slate-300">Sammle XP</span>
+                <span className="text-sm text-slate-300">
+                  {t("login.collectXp")}
+                </span>
               </div>
               <div className="flex items-center gap-2">
                 <Gem className="w-5 h-5 text-blue-400" />
-                <span className="text-sm text-slate-300">Verdiene Gems</span>
+                <span className="text-sm text-slate-300">
+                  {t("login.earnGems")}
+                </span>
               </div>
               <div className="flex items-center gap-2">
                 <Star className="w-5 h-5 text-purple-400" />
-                <span className="text-sm text-slate-300">Erreiche Prestige</span>
+                <span className="text-sm text-slate-300">
+                  {t("login.reachPrestige")}
+                </span>
               </div>
             </motion.div>
           </motion.div>
@@ -161,10 +170,10 @@ export default function LoginPage() {
                   transition={{ duration: 0.6, delay: 0.8 }}
                 >
                   <CardTitle className="text-2xl font-bold text-white">
-                    Willkommen zurück!
+                    {t("login.welcomeBack")}
                   </CardTitle>
                   <p className="text-slate-400 mt-2">
-                    Melde dich an und setze deine Reise fort
+                    {t("login.signInContinue")}
                   </p>
                 </motion.div>
 
@@ -176,44 +185,44 @@ export default function LoginPage() {
                   className="flex justify-center gap-4 py-4"
                 >
                   <motion.div
-                    animate={{ 
+                    animate={{
                       rotate: [0, 10, -10, 0],
-                      scale: [1, 1.1, 1]
+                      scale: [1, 1.1, 1],
                     }}
-                    transition={{ 
+                    transition={{
                       duration: 2,
                       repeat: Infinity,
-                      repeatType: "reverse"
+                      repeatType: "reverse",
                     }}
                     className="p-3 rounded-full bg-gradient-to-br from-purple-500/20 to-pink-500/20 border border-purple-500/30"
                   >
                     <Trophy className="w-6 h-6 text-purple-400" />
                   </motion.div>
                   <motion.div
-                    animate={{ 
+                    animate={{
                       y: [0, -5, 0],
-                      scale: [1, 1.05, 1]
+                      scale: [1, 1.05, 1],
                     }}
-                    transition={{ 
+                    transition={{
                       duration: 2.5,
                       repeat: Infinity,
                       repeatType: "reverse",
-                      delay: 0.5
+                      delay: 0.5,
                     }}
                     className="p-3 rounded-full bg-gradient-to-br from-blue-500/20 to-cyan-500/20 border border-blue-500/30"
                   >
                     <Target className="w-6 h-6 text-blue-400" />
                   </motion.div>
                   <motion.div
-                    animate={{ 
+                    animate={{
                       rotate: [0, -10, 10, 0],
-                      scale: [1, 1.1, 1]
+                      scale: [1, 1.1, 1],
                     }}
-                    transition={{ 
+                    transition={{
                       duration: 2.2,
                       repeat: Infinity,
                       repeatType: "reverse",
-                      delay: 1
+                      delay: 1,
                     }}
                     className="p-3 rounded-full bg-gradient-to-br from-green-500/20 to-emerald-500/20 border border-green-500/30"
                   >
@@ -255,7 +264,7 @@ export default function LoginPage() {
                           d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
                         />
                       </svg>
-                      Mit Google anmelden
+                      {t("login.signInWithGoogle")}
                     </motion.div>
                   </Button>
                 </motion.div>
@@ -267,11 +276,11 @@ export default function LoginPage() {
                   className="text-center"
                 >
                   <p className="text-xs text-slate-500">
-                    Durch die Anmeldung stimmst du unseren{" "}
+                    {t("login.termsPrefix")}{" "}
                     <span className="text-purple-400 hover:text-purple-300 cursor-pointer">
-                      Nutzungsbedingungen
+                      {t("login.termsOfService")}
                     </span>{" "}
-                    zu
+                    {t("login.termsSuffix")}
                   </p>
                 </motion.div>
 
@@ -283,16 +292,24 @@ export default function LoginPage() {
                   className="grid grid-cols-3 gap-4 pt-4 border-t border-slate-700/50"
                 >
                   <div className="text-center">
-                    <div className="text-lg font-bold text-purple-400">1000+</div>
-                    <div className="text-xs text-slate-500">Aktive User</div>
+                    <div className="text-lg font-bold text-purple-400">
+                      1000+
+                    </div>
+                    <div className="text-xs text-slate-500">
+                      {t("login.activeUsers")}
+                    </div>
                   </div>
                   <div className="text-center">
                     <div className="text-lg font-bold text-blue-400">50K+</div>
-                    <div className="text-xs text-slate-500">Todos erledigt</div>
+                    <div className="text-xs text-slate-500">
+                      {t("login.todosCompleted")}
+                    </div>
                   </div>
                   <div className="text-center">
                     <div className="text-lg font-bold text-green-400">200+</div>
-                    <div className="text-xs text-slate-500">Achievements</div>
+                    <div className="text-xs text-slate-500">
+                      {t("login.achievementsCount")}
+                    </div>
                   </div>
                 </motion.div>
               </CardContent>

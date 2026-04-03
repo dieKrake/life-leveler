@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { checkSession } from "@/lib/authUtils";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
+import { useTranslation } from "@/hooks/useTranslation";
 
 interface TodoViewHeaderProps {
   onAddTodo: () => void;
@@ -19,12 +20,13 @@ export default function TodoViewHeader({
   isSyncing,
 }: TodoViewHeaderProps) {
   const router = useRouter();
+  const { t } = useTranslation();
 
   const handleAddTodo = async () => {
     const { valid } = await checkSession();
 
     if (!valid) {
-      toast.error("Deine Sitzung ist abgelaufen. Bitte melde dich erneut an.");
+      toast.error(t("errors.sessionExpired"));
       router.push("/auth/logout");
       return;
     }
@@ -41,11 +43,11 @@ export default function TodoViewHeader({
       >
         <div className="flex items-center justify-left gap-3 mb-4">
           <CheckSquare className="w-8 h-8 text-purple-400" />
-          <h1 className="text-3xl font-bold text-white">Meine Aufgaben</h1>
+          <h1 className="text-3xl font-bold text-white">
+            {t("todos.myTasks")}
+          </h1>
         </div>
-        <p className="text-slate-400 mt-1">
-          Verwalte deine Todos und sammle XP durch das Erledigen von Aufgaben
-        </p>
+        <p className="text-slate-400 mt-1">{t("todos.myTasksDescription")}</p>
       </motion.div>
 
       <motion.div
@@ -60,7 +62,7 @@ export default function TodoViewHeader({
             className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white"
           >
             <Plus className="w-4 h-4 mr-2" />
-            Todo hinzufügen
+            {t("todos.addTodo")}
           </Button>
         </motion.div>
         <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
@@ -73,7 +75,7 @@ export default function TodoViewHeader({
             <RefreshCw
               className={`w-4 h-4 mr-2 ${isSyncing ? "animate-spin" : ""}`}
             />
-            {isSyncing ? "Synchronisiere..." : "Google Sync"}
+            {isSyncing ? t("todos.syncing") : t("todos.googleSync")}
           </Button>
         </motion.div>
       </motion.div>

@@ -5,10 +5,12 @@ import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { useRouter } from "next/navigation";
 import type { User } from "@supabase/supabase-js";
 import { Button } from "./ui/button";
+import { useTranslation } from "@/hooks/useTranslation";
 
 export default function AuthButton({ user }: { user: User | null }) {
   const supabase = createClientComponentClient();
   const router = useRouter();
+  const { t } = useTranslation();
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -21,14 +23,14 @@ export default function AuthButton({ user }: { user: User | null }) {
 
   return user ? (
     <Button variant="destructive" onClick={handleSignOut}>
-      Abmelden
+      {t("nav.signOut")}
     </Button>
   ) : (
     <Button
       className="bg-gradient-to-br from-purple-400 via-pink-500 to-red-500"
       onClick={handleSignIn}
     >
-      Anmelden
+      {t("nav.signIn")}
     </Button>
   );
 }

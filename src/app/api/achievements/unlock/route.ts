@@ -1,12 +1,10 @@
-import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
-import { cookies } from "next/headers";
+import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 
 export async function POST(request: Request) {
-  const cookieStore = cookies();
-  const supabase = createRouteHandlerClient({ cookies: () => cookieStore });
+  const supabase = createClient();
 
   const {
     data: { user },
@@ -15,7 +13,7 @@ export async function POST(request: Request) {
   if (!user) {
     return NextResponse.json(
       { error: "Nicht authentifiziert" },
-      { status: 401 }
+      { status: 401 },
     );
   }
 
@@ -25,7 +23,7 @@ export async function POST(request: Request) {
     if (!achievementId) {
       return NextResponse.json(
         { error: "Achievement ID ist erforderlich" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -54,7 +52,7 @@ export async function POST(request: Request) {
             existsButInactive: anyAchievement && !anyAchievement.is_active,
           },
         },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -69,7 +67,7 @@ export async function POST(request: Request) {
     if (existing) {
       return NextResponse.json(
         { error: "Achievement bereits freigeschaltet" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -86,12 +84,12 @@ export async function POST(request: Request) {
       console.error("Fehler beim Freischalten:", unlockError);
       return NextResponse.json(
         { error: "Fehler beim Freischalten des Achievements" },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
     console.log(
-      `Achievement ${achievementId} erfolgreich freigeschaltet für User ${user.id}`
+      `Achievement ${achievementId} erfolgreich freigeschaltet für User ${user.id}`,
     );
 
     // Award gems using the existing database function for consistency
@@ -100,14 +98,14 @@ export async function POST(request: Request) {
       {
         p_xp_change: 0,
         p_gems_change: achievement.reward_gems,
-      }
+      },
     );
 
     if (gemsError) {
       console.error("Fehler beim Vergeben der Gems:", gemsError);
       return NextResponse.json(
         { error: "Fehler beim Vergeben der Edelsteine" },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -127,7 +125,7 @@ export async function POST(request: Request) {
     console.error("Unerwarteter Fehler:", error);
     return NextResponse.json(
       { error: "Interner Serverfehler" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

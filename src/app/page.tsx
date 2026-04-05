@@ -1,13 +1,9 @@
 import { redirect } from "next/navigation";
-import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
-import { cookies } from "next/headers";
+import { createClient } from "@/lib/supabase/server";
 import HeroSection from "@/components/HeroSection";
 
 export default async function Home() {
-  const cookieStore = cookies();
-  const supabase = createServerComponentClient({
-    cookies: () => cookieStore,
-  });
+  const supabase = createClient();
 
   const {
     data: { session },

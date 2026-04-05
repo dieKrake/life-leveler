@@ -1,5 +1,4 @@
-import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
-import { cookies } from "next/headers";
+import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { type ReactNode } from "react";
 
@@ -8,8 +7,7 @@ export default async function ProtectedLayout({
 }: {
   children: ReactNode;
 }) {
-  const cookieStore = cookies();
-  const supabase = createServerComponentClient({ cookies: () => cookieStore });
+  const supabase = createClient();
 
   const {
     data: { session },
@@ -26,12 +24,12 @@ export default async function ProtectedLayout({
         Authorization: `Bearer ${session.provider_token}`,
       },
       cache: "no-store",
-    }
+    },
   );
 
   if (!response.ok) {
     console.log(
-      "Proaktive Prüfung: Google Token ist abgelaufen. Leite Logout ein."
+      "Proaktive Prüfung: Google Token ist abgelaufen. Leite Logout ein.",
     );
 
     redirect("/auth/logout");

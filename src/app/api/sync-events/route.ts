@@ -1,5 +1,4 @@
-import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
-import { cookies } from "next/headers";
+import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
 
 // Typ-Definitionen für die Google-Antworten
@@ -18,8 +17,7 @@ interface GoogleTask {
 }
 
 export async function POST() {
-  const cookieStore = cookies();
-  const supabase = createRouteHandlerClient({ cookies: () => cookieStore });
+  const supabase = createClient();
 
   const {
     data: { session },

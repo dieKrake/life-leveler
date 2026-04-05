@@ -1,7 +1,7 @@
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { createClient } from "@/lib/supabase/client";
 
 export async function checkSession() {
-  const supabase = createClientComponentClient();
+  const supabase = createClient();
   const {
     data: { session },
   } = await supabase.auth.getSession();
@@ -17,7 +17,7 @@ export async function checkSession() {
       {
         headers: { Authorization: `Bearer ${session.provider_token}` },
         cache: "no-store",
-      }
+      },
     );
 
     return { valid: response.ok };

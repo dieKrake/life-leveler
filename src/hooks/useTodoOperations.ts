@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { createClient } from "@/lib/supabase/client";
 import { KeyedMutator } from "swr";
 import type { Todo } from "@/types";
 import { toast } from "sonner";
@@ -8,7 +8,7 @@ import { useTranslation } from "@/hooks/useTranslation";
 export function useTodoOperations(mutate: KeyedMutator<Todo[]>) {
   const [isSyncing, setIsSyncing] = useState(false);
   const [isArchiving, setIsArchiving] = useState(false);
-  const supabase = createClientComponentClient();
+  const supabase = createClient();
   const { t } = useTranslation();
 
   const handleSync = async () => {

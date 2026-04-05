@@ -1,12 +1,10 @@
-import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
-import { cookies } from "next/headers";
+import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 
 export async function POST() {
-  const cookieStore = cookies();
-  const supabase = createRouteHandlerClient({ cookies: () => cookieStore });
+  const supabase = createClient();
 
   const {
     data: { session },
@@ -15,7 +13,7 @@ export async function POST() {
   if (!session) {
     return NextResponse.json(
       { error: "Nicht authentifiziert" },
-      { status: 401 }
+      { status: 401 },
     );
   }
 
@@ -78,7 +76,7 @@ export async function POST() {
         } catch (error) {
           console.error(
             `Fehler beim Löschen von Google Item ${todo.google_event_id}:`,
-            error
+            error,
           );
           // Continue with other deletions even if one fails
         }
@@ -96,7 +94,7 @@ export async function POST() {
     console.error("Fehler beim Archivieren der erledigten Todos:", error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "Unbekannter Fehler" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

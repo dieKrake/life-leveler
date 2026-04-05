@@ -1,5 +1,4 @@
-import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
-import { cookies } from "next/headers";
+import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
@@ -14,8 +13,7 @@ const updateDifficultySchema = z.object({
 });
 
 export async function POST(request: Request) {
-  const cookieStore = cookies();
-  const supabase = createRouteHandlerClient({ cookies: () => cookieStore });
+  const supabase = createClient();
 
   const {
     data: { session },
@@ -24,7 +22,7 @@ export async function POST(request: Request) {
   if (!session) {
     return NextResponse.json(
       { error: "Nicht authentifiziert" },
-      { status: 401 }
+      { status: 401 },
     );
   }
 
@@ -35,7 +33,7 @@ export async function POST(request: Request) {
     if (!validation.success) {
       return NextResponse.json(
         { error: validation.error.format() },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -58,7 +56,7 @@ export async function POST(request: Request) {
     console.error("Fehler in update-todo-difficulty Route:", error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "Unbekannter Fehler" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

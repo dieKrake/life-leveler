@@ -5,7 +5,7 @@ import { useState } from "react";
 import { KeyedMutator } from "swr";
 import { Archive } from "lucide-react";
 import type { Todo } from "@/types";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
@@ -35,7 +35,7 @@ export default function DeleteTodoButton({
   mutate,
 }: DeleteTodoButtonProps) {
   const [isArchiving, setIsArchiving] = useState(false);
-  const supabase = createClientComponentClient();
+  const supabase = createClient();
   const router = useRouter();
   const { t } = useTranslation();
 

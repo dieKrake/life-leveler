@@ -1,13 +1,13 @@
 "use client";
 
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import LoginPageComponent from "@/components/LoginPage";
 import { useTranslation } from "@/hooks/useTranslation";
 
 export default function LoginPage() {
-  const supabase = createClientComponentClient();
+  const supabase = createClient();
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const { t } = useTranslation();

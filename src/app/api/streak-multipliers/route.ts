@@ -1,13 +1,11 @@
-import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
-import { cookies } from "next/headers";
+import { createClient } from "@/lib/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
 import { StreakMultiplier } from "@/types";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  const cookieStore = cookies();
-  const supabase = createRouteHandlerClient({ cookies: () => cookieStore });
+  const supabase = createClient();
 
   const {
     data: { user },
@@ -16,7 +14,7 @@ export async function GET() {
   if (!user) {
     return NextResponse.json(
       { error: "Nicht authentifiziert" },
-      { status: 401 }
+      { status: 401 },
     );
   }
 
@@ -34,8 +32,7 @@ export async function GET() {
 }
 
 export async function PUT(request: NextRequest) {
-  const cookieStore = cookies();
-  const supabase = createRouteHandlerClient({ cookies: () => cookieStore });
+  const supabase = createClient();
 
   const {
     data: { user },
@@ -44,7 +41,7 @@ export async function PUT(request: NextRequest) {
   if (!user) {
     return NextResponse.json(
       { error: "Nicht authentifiziert" },
-      { status: 401 }
+      { status: 401 },
     );
   }
 
@@ -54,7 +51,7 @@ export async function PUT(request: NextRequest) {
     if (!id || !multiplier || multiplier <= 0) {
       return NextResponse.json(
         { error: "ID und gültiger Multiplier sind erforderlich" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 

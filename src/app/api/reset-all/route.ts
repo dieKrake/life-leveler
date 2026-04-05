@@ -1,11 +1,9 @@
-import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
-import { cookies } from "next/headers";
+import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
 
 // TEMPORARY ENDPOINT FOR TESTING - REMOVE IN PRODUCTION!
 export async function POST() {
-  const cookieStore = cookies();
-  const supabase = createRouteHandlerClient({ cookies: () => cookieStore });
+  const supabase = createClient();
 
   try {
     const {
@@ -29,7 +27,7 @@ export async function POST() {
     console.error("Error resetting player data:", error);
     return NextResponse.json(
       { error: "Failed to reset player data" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

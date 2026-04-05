@@ -1,6 +1,6 @@
 "use client";
 
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { createClient } from "@/lib/supabase/client";
 import { useEffect, useState } from "react";
 import { useTranslation } from "@/hooks/useTranslation";
 
@@ -8,7 +8,7 @@ export default function HeroSection() {
   const { t } = useTranslation();
   const [user, setUser] = useState<any>(null);
   const [loaded, setLoaded] = useState(false);
-  const supabase = createClientComponentClient();
+  const supabase = createClient();
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {

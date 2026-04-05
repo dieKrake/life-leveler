@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import useSWR from "swr";
 import { motion } from "framer-motion";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { createClient } from "@/lib/supabase/client";
 import type { User } from "@supabase/supabase-js";
 import { PlayerStats } from "@/types";
 import ProfilePicture from "@/components/ProfilePicture";
@@ -13,7 +13,7 @@ import ResetAchievementsButton from "@/components/ResetAchievementsButton";
 export default function ProfileView() {
   const { data: stats, isLoading } = useSWR<PlayerStats>("/api/player-stats");
   const [user, setUser] = useState<User | null>(null);
-  const supabase = createClientComponentClient();
+  const supabase = createClient();
 
   useEffect(() => {
     const getUser = async () => {

@@ -2,14 +2,14 @@
 "use client";
 
 import { SWRConfig } from "swr";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { createClient } from "@/lib/supabase/client";
 
 export default function SWRProvider({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const supabase = createClientComponentClient();
+  const supabase = createClient();
 
   return (
     <SWRConfig

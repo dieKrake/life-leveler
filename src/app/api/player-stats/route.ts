@@ -1,13 +1,11 @@
 // app/api/player-stats/route.ts
-import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
-import { cookies } from "next/headers";
+import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  const cookieStore = cookies();
-  const supabase = createRouteHandlerClient({ cookies: () => cookieStore });
+  const supabase = createClient();
 
   const {
     data: { user },
@@ -15,7 +13,7 @@ export async function GET() {
   if (!user) {
     return NextResponse.json(
       { error: "Nicht authentifiziert" },
-      { status: 401 }
+      { status: 401 },
     );
   }
 
@@ -72,16 +70,19 @@ export async function GET() {
   }
 
   // Get streak multiplier
-  const { data: multiplierData } = await supabase
-    .rpc("get_streak_multiplier", { streak_days: playerData.current_streak });
+  const { data: multiplierData } = await supabase.rpc("get_streak_multiplier", {
+    streak_days: playerData.current_streak,
+  });
 
   // Calculate correct XP values for display
   const currentLevelXpRequired = currentLevelData?.xp_required || 0;
   const nextLevelXpRequired = nextLevelData?.xp_required || null;
-  
+
   // For level display: XP needed WITHIN the current level
   // Example: Level 2 (100 total) to Level 3 (250 total) = 150 XP needed within level 2
-  const xpNeededForNextLevel = nextLevelXpRequired ? (nextLevelXpRequired - currentLevelXpRequired) : null;
+  const xpNeededForNextLevel = nextLevelXpRequired
+    ? nextLevelXpRequired - currentLevelXpRequired
+    : null;
 
   const stats = {
     xp: playerData.xp || 0,

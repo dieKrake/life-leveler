@@ -1,6 +1,5 @@
 // app/auth/callback/route.ts
-import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
-import { cookies } from "next/headers";
+import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
@@ -18,14 +17,14 @@ export async function GET(request: NextRequest) {
     console.error("Auth error:", error, error_description);
     return NextResponse.redirect(
       `${requestUrl.origin}/login?error=${encodeURIComponent(
-        error_description || error
-      )}`
+        error_description || error,
+      )}`,
     );
   }
 
   if (code) {
     try {
-      const supabase = createRouteHandlerClient({ cookies });
+      const supabase = createClient();
       const { data, error: exchangeError } =
         await supabase.auth.exchangeCodeForSession(code);
 
@@ -39,8 +38,8 @@ export async function GET(request: NextRequest) {
         console.error("Session exchange error:", exchangeError);
         return NextResponse.redirect(
           `${requestUrl.origin}/login?error=${encodeURIComponent(
-            exchangeError.message
-          )}`
+            exchangeError.message,
+          )}`,
         );
       }
 
@@ -51,7 +50,7 @@ export async function GET(request: NextRequest) {
     } catch (error) {
       console.error("Auth callback exception:", error);
       return NextResponse.redirect(
-        `${requestUrl.origin}/login?error=auth_callback_failed`
+        `${requestUrl.origin}/login?error=auth_callback_failed`,
       );
     }
   }

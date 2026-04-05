@@ -1,10 +1,8 @@
-import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
-import { cookies } from "next/headers";
+import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
-  const cookieStore = cookies();
-  const supabase = createRouteHandlerClient({ cookies: () => cookieStore });
+  const supabase = createClient();
 
   const {
     data: { session },
@@ -13,7 +11,7 @@ export async function POST(request: Request) {
   if (!session) {
     return NextResponse.json(
       { error: "Nicht authentifiziert" },
-      { status: 401 }
+      { status: 401 },
     );
   }
 
@@ -23,7 +21,7 @@ export async function POST(request: Request) {
     if (!userChallengeId) {
       return NextResponse.json(
         { error: "Challenge ID fehlt" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -36,7 +34,7 @@ export async function POST(request: Request) {
       console.error("Error claiming challenge reward:", error);
       return NextResponse.json(
         { error: "Fehler beim Einfordern der Belohnung" },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -56,7 +54,7 @@ export async function POST(request: Request) {
     console.error("Error in claim-challenge route:", error);
     return NextResponse.json(
       { error: "Interner Serverfehler" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

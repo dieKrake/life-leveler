@@ -1,14 +1,14 @@
 // src/components/AuthButton.tsx
 "use client";
 
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import type { User } from "@supabase/supabase-js";
 import { Button } from "./ui/button";
 import { useTranslation } from "@/hooks/useTranslation";
 
 export default function AuthButton({ user }: { user: User | null }) {
-  const supabase = createClientComponentClient();
+  const supabase = createClient();
   const router = useRouter();
   const { t } = useTranslation();
 

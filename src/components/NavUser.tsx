@@ -1,7 +1,7 @@
 // Der neue, vereinfachte NavUser.tsx
 "use client";
 
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { createClient } from "@/lib/supabase/client";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import AuthButton from "./AuthButton";
@@ -10,7 +10,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export default function NavUser() {
   const [user, setUser] = useState<User | null>(null);
-  const supabase = createClientComponentClient();
+  const supabase = createClient();
   const pathname = usePathname();
 
   const isOnLoginPage = pathname === "/login";

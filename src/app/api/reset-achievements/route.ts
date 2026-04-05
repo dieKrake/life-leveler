@@ -1,11 +1,9 @@
-import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
-import { cookies } from "next/headers";
+import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
 
 // TEMPORARY ENDPOINT FOR TESTING - REMOVE IN PRODUCTION!
 export async function POST() {
-  const cookieStore = cookies();
-  const supabase = createRouteHandlerClient({ cookies: () => cookieStore });
+  const supabase = createClient();
 
   try {
     // Get current user
@@ -21,17 +19,20 @@ export async function POST() {
     // Get current achievements to calculate gems to subtract
     const { data: currentAchievements } = await supabase
       .from("user_achievements")
-      .select(`
+      .select(
+        `
         achievement_id,
         achievements!inner(reward_gems)
-      `)
+      `,
+      )
       .eq("user_id", user.id);
 
     // Calculate total gems from achievements
-    const totalGemsFromAchievements = currentAchievements?.reduce(
-      (sum, ua) => sum + (ua.achievements as any).reward_gems,
-      0
-    ) || 0;
+    const totalGemsFromAchievements =
+      currentAchievements?.reduce(
+        (sum, ua) => sum + (ua.achievements as any).reward_gems,
+        0,
+      ) || 0;
 
     // Delete all user achievements
     const { error: deleteError } = await supabase
@@ -50,7 +51,7 @@ export async function POST() {
         {
           p_xp_change: 0,
           p_gems_change: -totalGemsFromAchievements,
-        }
+        },
       );
 
       if (gemsError) {
@@ -68,7 +69,7 @@ export async function POST() {
     console.error("Error resetting achievements:", error);
     return NextResponse.json(
       { error: "Failed to reset achievements" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

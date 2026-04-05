@@ -9,7 +9,7 @@ import { useState, useEffect } from "react";
 import type { Todo } from "@/types";
 import { handleCalendarSelect } from "@/lib/dateUtils";
 import { cn } from "@/lib/utils";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { createClient } from "@/lib/supabase/client";
 import { toast } from "sonner";
 import { useTranslation } from "@/hooks/useTranslation";
 import { Button } from "@/components/ui/button";
@@ -79,7 +79,7 @@ type AddTodoFormProps = {
 
 export default function AddTodoForm({ onSuccess }: AddTodoFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const supabase = createClientComponentClient();
+  const supabase = createClient();
   const { t } = useTranslation();
 
   // Load favorite type from localStorage immediately (not in useEffect)

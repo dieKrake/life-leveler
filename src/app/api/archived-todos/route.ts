@@ -1,12 +1,10 @@
-import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
-import { cookies } from "next/headers";
+import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  const cookieStore = cookies();
-  const supabase = createRouteHandlerClient({ cookies: () => cookieStore });
+  const supabase = createClient();
 
   const {
     data: { session },
@@ -15,7 +13,7 @@ export async function GET() {
   if (!session) {
     return NextResponse.json(
       { error: "Nicht authentifiziert" },
-      { status: 401 }
+      { status: 401 },
     );
   }
 
@@ -54,14 +52,17 @@ export async function GET() {
 
     // Group by month for chart data
     const monthlyStats =
-      archivedTodos?.reduce((acc, todo) => {
-        const date = new Date(todo.archived_at);
-        const monthKey = `${date.getFullYear()}-${String(
-          date.getMonth() + 1
-        ).padStart(2, "0")}`;
-        acc[monthKey] = (acc[monthKey] || 0) + 1;
-        return acc;
-      }, {} as Record<string, number>) || {};
+      archivedTodos?.reduce(
+        (acc, todo) => {
+          const date = new Date(todo.archived_at);
+          const monthKey = `${date.getFullYear()}-${String(
+            date.getMonth() + 1,
+          ).padStart(2, "0")}`;
+          acc[monthKey] = (acc[monthKey] || 0) + 1;
+          return acc;
+        },
+        {} as Record<string, number>,
+      ) || {};
 
     return NextResponse.json({
       todos: archivedTodos,
@@ -76,7 +77,7 @@ export async function GET() {
     console.error("Fehler beim Abrufen der archivierten Todos:", error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "Unbekannter Fehler" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

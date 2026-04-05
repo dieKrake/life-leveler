@@ -1,16 +1,12 @@
 import NavUser from "./NavUser";
 import NavLinks from "./NavLinks";
 import LanguageToggle from "./LanguageToggle";
-import { cookies } from "next/headers";
-import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
+import { createClient } from "@/lib/supabase/server";
 import PlayerStatsBar from "./PlayerStatsBar";
 import Logo from "./Logo";
 
 export default async function Navbar() {
-  const cookieStore = cookies();
-  const supabase = createServerComponentClient({
-    cookies: () => cookieStore,
-  });
+  const supabase = createClient();
 
   const {
     data: { session },

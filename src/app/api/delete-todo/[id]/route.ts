@@ -1,14 +1,12 @@
-import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
-import { cookies } from "next/headers";
+import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: { id: string } },
 ) {
   const googleItemId = params.id;
-  const cookieStore = cookies();
-  const supabase = createRouteHandlerClient({ cookies: () => cookieStore });
+  const supabase = createClient();
 
   const {
     data: { session },
@@ -16,7 +14,7 @@ export async function DELETE(
   if (!session || !session.provider_token) {
     return NextResponse.json(
       { error: "Nicht authentifiziert" },
-      { status: 401 }
+      { status: 401 },
     );
   }
 
@@ -33,7 +31,7 @@ export async function DELETE(
         console.error(
           "Fehler beim Löschen des Google Calendar Events:",
           response.status,
-          await response.text()
+          await response.text(),
         );
       }
     } else if (googleItemId.startsWith("tsk-")) {
@@ -77,7 +75,7 @@ export async function DELETE(
     console.error("Fehler in delete-todo Route:", error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "Unbekannter Fehler" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

@@ -1,10 +1,8 @@
-import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
-import { cookies } from "next/headers";
+import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
-  const cookieStore = cookies();
-  const supabase = createRouteHandlerClient({ cookies: () => cookieStore });
+  const supabase = createClient();
 
   const {
     data: { session },
@@ -13,7 +11,7 @@ export async function POST(request: Request) {
   if (!session) {
     return NextResponse.json(
       { error: "Nicht authentifiziert" },
-      { status: 401 }
+      { status: 401 },
     );
   }
 
@@ -23,7 +21,7 @@ export async function POST(request: Request) {
     if (!challenge_id) {
       return NextResponse.json(
         { error: "Challenge ID fehlt" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -38,7 +36,7 @@ export async function POST(request: Request) {
       console.error("Error updating challenge progress:", error);
       return NextResponse.json(
         { error: "Fehler beim Aktualisieren des Fortschritts" },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -53,7 +51,7 @@ export async function POST(request: Request) {
     console.error("Unexpected error:", error);
     return NextResponse.json(
       { error: "Ein unerwarteter Fehler ist aufgetreten" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

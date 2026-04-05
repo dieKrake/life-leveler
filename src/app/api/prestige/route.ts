@@ -1,10 +1,9 @@
-import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
-import { cookies } from "next/headers";
+import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
 
 export async function POST() {
   try {
-    const supabase = createRouteHandlerClient({ cookies });
+    const supabase = createClient();
 
     // Get current user
     const {
@@ -23,14 +22,11 @@ export async function POST() {
 
     if (error) {
       console.error("Prestige error:", error);
-      return NextResponse.json(
-        { error: error.message },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: error.message }, { status: 400 });
     }
 
     const result = data[0];
-    
+
     return NextResponse.json({
       success: true,
       new_prestige: result.new_prestige,
@@ -41,7 +37,7 @@ export async function POST() {
     console.error("Prestige API error:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

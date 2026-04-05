@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, forwardRef } from "react";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { createClient } from "@/lib/supabase/client";
 import type { Todo } from "@/types";
 import { KeyedMutator } from "swr";
 import { useUnifiedData } from "./UnifiedDataProvider";
@@ -30,7 +30,7 @@ const TodoItem = forwardRef<HTMLDivElement, TodoItemProps>(function TodoItem(
   { todo, todos, mutate },
   ref,
 ) {
-  const supabase = createClientComponentClient();
+  const supabase = createClient();
   const [isChecked, setIsChecked] = useState(todo.is_completed);
   const { mutateAll, playerStats: stats } = useUnifiedData();
   const { t } = useTranslation();

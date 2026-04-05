@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -18,7 +18,7 @@ import {
 import { useTranslation } from "@/hooks/useTranslation";
 
 export default function LoginPage() {
-  const supabase = createClientComponentClient();
+  const supabase = createClient();
   const { t } = useTranslation();
 
   const handleGoogleLogin = async () => {

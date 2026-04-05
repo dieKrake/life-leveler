@@ -5,8 +5,7 @@ import SWRProvider from "@/components/SWRProvider";
 import RewardProvider from "@/components/RewardProvider";
 import { UnifiedDataProvider } from "@/components/UnifiedDataProvider";
 import Navbar from "@/components/Navbar";
-import { cookies } from "next/headers";
-import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
+import { createClient } from "@/lib/supabase/server";
 import { Toaster } from "sonner";
 import LanguageProvider from "@/lib/LanguageProvider";
 
@@ -22,10 +21,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const cookieStore = cookies();
-  const supabase = createServerComponentClient({
-    cookies: () => cookieStore,
-  });
+  const supabase = createClient();
 
   const {
     data: { session },

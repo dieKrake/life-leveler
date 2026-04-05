@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/tooltip";
 import type { Todo } from "@/types";
 import { KeyedMutator } from "swr";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -37,7 +37,7 @@ export default function ArchiveTodoDialog({
   mutate,
 }: ArchiveTodoDialogProps) {
   const [isArchiving, setIsArchiving] = useState(false);
-  const supabase = createClientComponentClient();
+  const supabase = createClient();
   const router = useRouter();
   const { t } = useTranslation();
 

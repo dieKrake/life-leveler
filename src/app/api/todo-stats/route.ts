@@ -1,12 +1,10 @@
-import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
-import { cookies } from "next/headers";
+import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  const cookieStore = cookies();
-  const supabase = createRouteHandlerClient({ cookies: () => cookieStore });
+  const supabase = createClient();
 
   const {
     data: { user },
@@ -15,7 +13,7 @@ export async function GET() {
   if (!user) {
     return NextResponse.json(
       { error: "Nicht authentifiziert" },
-      { status: 401 }
+      { status: 401 },
     );
   }
 
@@ -93,13 +91,13 @@ export async function GET() {
       // Calculate proper ISO week number
       const getWeekNumber = (date: Date): number => {
         const d = new Date(
-          Date.UTC(date.getFullYear(), date.getMonth(), date.getDate())
+          Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()),
         );
         const dayNum = d.getUTCDay() || 7;
         d.setUTCDate(d.getUTCDate() + 4 - dayNum);
         const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
         return Math.ceil(
-          ((d.getTime() - yearStart.getTime()) / 86400000 + 1) / 7
+          ((d.getTime() - yearStart.getTime()) / 86400000 + 1) / 7,
         );
       };
 
@@ -141,7 +139,7 @@ export async function GET() {
     // Find most productive hour
     const mostProductiveHour = hourlyData.reduce(
       (max, current) => (current.count > max.count ? current : max),
-      hourlyData[0]
+      hourlyData[0],
     );
 
     const stats = {
@@ -164,7 +162,7 @@ export async function GET() {
     console.error("Fehler beim Laden der Todo-Statistiken:", error);
     return NextResponse.json(
       { error: "Fehler beim Laden der Statistiken" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

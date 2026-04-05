@@ -11,7 +11,7 @@ const createTodoSchema = z.object({
 });
 
 export async function POST(request: Request) {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const {
     data: { session },

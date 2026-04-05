@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import HeroSection from "@/components/HeroSection";
 
 export default async function Home() {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const {
     data: { session },

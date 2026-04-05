@@ -7,7 +7,7 @@ export default async function ProtectedLayout({
 }: {
   children: ReactNode;
 }) {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const {
     data: { session },

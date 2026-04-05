@@ -6,7 +6,7 @@ export async function DELETE(
   { params }: { params: { id: string } },
 ) {
   const googleItemId = params.id;
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const {
     data: { session },

@@ -17,7 +17,7 @@ interface GoogleTask {
 }
 
 export async function POST() {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const {
     data: { session },

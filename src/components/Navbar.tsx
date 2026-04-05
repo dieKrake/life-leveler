@@ -6,7 +6,7 @@ import PlayerStatsBar from "./PlayerStatsBar";
 import Logo from "./Logo";
 
 export default async function Navbar() {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const {
     data: { session },

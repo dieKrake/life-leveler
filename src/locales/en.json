@@ -212,7 +212,8 @@
     "achievementUnlockableDescription": "Go to the achievements page to claim your reward!",
     "challengeCompletable": "\"{{title}}\" completed!",
     "challengeCompletableGeneric": "Challenge completed!",
-    "challengeCompletableDescription": "Go to the challenges page to claim your reward!"
+    "challengeCompletableDescription": "Go to the challenges page to claim your reward!",
+    "todoUndoneTitle": "Todo undone"
   },
 
   "dashboard": {

@@ -5,7 +5,7 @@ import { StreakMultiplier } from "@/types";
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const {
     data: { user },
@@ -32,7 +32,7 @@ export async function GET() {
 }
 
 export async function PUT(request: NextRequest) {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const {
     data: { user },

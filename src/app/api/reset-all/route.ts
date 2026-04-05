@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 
 // TEMPORARY ENDPOINT FOR TESTING - REMOVE IN PRODUCTION!
 export async function POST() {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   try {
     const {

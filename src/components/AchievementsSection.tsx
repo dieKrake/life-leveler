@@ -2,7 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Target } from "lucide-react";
 import { motion } from "framer-motion";
 import { useAchievements } from "@/components/UnifiedDataProvider";
-import AchievementCard from "@/components/achievements/AchievementCard";
+import AchievementCard from "@/components/AchievementCard";
 import { GRADIENTS } from "@/lib/constants";
 import { useTranslation } from "@/hooks/useTranslation";
 

@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Flame, ChevronDown, ChevronUp } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { GRADIENTS } from "@/lib/constants";
-import StreakTierCard from "@/components/streak/StreakTierCard";
+import StreakTierCard from "@/components/StreakTierCard";
 import { useTranslation } from "@/hooks/useTranslation";
 
 interface StreakSectionProps {

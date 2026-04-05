@@ -8,7 +8,10 @@ interface DashboardTodoItemProps {
   index: number;
 }
 
-export default function DashboardTodoItem({ todo, index }: DashboardTodoItemProps) {
+export default function DashboardTodoItem({
+  todo,
+  index,
+}: DashboardTodoItemProps) {
   return (
     <motion.div
       key={todo.id}
@@ -31,7 +34,9 @@ export default function DashboardTodoItem({ todo, index }: DashboardTodoItemProp
         {todo.is_completed && <CheckCircle2 className="w-3 h-3 text-white" />}
       </div>
       <div className="flex-1">
-        <div className={`font-medium ${todo.is_completed ? "line-through" : ""}`}>
+        <div
+          className={`font-medium ${todo.is_completed ? "line-through" : ""}`}
+        >
           {todo.title}
         </div>
         <div className="text-xs text-slate-400">{todo.xp_value} XP</div>

@@ -8,7 +8,12 @@ import { CalendarIcon, Gem, Bookmark } from "lucide-react";
 import { useState, useEffect } from "react";
 import type { Todo } from "@/types";
 import { handleCalendarSelect } from "@/lib/dateUtils";
+import { cn } from "@/lib/utils";
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { toast } from "sonner";
+import { useTranslation } from "@/hooks/useTranslation";
 import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
 import {
   Form,
   FormControl,
@@ -18,11 +23,13 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
   Select,
   SelectContent,
@@ -31,13 +38,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { Calendar } from "@/components/ui/calendar";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Label } from "@/components/ui/label";
-import { cn } from "@/lib/utils";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
-import { toast } from "sonner";
-import { useTranslation } from "@/hooks/useTranslation";
 
 // Generate 15-minute intervals for time selection
 const generateTimeOptions = () => {

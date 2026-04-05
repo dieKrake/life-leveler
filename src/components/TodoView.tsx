@@ -1,15 +1,13 @@
-"use client";
-
-import { useTodos } from "./UnifiedDataProvider";
 import { useMemo, useState } from "react";
+import { motion } from "framer-motion";
 import { CheckSquare, Clock } from "lucide-react";
+import { useTodos } from "./UnifiedDataProvider";
+import { useTodoOperations } from "@/hooks/useTodoOperations";
+import { useTranslation } from "@/hooks/useTranslation";
 import AddTodoSheet from "./AddTodoSheet";
 import TodoViewHeader from "./TodoViewHeader";
 import TodoSection from "./TodoSection";
 import ArchiveAllDialog from "./ArchiveAllDialog";
-import { useTodoOperations } from "@/hooks/useTodoOperations";
-import { motion } from "framer-motion";
-import { useTranslation } from "@/hooks/useTranslation";
 
 export default function TodoView() {
   const [isSheetOpen, setIsSheetOpen] = useState(false);

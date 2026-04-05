@@ -1,7 +1,7 @@
 "use client";
 
-import { motion } from "framer-motion";
 import Link from "next/link";
+import { motion } from "framer-motion";
 import {
   Calendar,
   Target,
@@ -21,12 +21,11 @@ import {
   usePlayerStats,
   useTodos,
 } from "./UnifiedDataProvider";
+import { useTranslation } from "@/hooks/useTranslation";
 import { GRADIENTS, ICON_MAP } from "@/lib/constants";
 import DashboardStatsCard from "./dashboard/DashboardStatsCard";
 import DashboardTodoItem from "./dashboard/DashboardTodoItem";
 import DashboardChallengeItem from "./dashboard/DashboardChallengeItem";
-import AchievementCard from "./achievements/AchievementCard";
-import { useTranslation } from "@/hooks/useTranslation";
 
 export default function DashboardView() {
   const { t } = useTranslation();
